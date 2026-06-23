@@ -1,0 +1,13 @@
+/docs
+│
+├── FASE-01-BIBLIA-NARRATIVA.md
+├── FASE-02-PERSONAJES-Y-CONSPIRACION.md
+├── FASE-03-MAPA-DE-EXPERIENCIA.md
+├── FASE-04-DISENO-JUGABLE.md
+├── FASE-05-GUIONES-Y-PRODUCCION.md
+├── FASE-06-APP-Y-ARQUITECTURA.md
+├── FASE-07-OPERACION-Y-LANZAMIENTO.md
+│
+└── historias/
+      └── cartagena/
+             └── el-manuscrito-prohibido/

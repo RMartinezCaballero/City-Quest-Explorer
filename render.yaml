@@ -1,0 +1,30 @@
+# Render Blueprint for City Quest Explorer Backend
+# Deploy: https://dashboard.render.com/blueprints
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: city-quest-explorer-api
+    env: node
+    region: ohio
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: DATABASE_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: DIRECT_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false

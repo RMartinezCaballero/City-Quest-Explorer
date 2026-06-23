@@ -1,0 +1,445 @@
+Excelente punto de partida. Para crear una experiencia al nivel de *National Treasure*, *The Da Vinci Code* y un Escape Room urbano en Cartagena, primero necesito definir la arquitectura narrativa, operativa y tecnológica de la experiencia.
+
+# Historia Base
+
+**Título:** *El Manuscrito Prohibido*
+
+**Ciudad:** Cartagena de Indias
+
+**Género:**
+
+* Misterio histórico
+* Conspiración
+* Búsqueda del tesoro
+* Escape Room urbano
+* Investigación detectivesca
+
+**Inspiraciones:**
+
+* National Treasure
+* The Da Vinci Code
+* Sherlock Holmes
+
+---
+
+
+## 1. Tipo de experiencia
+
+¿Será:
+
+D. Mixta (recomendado)
+
+---
+
+## 2. Duración total
+
+¿Deseas que dure?
+
+* 30 minutos a  2 horas
+
+---
+
+## 3. Público objetivo
+
+¿Quién jugará? Todos
+
+* Turistas extranjeros
+* Turistas nacionales
+* Familias
+* Universitarios
+* Empresas (team building)
+* Jugadores expertos de escape room
+
+---
+
+## 4. Tamaño del equipo
+
+¿Cuántas personas por grupo?
+
+* 2-4 seria lo ideal pero tambien pueden ser individual
+
+---
+
+## 5. Nivel de dificultad
+
+Escala 1 a 10 Variable entre 7 a 10
+
+---
+
+## 6. ¿Qué tan realista debe ser?
+
+### Opción B
+
+Historia ficticia mezclada con hechos históricos.
+
+
+---
+
+## 7. Villano principal
+
+¿Qué prefieres?
+
+Sorprendeme podremos hacer una trilogia o juegos similares de caba historia es decir Capitulo 1 2 o mas.
+
+---
+
+## 8. El Manuscrito Prohibido contiene...
+
+¿Qué secreto protege?
+
+sorprendeme
+
+---
+
+## 9. Final de la historia
+
+¿Qué deseas?
+
+Puede Variar entre cada juego. ningun juego obligara a participar de nuevo para poder saber el resultado final
+
+---
+
+## 10. Tecnología disponible
+
+¿La App podrá usar?
+
+* GPS
+* QR
+* NFC
+* Realidad Aumentada
+* Audio espacial
+* Videos
+* IA conversacional
+
+---
+
+# Producción multimedia
+
+## 11. Audios
+
+¿Quieres voces?
+ Segun Los Personajes Creados
+* Ambos
+
+---
+
+## 12. Idiomas
+
+* Ambos
+
+---
+
+## 13. Videos
+
+¿Qué estilo?
+
+* Cinematográfico
+* Documental
+* Noticiero
+* Grabaciones antiguas
+
+---
+
+## 14. Personaje guía
+
+¿Habrá un mentor?
+
+soprendeme con algo genial super innovador
+
+---
+
+## 15. ¿El jugador quién es?
+
+puedes ser cualquiera hasta se podra elegir
+
+---
+
+# Cartagena
+
+## 16. Lugares permitidos
+
+¿Podemos usar?
+
+* Torre del Reloj
+* Plaza de los Coches
+* Plaza de la Aduana
+* Iglesia de San Pedro Claver
+* Las Bóvedas
+* Castillo San Felipe de Barajas
+* Convento de la Popa
+ y algunos otros sitios con los cuales tengamos convenios
+
+---
+
+## 17. Cantidad de pistas
+
+¿Cuántas pruebas deseas?
+lo ideal serian de  * 10 a * 15
+
+---
+
+## 18. Tipo de acertijos
+
+Sorprendeme con esto recuerda que para todos los acertijos debemos poder tener las respuestas verdaderas encriptadas en el manual original para que lo guias o lideres de juego puedan saber quien termino realmente el juego
+
+* Criptografía
+* Códigos QR
+* Coordenadas GPS
+* Acertijos históricos
+* Objetos ocultos
+* Realidad aumentada
+* Audios secretos
+* Mensajes cifrados
+
+---
+
+## 19. ¿Deseas NPCs?
+
+Personajes interpretados por actores.
+
+Sí
+
+---
+
+## 20. Escalabilidad
+
+¿La historia debe poder replicarse después en:
+Nos vamos a centrar inicialmente en las ciudades de santa marta, barranquilla, cartagena, sincelejo y monteria.
+
+---
+
+# Entregables que puedo construir después de tus respuestas
+
+Una vez respondas, desarrollaré:
+
+### Fase 1
+
+* Sinopsis cinematográfica
+* Línea temporal
+* Lore completo
+* Historia principal
+
+### Fase 2
+
+* Héroes
+* Villanos
+* Aliados
+* NPCs
+
+### Fase 3
+
+* 15 a 30 misiones
+* Pistas encadenadas
+* Acertijos
+* Coordenadas GPS
+
+### Fase 4
+
+* Guiones de audio
+* Guiones de video
+* Mensajes ocultos
+* Evidencias digitales
+
+### Fase 5
+
+* Finales alternativos
+* Sistema de puntuación
+* Modo competitivo
+* Modo cooperativo
+
+### Fase 6
+
+* Adaptación completa para tu App **City Quest Explorer** con flujo GPS + QR + IA + multimedia.
+
+Respóndeme las 20 preguntas y diseñaré la biblia narrativa completa de **El Manuscrito Prohibido**.
+
+
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+
+
+Pregunta 1
+
+Cuando un jugador termine la aventura y alguien le pregunte:
+
+"¿De qué trataba?"
+
+
+Opción E
+
+Combinación de varias.
+
+Pregunta 2
+
+¿Qué emoción debe dominar los últimos 10 minutos?
+
+
+Opción D
+
+Orgullo por resolverlo
+
+
+Pregunta 3
+
+¿Qué tan oscura será la historia?
+
+
+Mi recomendación: debemos poder tener las dos opciones tambien podran jugar niños o jovenes de 12 en adelante
+
+BLOQUE 2
+EL MANUSCRITO
+
+Esta es probablemente la decisión más importante de toda la historia.
+
+Pregunta 4
+
+¿Qué contiene exactamente el manuscrito?
+
+
+Opción E
+
+Algo completamente inesperado
+
+Pregunta 5
+
+¿Qué valor tiene? individual 25.000 pesos y grupal 100.000 maximo  5 grupos al mismo tiempo solo se podra programas 2 veces en la noche una a las 6 pm a 8 pm y  8 pm a 10 pm
+
+¿Por qué alguien arriesgaría todo por obtenerlo?
+Una forma de vivir nuevas experiencias en la ciudad alguna forma innovadora de conocer sitios emblematicos de la ciudad.
+
+Pregunta 6
+
+¿El contenido debe basarse parcialmente en hechos históricos reales de Cartagena?
+
+Sí enfocado a cada ciudad la historia se puede ajustar a cada ciudad con personajes de cada una para crear un ambiente similar en cada experiencia
+
+BLOQUE 3
+ARIADNA
+
+
+Pregunta 7
+
+¿ARIADNA debe aparecer en todas las historias futuras?
+
+No necesariamente
+
+Pregunta 8
+
+ARIADNA es:
+
+
+Opción B
+
+Humana usando IA tendremos una actriz interpretando el personaje al final del juego. pero puede varias en cada juego ya que la historias se cambiaran todos los meses por una nueva
+
+Pregunta 9
+
+¿ARIADNA debe tener humor ocasional?
+
+Sí
+
+BLOQUE 4
+EL VILLANO
+
+Actualmente tenemos a Adrián Velasco.
+
+Pero aún falta algo.
+
+Pregunta 10
+
+¿Debe aparecer físicamente?
+
+No.
+
+Pregunta 11
+
+¿Debe hablar directamente con los jugadores?
+
+podriamos tenerlo en alguna pista para alentar a los jugadores a seguir.
+
+Pregunta 12
+
+¿Debe escapar al final?
+
+
+Depende de las decisiones.
+
+BLOQUE 5
+ISABELLA
+
+La verdadera protagonista.
+
+Pregunta 13
+
+¿Está viva al final?
+
+
+Ambiguo
+
+Pregunta 14
+
+¿Los jugadores llegan a verla?
+
+Sí y Inicialmente video.
+
+Pregunta 15
+
+¿Se convierte en aliada o manipuladora?
+
+Aliada
+
+
+BLOQUE 6
+EXPERIENCIA COMERCIAL
+
+Muy importante.
+
+Pregunta 16
+
+¿La historia tendrá finales múltiples reales?
+
+Final
+
+¿Todos terminan igual y solo cambia la puntuación? la puntuacion se basa en el tiempo de resolucion de cada pista usaremos control por Qr y lo leeremos desde nuestra app. para poder garantizar el tiempo de respuesta de cada jugador 
+
+Pregunta 17
+
+¿Deseas rejugabilidad?
+
+Por ejemplo:
+
+Segunda vez que juegas aparecen pistas diferentes.
+No.
+
+Pregunta 18
+
+¿Habrá modo nocturno?
+
+Lo ideal es jugar lo de noche solo cuando se trate de colegios o universidades podremos ofrecer la experiencia de dia.
+
+BLOQUE 7
+ESCALABILIDAD
+Pregunta 19
+
+¿Cuántas historias deseas eventualmente en Cartagena?
+
+Mi recomendación:
+
+5 historias independientes.
+
+y solo se podra jugar 1 por mes o bimensual ya que tenemos que preparar cada historia nueva y organizar los prelanzamientos y marketing
+
+¿Cuántas visualizas?
+
+Pregunta 20
+
+¿Quieres que algunas decisiones de los jugadores queden guardadas en su perfil para futuras historias?
+
+Sí 
+
+PREGUNTA EXTRA (LA MÁS IMPORTANTE)
+
+Si City Quest Explorer se vuelve famoso y esta es la historia que aparece en todos los videos promocionales, ¿qué escena quieres que la gente recuerde?
+
+sorprendeme con un promnt para un video genial que impacte todas las redes
+
+Tu respuesta a esta última pregunta influirá en toda la Biblia Narrativa definitiva.

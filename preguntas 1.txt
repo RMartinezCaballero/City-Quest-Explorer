@@ -1,0 +1,39 @@
+Pais: Colombia
+Ciudad: Cartagena
+Idioma: Español, Ingles
+Moneda: COP, USD
+Mapas: Centro Historico de Cartagena
+Pasarela de Pago: Paypal - Breve
+Turismo: Local y Visitantes
+Tipo de Juego: Opcion C
+Ciudad Piloto: Cartagena
+Público Objetivo: ¿Quién compra?: Todos.
+Duración Ideal: de 45 - 120 min
+Precio: Individual 25.000 grupo 100.000
+Grupo hasta 5 Personas.
+Historia Inicial: Tematicas: Variadas: Misterio, Tesoro perdido, Historia, Piratas, Detectives, Asesinato ficticio, Fantasía, Objeto mágico.
+Contenido Multimedia: ¿O quieres que IA los genere?
+Equipo Yo solo Emprendedor Nocion intermedia en Deiseño e intermedia en desarrollo
+
+Lo que necesito de ti ahora
+
+Respóndeme estas 9 preguntas:
+
+¿País de lanzamiento? Colombia
+¿Ciudad piloto? Cartagena
+¿Público objetivo? Jovenes
+¿Precio estimado? 25.000 por persona y 100.000 en grupo
+¿Duración del juego? 45 a 120 minutos
+¿Temática principal? Misterio
+¿Tienes conocimientos de programación? (básico/intermedio/avanzado/ninguno) basico
+¿Tienes presupuesto mensual? ¿Cuánto? 0
+¿Quieres que el sistema permita que cualquier ciudad del mundo pueda crear sus propias rutas en el futuro? si para futuro
+
+
+
+Nomnbre de la App: City Quest Explorer
+1 ¿Quieres que el juego funcione únicamente con GPS o también con QR físicos colocados en negocios aliados? SI ambas opciones.
+2. ¿Los jugadores jugarán individualmente o formando equipos? si Ambas
+3. ¿Quieres incluir ranking y tiempos desde la primera versión? si
+4. ¿Quieres vender desde una web o únicamente desde la app al inicio? Si
+5. ¿Prefieres que el primer juego sea: El Manuscrito Prohibido

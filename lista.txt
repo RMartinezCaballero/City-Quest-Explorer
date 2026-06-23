@@ -1,0 +1,21 @@
+CEO_Agen_Checklist.md
+CEO_Agen_Master_Plan.md
+CITY-QUEST-EXPLORER_QA_LOG.md
+City_Quest_Explorer.md
+City_Quest_Explorer_Admin_Panel.md
+City_Quest_Explorer_Architecture_Principal.md
+City_Quest_Explorer_DevOps_Deployment.md
+City_Quest_Explorer_Escape_Room_Experiences.md
+City_Quest_Explorer_Growth_Hacking.md
+City_Quest_Explorer_QA_Test_Plan.md
+City_Quest_Explorer_Story_Writing.md
+City_Quest_Explorer_Tourism_Monetization.md
+City_Quest_Explorer_UX_Ui_Wireframes.md
+Game_Designer_Mission_Pack_City_Pilot_Cartagena.md
+Orden_Archivos.md
+README_POSTGRES_SETUP_WINDOWS.md
+README_SUPABASE_SETUP.md
+Todo.md
+TODO_SUPABASE_DB.md
+deep-research-report.md
+REsumen Ejecutivo.md

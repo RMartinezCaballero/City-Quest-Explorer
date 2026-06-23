@@ -1,0 +1,22 @@
+deep-research-report.md
+fase 5 nnuevo.md
+FASE-01-BIBLIA-NARRATIVA.md
+FASE-02-PERSONAJES-Y-CONSPIRACION.md
+FASE-03-MAPA-DE-EXPERIENCIA.md
+FASE-04-DISENO-JUGABLE.md
+FASE-05-GUIONES-Y-PRODUCCION.md
+FASE-06-ARQUITECTURA-APP-Y-BACKEND.md
+FASE-07-MANUAL-DE-OPERACIONES-Y-FRANQUICIAS.md
+FASE-08-MARKETING-LANZAMIENTO-Y-CRECIMIENTO.md
+FASE-09-PLAN-FINANCIERO-Y-MODELO-DE-NEGOCIO.md
+FASE-10-PRD-COMPLETO-CITY-QUEST-EXPLORER.md
+FASES NUEVAS.md
+Manuscrito Prohibido.md
+Manuscrito_Detallado_Fase-1.md
+Manuscrito_Detallado_Fase-2.md
+Manuscrito_Detallado_Fase-3.md
+Manuscrito_Detallado_Fase-4 opcon 2.md
+Manuscrito_Detallado_Fase-4.md
+Manuscrito_Prohibido_Narrativa_Larga_Guia.md
+Narrative_Designer_Pack_City_Pilot_Cartagena.md
+REsumen Ejecutivo.md

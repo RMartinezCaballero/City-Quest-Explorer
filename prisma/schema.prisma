@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ──────────────────────────────────────────────
+// User
+// ──────────────────────────────────────────────
+model User {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supabaseUserId  String?  @unique
+  email           String   @unique
+  passwordHash    String?
+  name            String
+  role            String   @default("USER")
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  teamMembers TeamMember[]
+
+  @@map("User")
+}
+
+// ──────────────────────────────────────────────
+// City
+// ──────────────────────────────────────────────
+model City {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String   @unique
+  country   String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  routes      Route[]
+  gameSessions GameSession[]
+
+  @@map("City")
+}
+
+// ──────────────────────────────────────────────
+// Route
+// ──────────────────────────────────────────────
+model Route {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cityId           String   @db.Uuid
+  name             String
+  description      String
+  difficulty       String   @default("EASY")
+  distanceMeters   Int
+  estimatedMinutes Int
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+
+  city            City            @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  checkpoints     Checkpoint[]
+  qrCodes         QRCode[]
+  teams           Team[]
+  gameSessions    GameSession[]
+  rankings        Ranking[]
+
+  @@index([cityId])
+  @@map("Route")
+}
+
+// ──────────────────────────────────────────────
+// Checkpoint
+// ──────────────────────────────────────────────
+model Checkpoint {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  routeId     String   @db.Uuid
+  name        String
+  description String
+  latitude    Float
+  longitude   Float
+  orderIndex  Int
+
+  route           Route           @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  qrCodes         QRCode[]
+  gameSessions    GameSession[]   @relation("CurrentCheckpoint")
+
+  @@index([routeId])
+  @@map("Checkpoint")
+}
+
+// ──────────────────────────────────────────────
+// QRCode
+// ──────────────────────────────────────────────
+model QRCode {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  routeId       String   @db.Uuid
+  checkpointId  String   @db.Uuid
+  code          String   @unique
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  route       Route      @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  checkpoint  Checkpoint @relation(fields: [checkpointId], references: [id], onDelete: Cascade)
+
+  @@index([routeId])
+  @@index([checkpointId])
+  @@map("QRCode")
+}
+
+// ──────────────────────────────────────────────
+// Team
+// ──────────────────────────────────────────────
+model Team {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  routeId   String   @db.Uuid
+  name      String
+  captainId String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  route           Route           @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  members         TeamMember[]
+  gameSessions    GameSession[]
+  rankings        Ranking[]
+
+  @@index([routeId])
+  @@map("Team")
+}
+
+// ──────────────────────────────────────────────
+// TeamMember
+// ──────────────────────────────────────────────
+model TeamMember {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  teamId   String   @db.Uuid
+  userId   String   @db.Uuid
+  role     String   @default("MEMBER")
+  joinedAt DateTime @default(now()) @db.Timestamptz(6)
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@map("TeamMember")
+}
+
+// ──────────────────────────────────────────────
+// GameSession
+// ──────────────────────────────────────────────
+model GameSession {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  teamId              String    @db.Uuid
+  routeId             String    @db.Uuid
+  cityId              String    @db.Uuid
+  status              String    @default("ACTIVE")
+  startedAt           DateTime  @default(now()) @db.Timestamptz(6)
+  finishedAt          DateTime? @db.Timestamptz(6)
+  currentCheckpointId String?   @db.Uuid
+  score               Int       @default(0)
+  metadata            Json?
+
+  team              Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  route             Route       @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  city              City        @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  currentCheckpoint Checkpoint? @relation("CurrentCheckpoint", fields: [currentCheckpointId], references: [id], onDelete: SetNull)
+  events            SessionEvent[]
+
+  @@index([teamId])
+  @@index([routeId])
+  @@index([cityId])
+  @@map("GameSession")
+}
+
+// ──────────────────────────────────────────────
+// SessionEvent
+// ──────────────────────────────────────────────
+model SessionEvent {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId  String   @db.Uuid
+  eventType  String
+  eventData  Json
+  occurredAt DateTime @default(now()) @db.Timestamptz(6)
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("SessionEvent")
+}
+
+// ──────────────────────────────────────────────
+// Ranking
+// ──────────────────────────────────────────────
+model Ranking {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  routeId     String   @db.Uuid
+  teamId      String   @db.Uuid
+  score       Int
+  position    Int
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  route Route @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  team  Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([routeId])
+  @@index([teamId])
+  @@map("Ranking")
+}
