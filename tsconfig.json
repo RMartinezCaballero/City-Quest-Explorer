@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "node16",
     "target": "ES2023",
     "lib": ["ES2023"],
     "declaration": true,
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strict": true,
