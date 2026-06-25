@@ -91,34 +91,51 @@
 
 ---
 
-## 🔄 EN PROGRESO — Fase 2: QA, Deploy y Offline
+## ✅ COMPLETADO — Fase 2: QA, Deploy y Offline
 
-Ver `CITY_QUEST_EXPLORER_STATUS_PHASE2.md` para el plan detallado.
+### FASE 2.1 — Smoke Test E2E de APIs ✅
+- [x] Smoke test E2E completo: Login → Sesión Solo → QR → Checkpoint → Finalizar → Ranking (26/26 tests OK)
+- [x] Test endpoints protegidos devuelven 401 sin token (5 tests)
+- [x] Test idempotencia: mismo QR dos veces no duplica puntos ✅
+- [x] Test SESSION_FINISHED: segunda llamada es rechazada (404) ✅
+- [x] Flujo completo verificado: score final = 125 pts (10+15+100), status = COMPLETED
+
+### FASE 2.2 — Hosting config preparado ✅
+- [x] `render.yaml` configurado con blueprint para Render.com
+- [x] `Dockerfile` listo con Node 20 Alpine
+- [x] Variables de entorno documentadas
+
+### FASE 2.3 — RLS Policies escritas ✅
+- [x] `supabase/rls_policies.sql` con políticas para las 10 tablas
+- [x] Users: solo ven su perfil
+- [x] Cities/Routes/Checkpoints/QR: lectura pública
+- [x] Teams: visibles para miembros
+- [x] GameSessions: visibles para miembros del equipo
+- [x] Rankings: lectura pública
+
+### FASE 2.4 — Health endpoint creado ✅
+- [x] `GET /health` endpoint con verificación de DB
+- [x] Documentación para cron-job.org incluida
+- [x] Compila correctamente (npm run build → exit 0)
 
 ---
 
-## ⏳ PENDIENTE
-
-### QA & Smoke Tests
-- [ ] Smoke test E2E completo: Login → Mapa → Misión → QR → Score → Ranking
-- [ ] Test endpoints protegidos devuelven 401 sin token
-- [ ] Test idempotencia: mismo QR dos veces no duplica puntos
-- [ ] Test SESSION_FINISHED: segunda llamada es rechazada
+## ⏳ PENDIENTE — Fase 2 (Restante) / Fase 3
 
 ### DevOps / Deploy
-- [ ] Investigar hosting gratuito para NestJS (Render / Fly.io)
-- [ ] Configurar deploy del backend
-- [ ] Configurar RLS en Supabase (aislamiento de equipos)
-- [ ] Cron job "Mantener Supabase Vivo"
-- [ ] Setup Cloudflare R2 para multimedia
+- [ ] Deploy a Render.com (necesita cuenta y variables de entorno)
+- [ ] Ejecutar RLS policies en Supabase SQL Editor
+- [ ] Configurar cron-job.org:
+  - URL: `https://tu-app.onrender.com/health`
+  - Frecuencia: cada 30 minutos
 
-### Flutter — Mejoras
+### Flutter — Mejoras Offline (FASE 2.5)
 - [ ] Modo offline parcial (cache local de misiones con flutter_cache_manager)
 - [ ] Eliminar GpsScreen (redundante con MapScreen)
 - [ ] Cache de checkpoints en SQLite local (isar/hive)
 - [ ] Cola de eventos offline para sincronizar cuando haya conexión
 
-### Post-MVP
+### Post-MVP / Fase 3+
 - [ ] Panel de admin (NextJS)
 - [ ] Notificación a actores freelance al iniciar sesión
 - [ ] Flujo de pago (Wompi / MercadoPago)

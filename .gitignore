@@ -30,6 +30,15 @@ npm-debug.log*
 # Prisma
 prisma/.env
 
+# Sensitive / generated files
+backend.out
+diag_token.json
+supabase_response.json
+nul
+
+# Coverage
+coverage/
+
 # Flutter
 mobile/build/
 mobile/.dart_tool/

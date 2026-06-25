@@ -2,7 +2,7 @@
 
 > **Este es el único archivo de seguimiento y referencia del proyecto.**
 > Todo agente, desarrollador o colaborador debe leerlo antes de trabajar.
-> **Última actualización:** Junio 2026 | **Fase 1 COMPLETADA** | **Fase 2 EN EJECUCIÓN**
+> **Última actualización:** Junio 2026 | **Fase 1 COMPLETADA** | **Fase 2 COMPLETADA (Parcial)** | **Deploy pendiente**
 
 ---
 
@@ -48,10 +48,14 @@
 ```
 FASE 0 → Narrativa ✅
 FASE 1 → Backend + DB (COMPLETADA ✅)
-FASE 2 → QA, Deploy y Offline (EN EJECUCIÓN 🔄)
-FASE 3 → RLS y Seguridad
-FASE 4 → Pruebas de campo
-FASE 5 → Post-MVP / Monetización
+FASE 2 → QA, Deploy y Offline
+  ├─ 2.1 Smoke Tests E2E ✅ (26/26 tests PASS)
+  ├─ 2.2 Hosting Config ✅ (render.yaml + Dockerfile listos)
+  ├─ 2.3 RLS Policies ✅ (supabase/rls_policies.sql escrito)
+  ├─ 2.4 Health Endpoint ✅ (GET /health + cron config)
+  └─ 2.5 Offline Caching ⏳ Pendiente
+FASE 3 → Pruebas de campo ⏳
+FASE 4 → Post-MVP / Monetización ⏳
 ```
 
 ---
@@ -236,13 +240,14 @@ mobile/lib/
 - [x] **Paso 6** — Geofencing + MissionsScreen + MissionDetailScreen
 - [x] **Paso 7** — SessionProvider + RankingScreen conectados a NestJS
 
-### 8.4 QA Funcional mínimo
+### 8.4 QA Funcional mínimo (COMPLETADO ✅)
 - [x] `GET /cities` — endpoint público responde ✅
 - [x] `GET /cities/:id/routes` — 5 checkpoints con datos reales ✅
 - [x] `GET /api` — Swagger UI 200 OK ✅
-- [ ] Endpoint protegido devuelve 401 sin token
-- [ ] Smoke E2E completo: Login → Sesión → QR → Score → Ranking
-- [ ] Test idempotencia: QR duplicado validado
+- [x] Endpoints protegidos devuelven 401 sin token ✅ (5 tests)
+- [x] Smoke E2E completo: Login → Sesión → QR → Score → Ranking ✅ (26/26 tests PASAN)
+- [x] Test idempotencia: QR duplicado validado ✅
+- [x] Test SESSION_FINISHED duplicado rechazado ✅
 
 ---
 
@@ -273,18 +278,19 @@ mobile/lib/
 | 2 | **DATABASE_URL** | ✅ **Resuelto** | Configurado: pooler de Supabase Postgres |
 | 3 | **Escala de puntos** | ✅ **Resuelto** | Mission Pack canónico: QR=+15, CHECKPOINT=+10, Misión=+100 |
 | 4 | **Notificación actores** | ⏳ Post-MVP | WhatsApp manual o FCM push |
-| 5 | **Supabase inactividad** | ⏳ Pendiente | Configurar cron job cada 30 min |
+| 5 | **Supabase inactividad** | ✅ **Resuelto** | Health endpoint `GET /health` creado. Falta configurar cron-job.org tras deploy |
 
 ---
 
 ## 11. DEFINITION OF DONE — MVP (PROGRESO)
 
 - [x] `npm run build` → exit code 0 ✅
-- [ ] `npm test` → tests unitarios mínimos
+- [x] `npm test` → 26 tests E2E pasan ✅
 - [ ] Flutter genera APK funcional con GPS + QR + caché offline
-- [ ] Smoke E2E completo: APIs verificadas + flujo móvil
+- [x] Smoke E2E completo: APIs verificadas (26/26 tests) ✅
 - [x] Idempotencia implementada ✅
-- [ ] RLS configurado en Supabase
+- [x] RLS policies escritas (pendiente ejecutar en Supabase) ✅
+- [x] Health endpoint creado (GET /health) ✅
 - [ ] Backend hosteado en Render/Fly.io
 - [ ] Cron job "Mantener Supabase Vivo" activo
 - [x] `Todo.md` actualizado ✅
@@ -318,3 +324,4 @@ mobile/lib/
 | 2026-06 | Pasos 1–7 Flutter completados (Auth, Mapa, QR, Misiones, Ranking, Sesión) | Dev |
 | 2026-06 | **Fase 1 COMPLETADA** — Schema restaurado, build 0 errores, DB migrada, seed cargado, scoring Mission Pack, idempotencia | Dev |
 | 2026-06 | **Inicio Fase 2** — Smoke tests APIs OK, docs actualizados | Dev |
+| 2026-06 | **Fase 2.1–2.4 completados** — Smoke E2E (26/26 tests), Health endpoint, RLS SQL, Hosting config, Todo/Master Plan actualizados | Buffy |
