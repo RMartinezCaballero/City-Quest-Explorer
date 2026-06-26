@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
-import '../features/gps/presentation/screens/gps_screen.dart';
 import '../features/map/presentation/screens/map_screen.dart';
 import '../features/missions/presentation/screens/mission_detail_screen.dart';
 import '../features/missions/presentation/screens/missions_screen.dart';
@@ -47,7 +46,6 @@ final appRouter = GoRouter(
     GoRoute(path: '/login', builder: (ctx, s) => const LoginScreen()),
     GoRoute(path: '/register', builder: (ctx, s) => const RegisterScreen()),
     GoRoute(path: '/map', builder: (ctx, s) => const MapScreen()),
-    GoRoute(path: '/gps', builder: (ctx, s) => const GpsScreen()),
     GoRoute(path: '/qr', builder: (ctx, s) => const QrScreen()),
     GoRoute(path: '/missions', builder: (ctx, s) => const MissionsScreen()),
     GoRoute(

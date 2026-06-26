@@ -46,7 +46,7 @@ class PendingEventsNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 
   Future<void> _persistQueue(List<Map<String, dynamic>> queue) async {
     try {
-      await missionCacheManager.storeFile(
+      await missionCacheManager.putFile(
         'pending_events',
         utf8.encode(jsonEncode(queue)),
       );
@@ -66,6 +66,95 @@ class PendingEventsNotifier extends StateNotifier<List<Map<String, dynamic>>> {
       developer.log('[OfflineCache] Restored ${state.length} pending events');
     } catch (e) {
       developer.log('[OfflineCache] Error loading queue: $e');
+    }
+  }
+}
+
+/// ── Session Cache ──
+/// Persiste la sesión de juego activa para restaurarla al reabrir la app.
+
+class SessionCacheData {
+  final String sessionId;
+  final String teamId;
+  final String routeId;
+  final int score;
+  final String status;
+
+  const SessionCacheData({
+    required this.sessionId,
+    required this.teamId,
+    required this.routeId,
+    required this.score,
+    required this.status,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'sessionId': sessionId,
+        'teamId': teamId,
+        'routeId': routeId,
+        'score': score,
+        'status': status,
+      };
+
+  factory SessionCacheData.fromJson(Map<String, dynamic> json) =>
+      SessionCacheData(
+        sessionId: json['sessionId'] as String,
+        teamId: json['teamId'] as String,
+        routeId: json['routeId'] as String,
+        score: json['score'] as int? ?? 0,
+        status: json['status'] as String? ?? 'ACTIVE',
+      );
+}
+
+class SessionCacheService {
+  static const _sessionKey = 'active_session';
+
+  static Future<void> saveSession({
+    required String sessionId,
+    required String teamId,
+    required String routeId,
+    required int score,
+    required String status,
+  }) async {
+    try {
+      final data = SessionCacheData(
+        sessionId: sessionId,
+        teamId: teamId,
+        routeId: routeId,
+        score: score,
+        status: status,
+      );
+      await missionCacheManager.putFile(
+        _sessionKey,
+        utf8.encode(jsonEncode(data.toJson())),
+      );
+      developer.log('[SessionCache] Session saved');
+    } catch (e) {
+      developer.log('[SessionCache] Error saving session: $e');
+    }
+  }
+
+  static Future<SessionCacheData?> getSavedSession() async {
+    try {
+      final fileInfo =
+          await missionCacheManager.getFileFromCache(_sessionKey);
+      if (fileInfo == null) return null;
+      final content = await fileInfo.file.readAsString();
+      final json = jsonDecode(content) as Map<String, dynamic>;
+      developer.log('[SessionCache] Session restored');
+      return SessionCacheData.fromJson(json);
+    } catch (e) {
+      developer.log('[SessionCache] Error restoring session: $e');
+      return null;
+    }
+  }
+
+  static Future<void> clearSession() async {
+    try {
+      await missionCacheManager.removeFile(_sessionKey);
+      developer.log('[SessionCache] Session cleared');
+    } catch (e) {
+      developer.log('[SessionCache] Error clearing session: $e');
     }
   }
 }
@@ -91,7 +180,7 @@ class OfflineCacheService {
               })
           .toList();
 
-      await missionCacheManager.storeFile(
+      await missionCacheManager.putFile(
         _checkpointsKey,
         utf8.encode(jsonEncode(jsonList)),
       );
@@ -136,7 +225,7 @@ class OfflineCacheService {
 
   static Future<void> cacheNarratives(Map<String, String> narratives) async {
     try {
-      await missionCacheManager.storeFile(
+      await missionCacheManager.putFile(
         _narrativesKey,
         utf8.encode(jsonEncode(narratives)),
       );

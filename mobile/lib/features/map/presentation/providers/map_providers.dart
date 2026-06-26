@@ -3,50 +3,25 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:mobile/features/map/domain/checkpoint_marker.dart';
+import 'package:mobile/core/cache/checkpoint_controller.dart';
 
-// Checkpoints piloto — El Manuscrito Prohibido, Cartagena de Indias
-final checkpointsProvider = Provider<List<CheckpointMarker>>((ref) => [
-      const CheckpointMarker(
-        id: 'cp-01',
-        name: 'Torre del Reloj',
-        description: 'Punto de inicio. La misión comienza aquí.',
-        latitude: 10.4227,
-        longitude: -75.5514,
-        orderIndex: 1,
-      ),
-      const CheckpointMarker(
-        id: 'cp-02',
-        name: 'Palacio de la Inquisición',
-        description: 'Busca la marca del manuscrito en la fachada.',
-        latitude: 10.4231,
-        longitude: -75.5497,
-        orderIndex: 2,
-      ),
-      const CheckpointMarker(
-        id: 'cp-03',
-        name: 'Iglesia del Santísimo',
-        description: 'El tercer fragmento aguarda entre las sombras.',
-        latitude: 10.4238,
-        longitude: -75.5508,
-        orderIndex: 3,
-      ),
-      const CheckpointMarker(
-        id: 'cp-04',
-        name: 'Castillo San Felipe',
-        description: 'Las bóvedas guardan el secreto final.',
-        latitude: 10.4231,
-        longitude: -75.5403,
-        orderIndex: 4,
-      ),
-      const CheckpointMarker(
-        id: 'cp-05',
-        name: 'Las Bóvedas',
-        description: 'El manuscrito espera ser descubierto.',
-        latitude: 10.4278,
-        longitude: -75.5486,
-        orderIndex: 5,
-      ),
-    ]);
+/// Checkpoints con estrategia cache-first.
+/// - Primero carga datos hardcodeados (instantáneo)
+/// - Luego intenta cargar desde caché
+/// - Finalmente fetch desde API en background
+final checkpointsProvider = Provider<List<CheckpointMarker>>((ref) {
+  return ref.watch(checkpointControllerProvider).checkpoints;
+});
+
+/// Provider que indica si los checkpoints vienen de la API (vs hardcode/cache)
+final checkpointsFromApiProvider = Provider<bool>((ref) {
+  return ref.watch(checkpointControllerProvider).isFromApi;
+});
+
+/// Forzar recarga de checkpoints desde la API
+final refreshCheckpointsProvider = Provider<void Function()>((ref) {
+  return () => ref.read(checkpointControllerProvider.notifier).refresh();
+});
 
 /// Verifica permisos de ubicación. Devuelve true si están concedidos.
 Future<bool> _checkLocationPermission() async {
@@ -60,7 +35,7 @@ Future<bool> _checkLocationPermission() async {
       permission != LocationPermission.deniedForever;
 }
 
-// Provider de ubicación GPS del usuario (one-shot)
+/// Provider de ubicación GPS del usuario (one-shot)
 final userLocationProvider = FutureProvider<LatLng?>((ref) async {
   final hasPermission = await _checkLocationPermission();
   if (!hasPermission) return null;
@@ -71,7 +46,7 @@ final userLocationProvider = FutureProvider<LatLng?>((ref) async {
   return LatLng(pos.latitude, pos.longitude);
 });
 
-// Stream continuo de posición GPS con verificación de permisos
+/// Stream continuo de posición GPS con verificación de permisos
 final positionStreamProvider = StreamProvider<Position>((ref) async* {
   final hasPermission = await _checkLocationPermission();
   if (!hasPermission) return;

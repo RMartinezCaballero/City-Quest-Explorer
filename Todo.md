@@ -122,18 +122,27 @@
 
 ## ⏳ PENDIENTE — Fase 2 (Restante) / Fase 3
 
-### DevOps / Deploy
-- [ ] Deploy a Render.com (necesita cuenta y variables de entorno)
+### DevOps / Deploy ✅ (Completado)
+- [x] Deploy a Render.com exitoso ✅
+  - URL: `https://city-quest-explorer-api.onrender.com`
+  - Health endpoint: `GET /health` → DB connected
+  - Swagger UI: `GET /api`
+  - API pública: `GET /cities` → Cartagena data
+- [x] Smoke tests E2E contra producción (26/26 tests PASS ✅)
 - [ ] Ejecutar RLS policies en Supabase SQL Editor
 - [ ] Configurar cron-job.org:
-  - URL: `https://tu-app.onrender.com/health`
+  - URL: `https://city-quest-explorer-api.onrender.com/health`
   - Frecuencia: cada 30 minutos
 
-### Flutter — Mejoras Offline (FASE 2.5)
-- [ ] Modo offline parcial (cache local de misiones con flutter_cache_manager)
-- [ ] Eliminar GpsScreen (redundante con MapScreen)
-- [ ] Cache de checkpoints en SQLite local (isar/hive)
-- [ ] Cola de eventos offline para sincronizar cuando haya conexión
+### FASE 2.5 — Offline Caching ✅
+- [x] `checkpoint_api.dart` — API service para fetch desde `GET /cities/:cityId/routes/:routeId`
+- [x] `checkpoint_controller.dart` — Cache-first StateNotifier: hardcoded → caché → API
+- [x] `SessionCacheService` en `offline_cache_service.dart` — Persistencia de sesión activa
+- [x] `map_providers.dart` actualizado para usar cache-first strategy
+- [x] `session_provider.dart` — Restaura sesión desde caché al iniciar + `updateScoreOffline()` + `finishOffline()`
+- [x] `qr_providers.dart` — Cola offline: cuando falla red, encola evento en `PendingEventsNotifier` + `syncPendingEvents()` para sincronizar
+- [x] `offline_cache_service.dart` — Fix `storeFile`→`putFile` (API correcta de flutter_cache_manager)
+- [x] GpsScreen eliminado (placeholder redundante)
 
 ### Post-MVP / Fase 3+
 - [ ] Panel de admin (NextJS)

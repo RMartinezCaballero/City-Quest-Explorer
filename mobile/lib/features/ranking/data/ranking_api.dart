@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/network/api_client.dart';
-import 'package:mobile/features/games/presentation/providers/session_provider.dart';
 
 /// ID de la ruta piloto (El Manuscrito Prohibido - Cartagena)
 /// Generado por prisma/seed.ts

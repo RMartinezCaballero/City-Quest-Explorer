@@ -2,7 +2,7 @@
 
 > **Este es el único archivo de seguimiento y referencia del proyecto.**
 > Todo agente, desarrollador o colaborador debe leerlo antes de trabajar.
-> **Última actualización:** Junio 2026 | **Fase 1 COMPLETADA** | **Fase 2 COMPLETADA (Parcial)** | **Deploy pendiente**
+> **Última actualización:** Junio 2026 | **Fase 1 COMPLETADA** | **Fase 2 COMPLETADA** | **Deploy COMPLETADO ✅**
 
 ---
 
@@ -53,7 +53,7 @@ FASE 2 → QA, Deploy y Offline
   ├─ 2.2 Hosting Config ✅ (render.yaml + Dockerfile listos)
   ├─ 2.3 RLS Policies ✅ (supabase/rls_policies.sql escrito)
   ├─ 2.4 Health Endpoint ✅ (GET /health + cron config)
-  └─ 2.5 Offline Caching ⏳ Pendiente
+  └─ 2.5 Offline Caching ✅ (cache-first checkpoints, sesión persistente, cola QR offline)
 FASE 3 → Pruebas de campo ⏳
 FASE 4 → Post-MVP / Monetización ⏳
 ```
@@ -197,8 +197,12 @@ mobile/lib/
 - [x] Tema dark-dorado global (El Manuscrito Prohibido)
 - [x] Errores de Supabase traducidos al español
 - [x] IDs sincronizados con seed de Supabase (UUIDs determinísticos)
-- [ ] Modo offline parcial (cache local SQLite)
-- [ ] Eliminar GpsScreen (redundante con MapScreen)
+- [x] **FASE 2.5** — Offline Caching implementado ✅
+  - [x] `checkpoint_api.dart` + `checkpoint_controller.dart` con cache-first strategy
+  - [x] `offline_cache_service.dart`: session persistence + fix `storeFile`→`putFile`
+  - [x] `session_provider.dart`: restaura sesión desde caché, `updateScoreOffline()`, `finishOffline()`
+  - [x] `qr_providers.dart`: cola offline con `PendingEventsNotifier` + `syncPendingEvents()`
+  - [x] GpsScreen eliminado (placeholder redundante)
 
 ---
 
@@ -278,7 +282,7 @@ mobile/lib/
 | 2 | **DATABASE_URL** | ✅ **Resuelto** | Configurado: pooler de Supabase Postgres |
 | 3 | **Escala de puntos** | ✅ **Resuelto** | Mission Pack canónico: QR=+15, CHECKPOINT=+10, Misión=+100 |
 | 4 | **Notificación actores** | ⏳ Post-MVP | WhatsApp manual o FCM push |
-| 5 | **Supabase inactividad** | ✅ **Resuelto** | Health endpoint `GET /health` creado. Falta configurar cron-job.org tras deploy |
+| 5 | **Supabase inactividad** | ✅ **Resuelto** | Health endpoint `GET /health` creado. Servicio live en Render. Falta configurar cron-job.org |
 
 ---
 
@@ -291,7 +295,8 @@ mobile/lib/
 - [x] Idempotencia implementada ✅
 - [x] RLS policies escritas (pendiente ejecutar en Supabase) ✅
 - [x] Health endpoint creado (GET /health) ✅
-- [ ] Backend hosteado en Render/Fly.io
+- [x] Backend hosteado en Render.com ✅
+  - URL: `https://city-quest-explorer-api.onrender.com`
 - [ ] Cron job "Mantener Supabase Vivo" activo
 - [x] `Todo.md` actualizado ✅
 - [x] `CITY-QUEST-EXPLORER_QA_LOG.md` con entrada de cierre ✅

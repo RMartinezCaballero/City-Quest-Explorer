@@ -1,6 +1,10 @@
 -- ============================================================
 -- RLS Policies for City Quest Explorer
 -- Run this in Supabase SQL Editor (https://supabase.com/dashboard)
+-- 
+-- NOTA: Las columnas 'supabaseUserId', 'userId', 'captainId', 'teamId'
+--       son tipo uuid en PostgreSQL. auth.uid() también es uuid.
+--       Usamos ::text en AMBOS lados para comparación segura.
 -- ============================================================
 
 -- Enable RLS on all tables
@@ -20,11 +24,11 @@ ALTER TABLE "Ranking" ENABLE ROW LEVEL SECURITY;
 -- ============================================================
 CREATE POLICY "Users can view own profile"
   ON "User" FOR SELECT
-  USING (auth.uid()::text = "supabaseUserId");
+  USING (auth.uid()::text = "supabaseUserId"::text);
 
 CREATE POLICY "Users can update own profile"
   ON "User" FOR UPDATE
-  USING (auth.uid()::text = "supabaseUserId");
+  USING (auth.uid()::text = "supabaseUserId"::text);
 
 -- ============================================================
 -- 2. City: lectura pública, escritura solo admin
@@ -65,7 +69,7 @@ CREATE POLICY "Teams are viewable by members"
   ON "Team" FOR SELECT
   USING (
     auth.uid()::text IN (
-      SELECT "userId" FROM "TeamMember" WHERE "teamId" = id
+      SELECT "userId"::text FROM "TeamMember" WHERE "teamId" = id
     )
   );
 
@@ -78,13 +82,13 @@ CREATE POLICY "Teams can be created by any authenticated user"
 -- ============================================================
 CREATE POLICY "TeamMembers viewable by own user"
   ON "TeamMember" FOR SELECT
-  USING (auth.uid()::text = "userId");
+  USING (auth.uid()::text = "userId"::text);
 
 CREATE POLICY "TeamMembers insertable by captain"
   ON "TeamMember" FOR INSERT
   WITH CHECK (
     auth.uid()::text IN (
-      SELECT "captainId" FROM "Team" WHERE id = "teamId"
+      SELECT "captainId"::text FROM "Team" WHERE id = "teamId"
     )
   );
 
@@ -95,7 +99,7 @@ CREATE POLICY "Sessions viewable by team members"
   ON "GameSession" FOR SELECT
   USING (
     auth.uid()::text IN (
-      SELECT "userId" FROM "TeamMember" WHERE "teamId" = "teamId"
+      SELECT "userId"::text FROM "TeamMember" WHERE "teamId" = "teamId"
     )
   );
 
@@ -103,7 +107,7 @@ CREATE POLICY "Sessions insertable by team members"
   ON "GameSession" FOR INSERT
   WITH CHECK (
     auth.uid()::text IN (
-      SELECT "userId" FROM "TeamMember" WHERE "teamId" = "teamId"
+      SELECT "userId"::text FROM "TeamMember" WHERE "teamId" = "teamId"
     )
   );
 
@@ -115,7 +119,7 @@ CREATE POLICY "Events viewable by session team members"
   USING (
     "sessionId" IN (
       SELECT id FROM "GameSession" WHERE "teamId" IN (
-        SELECT "teamId" FROM "TeamMember" WHERE "userId" = auth.uid()::text
+        SELECT "teamId" FROM "TeamMember" WHERE "userId"::text = auth.uid()::text
       )
     )
   );

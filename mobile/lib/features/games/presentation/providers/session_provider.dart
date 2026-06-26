@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/core/cache/offline_cache_service.dart';
 import 'package:mobile/features/games/data/session_api.dart';
 
-// IDs del piloto de Cartagena — generados por prisma/seed.ts
-// Deben coincidir con los registros en la DB de Supabase/NestJS.
+/// IDs del piloto de Cartagena — generados por prisma/seed.ts
+/// Deben coincidir con los registros en la DB de Supabase/NestJS.
 const kPilotRouteId = '550e8400-e29b-41d4-a716-446655440010';
 const kPilotCityId = '550e8400-e29b-41d4-a716-446655440001';
 
@@ -40,7 +41,36 @@ final sessionProvider =
 
 class SessionNotifier extends StateNotifier<SessionState> {
   final SessionApi _api;
-  SessionNotifier(this._api) : super(const SessionState());
+  SessionNotifier(this._api) : super(const SessionState()) {
+    // Intentar restaurar sesión desde caché al iniciar
+    _restoreFromCache();
+  }
+
+  /// Restaura la sesión desde el caché local (para offline resume)
+  Future<void> _restoreFromCache() async {
+    final saved = await SessionCacheService.getSavedSession();
+    if (saved != null && saved.status == 'ACTIVE') {
+      state = SessionState(
+        session: GameSession(
+          id: saved.sessionId,
+          teamId: saved.teamId,
+          routeId: saved.routeId,
+          status: saved.status,
+          score: saved.score,
+        ),
+      );
+    }
+
+    // Intentar refrescar desde la API (validar que la sesión sigue activa)
+    if (state.hasSession) {
+      try {
+        final updated = await _api.getSession(state.sessionId!);
+        state = SessionState(session: updated);
+      } catch (_) {
+        // Si falla la red, mantener los datos cacheados
+      }
+    }
+  }
 
   /// Inicia sesión solo. Si ya existe una activa la reutiliza.
   Future<void> startSoloSession() async {
@@ -53,6 +83,14 @@ class SessionNotifier extends StateNotifier<SessionState> {
         cityId: kPilotCityId,
       );
       state = SessionState(session: session);
+      // Persistir en caché local
+      await SessionCacheService.saveSession(
+        sessionId: session.id,
+        teamId: session.teamId,
+        routeId: session.routeId,
+        score: session.score,
+        status: session.status,
+      );
     } catch (e) {
       state = SessionState(
         error: 'No se pudo conectar al servidor. Verifica tu conexión.',
@@ -60,14 +98,63 @@ class SessionNotifier extends StateNotifier<SessionState> {
     }
   }
 
-  /// Actualiza score desde el backend.
+  /// Actualiza score desde el backend y persiste localmente.
   Future<void> refresh() async {
     if (state.sessionId == null) return;
     try {
       final updated = await _api.getSession(state.sessionId!);
       state = state.copyWith(session: updated);
-    } catch (_) {}
+      // Actualizar caché local
+      await SessionCacheService.saveSession(
+        sessionId: updated.id,
+        teamId: updated.teamId,
+        routeId: updated.routeId,
+        score: updated.score,
+        status: updated.status,
+      );
+    } catch (_) {
+      // Si falla la red, mantener datos cacheados
+    }
   }
 
-  void clear() => state = const SessionState();
+  /// Actualiza el score localmente (para modo offline)
+  Future<void> updateScoreOffline(int increment) async {
+    if (state.session == null) return;
+    final newScore = state.score + increment;
+    final updated = GameSession(
+      id: state.session!.id,
+      teamId: state.session!.teamId,
+      routeId: state.session!.routeId,
+      status: state.session!.status,
+      score: newScore,
+    );
+    state = state.copyWith(session: updated);
+    // Persistir score actualizado localmente
+    await SessionCacheService.saveSession(
+      sessionId: updated.id,
+      teamId: updated.teamId,
+      routeId: updated.routeId,
+      score: newScore,
+      status: updated.status,
+    );
+  }
+
+  /// Finaliza la sesión localmente y limpia caché
+  Future<void> finishOffline() async {
+    if (state.session == null) return;
+    final updated = GameSession(
+      id: state.session!.id,
+      teamId: state.session!.teamId,
+      routeId: state.session!.routeId,
+      status: 'COMPLETED',
+      score: state.score + 100, // Bonus de misión completa
+    );
+    state = SessionState(session: updated);
+    await SessionCacheService.clearSession();
+  }
+
+  void clear() {
+    SessionCacheService.clearSession();
+    state = const SessionState();
+  }
 }
