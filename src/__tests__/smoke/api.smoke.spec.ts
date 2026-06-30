@@ -131,12 +131,12 @@ describe('🏛️  Endpoints Públicos', () => {
     expect(city.name).toContain('Cartagena');
   });
 
-  test('GET /cities/:cityId/routes — ruta con 5 checkpoints', async () => {
+  test('GET /cities/:cityId/routes — ruta con 10 checkpoints (M1–M10)', async () => {
     const { status, body } = await api(`/cities/${CITY_ID}/routes`);
     expect(status).toBe(200);
     const routes = body as Array<Record<string, unknown>>;
     expect(routes).toHaveLength(1);
-    expect((routes[0].checkpoints as Array<unknown>)).toHaveLength(5);
+    expect((routes[0].checkpoints as Array<unknown>)).toHaveLength(10);
   });
 
   test('GET /cities/:cityId/routes/:routeId — detalle de ruta', async () => {

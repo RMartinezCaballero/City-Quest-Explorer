@@ -25,7 +25,13 @@ const navItems = [
   { href: "/admin", icon: Home, label: "Dashboard" },
   { href: "/admin/games", icon: Gamepad2, label: "Juegos" },
   { href: "/admin/missions", icon: BookOpen, label: "Misiones" },
+  // Historias es para admins: se accede seleccionando primero la ciudad.
+  // Los jugadores entran al juego usando un código (QR) ya generado.
+  { href: "/admin/locations", icon: MapPin, label: "Historias" },
+
   { href: "/admin/locations", icon: MapPin, label: "Ubicaciones" },
+
+
   { href: "/admin/qr-codes", icon: QrCode, label: "QR Codes" },
   { href: "/admin/users", icon: Users, label: "Usuarios" },
   { href: "/admin/stats", icon: BarChart3, label: "Estadísticas" },

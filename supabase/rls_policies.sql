@@ -99,7 +99,8 @@ CREATE POLICY "Sessions viewable by team members"
   ON "GameSession" FOR SELECT
   USING (
     auth.uid()::text IN (
-      SELECT "userId"::text FROM "TeamMember" WHERE "teamId" = "teamId"
+      SELECT "userId"::text FROM "TeamMember" 
+      WHERE "TeamMember"."teamId" = "GameSession"."teamId"
     )
   );
 
@@ -107,7 +108,8 @@ CREATE POLICY "Sessions insertable by team members"
   ON "GameSession" FOR INSERT
   WITH CHECK (
     auth.uid()::text IN (
-      SELECT "userId"::text FROM "TeamMember" WHERE "teamId" = "teamId"
+      SELECT "userId"::text FROM "TeamMember" 
+      WHERE "TeamMember"."teamId" = "GameSession"."teamId"
     )
   );
 

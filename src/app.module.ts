@@ -6,6 +6,7 @@ import { RoutesModule } from './routes/routes.module';
 import { TeamsModule } from './teams/teams.module';
 import { GamesModule } from './games/games.module';
 import { RankingsModule } from './rankings/rankings.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { HealthController } from './health.controller';
 
@@ -19,6 +20,7 @@ import { HealthController } from './health.controller';
     TeamsModule,
     GamesModule,
     RankingsModule,
+    NotificationsModule,
   ],
   controllers: [HealthController],
 })

@@ -3,15 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/auth_provider.dart';
 
-/// Base URL de la API.
+/// Base URL de la API — Producción en Render.com
 ///
-/// En Flutter web, `localhost` apunta a la máquina del browser (el host donde corre el sitio web),
-/// por eso conviene parametrizarlo.
-///
-/// Uso recomendado:
-/// `flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:3000/api`
-/// o `API_BASE_URL=http://<IP_LAN>:3000/api`.
-const String kDefaultBaseUrl = 'http://localhost:3000/api';
+/// Para desarrollo local, usar dart-define:
+/// `flutter run --dart-define=API_BASE_URL=http://127.0.0.1:3000/api`
+const String kDefaultBaseUrl = 'https://city-quest-explorer-api.onrender.com/api';
 
 String get kBaseUrl {
   const defined = String.fromEnvironment('API_BASE_URL');

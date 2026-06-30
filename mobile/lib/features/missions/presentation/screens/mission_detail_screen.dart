@@ -34,6 +34,55 @@ Aquí, donde los esclavos susurraban oraciones en lenguas olvidadas, el manuscri
 Tienes los fragmentos. Tienes el conocimiento. Solo falta el último código para abrir lo que nunca debió cerrarse.
 
 ¿Estás listo para conocer la verdad?''',
+
+  // M6 — Getsemaní: Cifrado de Piedra
+  'cp-06': '''El barrio de Getsemaní respira historias en cada esquina.
+
+Busca "La Página Perdida" entre los grafitis que decoran sus paredes. La piedra guarda letras que no gritan —el Manuscrito te da el índice, no la frase.
+
+Descifra el mensaje oculto. La respuesta está tallada en una de estas fachadas.
+
+Mira con atención: MARTIR.''',
+
+  // M7 — Calle de la Amargura: Observación
+  'cp-07': '''La Calle de la Amargura. Su nombre lo dice todo.
+
+No busques una pista: busca señales. Aquí todo parece diseñado para confundir, pero el Manuscrito siempre deja un rastro.
+
+El Falsificador pasó por aquí. Dejó su marca. Encuentra la contradicción entre lo que ves y lo que deberías ver.
+
+La respuesta está frente a tus ojos: OBSERVADOR.''',
+
+  // M8 — Bocagrande: Registro del Regreso
+  'cp-08': '''Bocagrande. El frente marítimo de Cartagena.
+
+El regreso escribe el verdadero mapa. Los custodios del conocimiento diseñaron esta ruta para que el camino de ida nunca fuera igual al de vuelta.
+
+Camina por el malecón. Busca la placa que conmemora un naufragio del siglo XVIII. Allí encontrarás la conexión con el manuscrito.
+
+Nota la paradoja: dos grupos llegaron esta noche.''',
+
+  // M9 — Pastelillo: Peligro Controlado
+  'cp-09': '''El Bastión de Pastelillo vigila la entrada a la bahía.
+
+La amenaza es un examen de calma. Aquí es donde todo pudo salir mal —y casi sale mal.
+
+El Falsificador preparó una trampa: documentos alterados que parecen auténticos. Pero el Manuscrito no miente.
+
+Confirma la SEÑAL 03 que ARIADNA te reveló. La verdad está codificada en la piedra.''',
+
+  // M10 — Muelle de los Pegasos: Capítulo Final
+  'cp-10': '''El Muelle de los Pegasos. El capítulo final.
+
+Frente a la bahía, donde los barcos trajeron secretos de ultramar durante siglos, el viaje culmina.
+
+Junta los diez fragmentos. Descifra el código maestro. Las letras que has recolectado forman una palabra:
+
+M — A — R — T — I — R — A — D — O — R
+
+El Manuscrito Prohibido no es un objeto. Es un sistema de clasificación del conocimiento. Y ahora, tú eres su nuevo guardián.
+
+Bienvenido al Círculo.''',
 };
 
 class MissionDetailScreen extends ConsumerWidget {

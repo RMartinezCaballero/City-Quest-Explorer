@@ -8,7 +8,7 @@ export class GamesService {
   constructor(private readonly prisma: PrismaService) { }
 
   async createSession(data: CreateSessionDto) {
-    return this.prisma.gameSession.create({
+    const session = await this.prisma.gameSession.create({
       data: {
         teamId: data.teamId,
         routeId: data.routeId,
@@ -16,6 +16,11 @@ export class GamesService {
       },
       include: { team: true, route: true, city: true },
     });
+
+    // Emitir evento de notificación para actores freelance
+    await this.emitSessionStartedNotification(session);
+
+    return session;
   }
 
   async createSoloSession(data: { userId: string; routeId: string; cityId: string }) {
@@ -52,7 +57,7 @@ export class GamesService {
       });
     }
 
-    return this.prisma.gameSession.create({
+    const session = await this.prisma.gameSession.create({
       data: {
         teamId: team.id,
         routeId: data.routeId,
@@ -60,6 +65,31 @@ export class GamesService {
       },
       include: { team: true, route: true, city: true },
     });
+
+    // Emitir evento de notificación para actores freelance
+    await this.emitSessionStartedNotification(session);
+
+    return session;
+  }
+
+  private async emitSessionStartedNotification(session: any) {
+    try {
+      await this.prisma.sessionEvent.create({
+        data: {
+          sessionId: session.id,
+          eventType: 'SESSION_STARTED',
+          eventData: {
+            teamName: session.team?.name ?? 'Desconocido',
+            location: session.route?.name ?? '',
+            actors: ['Carlos (Narrador)', 'Ana (Guía)'],
+            message: `Nuevo juego iniciado por ${session.team?.name ?? 'equipo desconocido'} en ${session.route?.name ?? 'ruta desconocida'}`,
+          },
+        },
+      });
+    } catch (error) {
+      // No fallar la creación de la sesión si la notificación falla
+      console.warn('⚠️ No se pudo emitir notificación de inicio de sesión:', error);
+    }
   }
 
   findSession(sessionId: string) {
@@ -88,9 +118,9 @@ export class GamesService {
     // ── IDEMPOTENCIA ──
     // Si la sesión ya está COMPLETED, rechazar eventos de scoring
     if (session.status === 'COMPLETED' &&
-        (payload.eventType === EventType.SESSION_FINISHED ||
-         payload.eventType === EventType.CHECKPOINT_REACHED ||
-         payload.eventType === EventType.QR_SCANNED)) {
+      (payload.eventType === EventType.SESSION_FINISHED ||
+        payload.eventType === EventType.CHECKPOINT_REACHED ||
+        payload.eventType === EventType.QR_SCANNED)) {
       throw new NotFoundException('La sesión ya fue completada. No se pueden registrar más eventos.');
     }
 
@@ -100,9 +130,9 @@ export class GamesService {
       if (qrCode) {
         const alreadyScanned = session.events.some(
           (e) => e.eventType === EventType.QR_SCANNED &&
-                typeof e.eventData === 'object' &&
-                e.eventData !== null &&
-                (e.eventData as Record<string, unknown>)['qrCode'] === qrCode
+            typeof e.eventData === 'object' &&
+            e.eventData !== null &&
+            (e.eventData as Record<string, unknown>)['qrCode'] === qrCode
         );
         if (alreadyScanned) {
           const lastEvent = session.events[session.events.length - 1];
@@ -113,8 +143,8 @@ export class GamesService {
 
     // Para CHECKPOINT_REACHED: si el checkpoint ya es el actual, no duplicar puntos
     if (payload.eventType === EventType.CHECKPOINT_REACHED &&
-        payload.checkpointId &&
-        session.currentCheckpointId === payload.checkpointId) {
+      payload.checkpointId &&
+      session.currentCheckpointId === payload.checkpointId) {
       // El checkpoint ya fue alcanzado, devolver el último evento sin modificar
       const lastEvent = session.events[session.events.length - 1];
       return lastEvent;
@@ -139,8 +169,18 @@ export class GamesService {
     }
 
     if (payload.eventType === EventType.QR_SCANNED) {
+      // Si el cliente manda checkpointId, alineamos el QR con la misión actual.
+      // MVP compatible: si no viene checkpointId, mantenemos idempotencia por qrCode.
+      if (payload.checkpointId) {
+        if (!session.currentCheckpointId || session.currentCheckpointId !== payload.checkpointId) {
+          // QR no corresponde a la misión/checkpoint actual => no sumar puntos.
+          return event;
+        }
+      }
+
       updateData.score = { increment: 15 };
     }
+
 
     if (payload.eventType === EventType.SESSION_FINISHED) {
       updateData.status = 'COMPLETED';
