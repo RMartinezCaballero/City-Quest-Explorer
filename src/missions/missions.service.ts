@@ -12,13 +12,33 @@ export class MissionsService {
     if (!route) {
       throw new NotFoundException('Ruta no encontrada');
     }
-    return this.prisma.mission.create({
+
+    const mission = await this.prisma.mission.create({
       data: {
         routeId,
         ...data,
       },
       include: { route: true, checkpoint: true },
     });
+
+    // Auto-generate QR code if mission has a checkpoint
+    if (data.checkpointId) {
+      const qrCode = `CQE-${routeId.slice(0, 8).toUpperCase()}-${String(data.orderIndex).padStart(2, '0')}`;
+      await this.prisma.qRCode.upsert({
+        where: {
+          id: `qr-${mission.id}`,
+        },
+        update: { code: qrCode },
+        create: {
+          id: `qr-${mission.id}`,
+          routeId,
+          checkpointId: data.checkpointId,
+          code: qrCode,
+        },
+      });
+    }
+
+    return mission;
   }
 
   findByRoute(routeId: string) {

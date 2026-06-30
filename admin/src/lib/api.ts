@@ -1,5 +1,14 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
+// Auth token management
+let authToken: string | null = null;
+
+export function setAuthToken(token: string | null) {
+  authToken = token;
+}
+
+
+
 export interface City {
   id: string;
   name: string;
@@ -171,20 +180,38 @@ async function fetchApi<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // Include auth token if available
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  // Merge custom headers
+  const customHeaders = options?.headers as Record<string, string> | undefined;
+  if (customHeaders) {
+    Object.assign(headers, customHeaders);
+  }
+
   const url = `${API_BASE}${endpoint}`;
   const res = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
     ...options,
+    headers,
   });
 
   if (!res.ok) {
-    throw new Error(`API Error: ${res.status} ${res.statusText}`);
+    const body = await res.text().catch(() => "");
+    throw new Error(`API Error ${res.status}: ${res.statusText}${body ? " - " + body : ""}`);
   }
 
-  return res.json();
+  // Handle void responses (e.g., DELETE)
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return res.json();
+  }
+  return undefined as T;
 }
 
 // ── Cities ──

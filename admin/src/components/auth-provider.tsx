@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { setAuthToken } from "@/lib/api";
 import type { User, Session } from "@supabase/supabase-js";
 
 export interface AuthContextType {
@@ -28,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setAuthToken(session?.access_token ?? null);
       setIsLoading(false);
     });
 
@@ -37,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setAuthToken(session?.access_token ?? null);
     });
 
     return () => subscription.unsubscribe();
@@ -44,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setAuthToken(null);
   };
 
   return (
