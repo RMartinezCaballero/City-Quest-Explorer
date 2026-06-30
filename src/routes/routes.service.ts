@@ -1,29 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRouteDto } from './dto/create-route.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RoutesService {
   constructor(private readonly prisma: PrismaService) { }
 
-  create(cityId: string, data: CreateRouteDto) {
+  async create(storyId: string, cityId: string, data: CreateRouteDto) {
+    const story = await this.prisma.story.findUnique({ where: { id: storyId } });
+    if (!story) {
+      throw new NotFoundException('Historia no encontrada');
+    }
     return this.prisma.route.create({
       data: {
+        storyId,
         cityId,
-        ...data,
+        name: data.name,
+        description: data.description,
+        difficulty: data.difficulty ?? 'EASY',
+        distanceMeters: data.distanceMeters,
+        estimatedMinutes: data.estimatedMinutes,
+        isDefault: data.isDefault ?? false,
+        conditions: (data.conditions ?? undefined) as Prisma.InputJsonValue | undefined,
+      },
+      include: {
+        missions: { orderBy: { orderIndex: 'asc' } },
       },
     });
   }
 
-  /**
-   * Contrato “Rutas -> Misiones”.
-   * MVP: Misiones = checkpoints ordenados por orderIndex.
-   */
   findByCity(cityId: string) {
     return this.prisma.route.findMany({
       where: { cityId },
       orderBy: { name: 'asc' },
       include: {
+        story: { select: { id: true, name: true } },
+        missions: {
+          orderBy: { orderIndex: 'asc' },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            orderIndex: true,
+            difficulty: true,
+            isLastMission: true,
+          },
+        },
         checkpoints: {
           orderBy: { orderIndex: 'asc' },
           select: {
@@ -45,13 +68,21 @@ export class RoutesService {
     });
   }
 
-  /**
-   * Contrato “misiones” para una ruta.
-   */
-  findOne(routeId: string) {
-    return this.prisma.route.findUnique({
+  async findOne(routeId: string) {
+    const route = await this.prisma.route.findUnique({
       where: { id: routeId },
       include: {
+        story: { select: { id: true, name: true } },
+        missions: {
+          orderBy: { orderIndex: 'asc' },
+          include: {
+            checkpoint: true,
+            challenges: {
+              include: { answers: true, unlockKeys: true },
+              orderBy: { orderIndex: 'asc' },
+            },
+          },
+        },
         checkpoints: {
           orderBy: { orderIndex: 'asc' },
           select: {
@@ -71,6 +102,45 @@ export class RoutesService {
         },
       },
     });
+    if (!route) {
+      throw new NotFoundException('Ruta no encontrada');
+    }
+    return route;
+  }
+
+  findByStory(storyId: string) {
+    return this.prisma.route.findMany({
+      where: { storyId },
+      orderBy: { name: 'asc' },
+      include: {
+        missions: {
+          orderBy: { orderIndex: 'asc' },
+          select: { id: true, title: true, orderIndex: true, difficulty: true },
+        },
+      },
+    });
+  }
+
+  async update(routeId: string, data: Partial<CreateRouteDto>) {
+    const route = await this.prisma.route.findUnique({ where: { id: routeId } });
+    if (!route) {
+      throw new NotFoundException('Ruta no encontrada');
+    }
+    return this.prisma.route.update({
+      where: { id: routeId },
+      data: {
+        ...data,
+        conditions: (data.conditions ?? undefined) as Prisma.InputJsonValue | undefined,
+      },
+      include: { missions: true },
+    });
+  }
+
+  async remove(routeId: string) {
+    const route = await this.prisma.route.findUnique({ where: { id: routeId } });
+    if (!route) {
+      throw new NotFoundException('Ruta no encontrada');
+    }
+    return this.prisma.route.delete({ where: { id: routeId } });
   }
 }
-

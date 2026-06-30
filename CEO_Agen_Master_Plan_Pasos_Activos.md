@@ -24,12 +24,12 @@
 **Objetivo:** asegurar disponibilidad usando `cron-job.org`.
 
 **Tareas**
-- [ ] Configurar cron-job.org
-  - [ ] URL: `https://city-quest-explorer-api.onrender.com/health`
-  - [ ] Frecuencia: cada 30 minutos
+- [x] Configurar cron-job.org
+  - [X] URL: `https://city-quest-explorer-api.onrender.com/health`
+  - [X] Frecuencia: cada 30 minutos
 
 **Evidencia/Done**
-- [ ] Verificar en cron-job que el endpoint responde 200 periódicamente.
+- [X] Verificar en cron-job que el endpoint responde 200 periódicamente.
 
 ---
 

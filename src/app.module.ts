@@ -8,6 +8,12 @@ import { GamesModule } from './games/games.module';
 import { RankingsModule } from './rankings/rankings.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { GamesTemplateModule } from './games-template/games-template.module';
+import { StoriesModule } from './stories/stories.module';
+import { MissionsModule } from './missions/missions.module';
+import { ChallengesModule } from './challenges/challenges.module';
+import { UnlockKeysModule } from './unlock-keys/unlock-keys.module';
+import { StoryEndingsModule } from './story-endings/story-endings.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -21,6 +27,12 @@ import { HealthController } from './health.controller';
     GamesModule,
     RankingsModule,
     NotificationsModule,
+    GamesTemplateModule,
+    StoriesModule,
+    MissionsModule,
+    ChallengesModule,
+    UnlockKeysModule,
+    StoryEndingsModule,
   ],
   controllers: [HealthController],
 })

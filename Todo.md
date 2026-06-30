@@ -1,16 +1,7 @@
-# TODO - Módulo Historias (Rutas) → Misiones (Checkpoints) → Juegos
-
-## Plan aprobado
-1) Crear navegación/menú para “Historias” dentro del admin (asociado a ciudad) y que sea accesible desde el admin web.
-2) Implementar ruta NextJS: `/admin/locations/[cityId]/histories`.
-3) Implementar listado + creación de Historias (Routes) usando `routesApi` del admin.
-4) Implementar “Detalle Historia” para listar Misiones (checkpoints ordenados) y preparar el reorden/selección de misiones para el juego.
-5) (Opcional) Reemplazar datos mock en `admin/src/app/admin/missions/page.tsx` por datos reales.
-
-## Progreso
-- [ ] Pendiente: Implementar (1)
-- [ ] Pendiente: Implementar (2)
-- [ ] Pendiente: Implementar (3)
-- [ ] Pendiente: Implementar (4)
-- [ ] Pendiente: Implementar (5) (opcional)
+- [ ] Re-link repo con Vercel (vercel link) y dejar scope correcto
+- [ ] Ejecutar build correcto para admin y backend (si aplica)
+- [ ] Confirmar que el deploy de Vercel en producción funciona
+- [ ] Hacer commit local en GitHub (git add/commit/push) según cambios actuales
+- [ ] Verificar que Vercel detecta el nuevo commit y/o que el deploy finalice
+- [ ] Documentar links/URLs de Vercel (prod y preview) en este archivo
 

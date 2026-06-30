@@ -295,7 +295,7 @@ export default function HistoriesPage() {
                                     <TableCell>{Math.round(r.distanceMeters)} m</TableCell>
                                     <TableCell>{Math.round(r.estimatedMinutes)} min</TableCell>
                                     <TableCell className="text-right">
-                                        <Button asChild variant="ghost" size="sm">
+                                        <Button variant="ghost" size="sm">
                                             <Link href={`/admin/locations/${cityId}/histories/${r.id}`}>
                                                 <BookOpen className="h-4 w-4 mr-2 inline" />
                                                 Misiones

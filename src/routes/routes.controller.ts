@@ -1,31 +1,61 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RoutesService } from './routes.service';
 import { CreateRouteDto } from './dto/create-route.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @ApiTags('routes')
-@Controller('cities/:cityId/routes')
+@Controller()
 export class RoutesController {
   constructor(private readonly routesService: RoutesService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Listar rutas de una ciudad' })
+  // ── Backward-compatible endpoints (preservados del MVP anterior) ──
+  @Get('cities/:cityId/routes')
+  @ApiOperation({ summary: 'Listar rutas de una ciudad (BC)' })
   findByCity(@Param('cityId') cityId: string) {
     return this.routesService.findByCity(cityId);
   }
 
-  @Get(':routeId')
+  @Get('cities/:cityId/routes/:routeId')
+  @ApiOperation({ summary: 'Obtener ruta por id (BC)' })
+  findOneByCity(@Param('routeId') routeId: string) {
+    return this.routesService.findOne(routeId);
+  }
+
+  // ── Nuevos endpoints con jerarquía Story ──
+  @Get('routes/:routeId')
   @ApiOperation({ summary: 'Obtener ruta por id' })
   findOne(@Param('routeId') routeId: string) {
     return this.routesService.findOne(routeId);
   }
 
-  @Post()
+  @Get('stories/:storyId/routes')
+  @ApiOperation({ summary: 'Listar rutas de una historia' })
+  findByStory(@Param('storyId') storyId: string) {
+    return this.routesService.findByStory(storyId);
+  }
+
+  @Post('stories/:storyId/cities/:cityId/routes')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Crear una ruta en una ciudad' })
-  create(@Param('cityId') cityId: string, @Body() payload: CreateRouteDto) {
-    return this.routesService.create(cityId, payload);
+  @ApiOperation({ summary: 'Crear una ruta en una historia' })
+  create(@Param('storyId') storyId: string, @Param('cityId') cityId: string, @Body() payload: CreateRouteDto) {
+    return this.routesService.create(storyId, cityId, payload);
+  }
+
+  @Patch('routes/:routeId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Actualizar una ruta' })
+  update(@Param('routeId') routeId: string, @Body() payload: Partial<CreateRouteDto>) {
+    return this.routesService.update(routeId, payload);
+  }
+
+  @Delete('routes/:routeId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Eliminar una ruta' })
+  remove(@Param('routeId') routeId: string) {
+    return this.routesService.remove(routeId);
   }
 }

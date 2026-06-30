@@ -143,6 +143,74 @@ export const rankingsApi = {
     }),
 };
 
+// ── NEW: Game Templates ──
+export interface Game {
+  id: string;
+  cityId: string;
+  name: string;
+  description: string | null;
+  durationMinutes: number;
+  difficulty: string;
+  status: string;
+  maxPlayers: number;
+  imageUrl: string | null;
+  city?: City;
+  stories?: Array<{ id: string; name: string; status: string }>;
+}
+
+export const gamesTemplateApi = {
+  listByCity: (cityId: string) => fetchApi<Game[]>(`/cities/${cityId}/games`),
+  get: (gameId: string) => fetchApi<Game>(`/games/${gameId}`),
+  create: (cityId: string, data: Partial<Game>) =>
+    fetchApi<Game>(`/cities/${cityId}/games`, { method: "POST", body: JSON.stringify(data) }),
+  update: (gameId: string, data: Partial<Game>) =>
+    fetchApi<Game>(`/games/${gameId}`, { method: "PATCH", body: JSON.stringify(data) }),
+  publish: (gameId: string) => fetchApi<Game>(`/games/${gameId}/publish`, { method: "POST" }),
+  clone: (gameId: string) => fetchApi<Game>(`/games/${gameId}/clone`, { method: "POST" }),
+};
+
+// ── NEW: Stories ──
+export interface Story {
+  id: string;
+  gameId: string;
+  name: string;
+  introduction: string | null;
+  lore: string | null;
+  objectives: string[] | null;
+  rules: string | null;
+  status: string;
+  routes?: Array<{ id: string; name: string; difficulty: string; status: string }>;
+  endings?: Array<{ id: string; name: string; orderIndex: number }>;
+}
+
+export const storiesApi = {
+  listByGame: (gameId: string) => fetchApi<Story[]>(`/games/${gameId}/stories`),
+  get: (gameId: string, storyId: string) => fetchApi<Story>(`/games/${gameId}/stories/${storyId}`),
+  create: (gameId: string, data: Partial<Story>) =>
+    fetchApi<Story>(`/games/${gameId}/stories`, { method: "POST", body: JSON.stringify(data) }),
+};
+
+// ── NEW: Missions ──
+export interface Mission {
+  id: string;
+  routeId: string;
+  title: string;
+  narrative: string | null;
+  description: string | null;
+  orderIndex: number;
+  difficulty: number;
+  isLastMission: boolean;
+}
+
+export const missionsApi = {
+  listByRoute: (routeId: string) => fetchApi<Mission[]>(`/routes/${routeId}/missions`),
+  get: (missionId: string) => fetchApi<Mission>(`/missions/${missionId}`),
+  reorder: (routeId: string, missionIds: string[]) =>
+    fetchApi<Mission[]>(`/routes/${routeId}/missions/reorder`, {
+      method: "POST", body: JSON.stringify({ missionIds }),
+    }),
+};
+
 // ── Game Sessions ──
 export const gamesApi = {
   getSession: (sessionId: string) =>

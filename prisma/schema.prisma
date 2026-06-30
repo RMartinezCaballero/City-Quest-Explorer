@@ -34,8 +34,14 @@ model City {
   name      String
   slug      String   @unique
   country   String
+  state     String?  @default("ACTIVE")
+  latitude  Float?
+  longitude Float?
+  imageUrl  String?
+  config    Json?    // Configuración visual/UI para la ciudad
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
+  games        Game[]
   routes      Route[]
   gameSessions GameSession[]
 
@@ -43,31 +49,110 @@ model City {
 }
 
 // ──────────────────────────────────────────────
-// Route
+// Game (Template configurable — NUEVO)
+// ──────────────────────────────────────────────
+model Game {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cityId          String   @db.Uuid
+  name            String
+  description     String?
+  durationMinutes Int      @default(120)
+  difficulty      String   @default("MEDIUM") // EASY, MEDIUM, HARD
+  status          String   @default("DRAFT")  // DRAFT, PUBLISHED, ARCHIVED
+  maxPlayers      Int      @default(5)
+  imageUrl        String?
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(6)
+
+  city    City    @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  stories Story[]
+
+  @@index([cityId])
+  @@map("Game")
+}
+
+// ──────────────────────────────────────────────
+// Story (Contenedor narrativo — NUEVO)
+// ──────────────────────────────────────────────
+model Story {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  gameId       String   @db.Uuid
+  name         String
+  introduction String?  @db.Text  // Texto de introducción narrativa
+  lore         String?  @db.Text  // Lore completo de la historia
+  objectives   Json?             // Lista de objetivos narrativos
+  rules        String?  @db.Text // Reglas especiales
+  status       String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+
+  game    Game          @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  routes  Route[]
+  endings StoryEnding[]
+
+  @@index([gameId])
+  @@map("Story")
+}
+
+// ──────────────────────────────────────────────
+// Route (Mejorado con storyId + branching)
 // ──────────────────────────────────────────────
 model Route {
   id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storyId          String   @db.Uuid
   cityId           String   @db.Uuid
   name             String
   description      String
   difficulty       String   @default("EASY")
   distanceMeters   Int
   estimatedMinutes Int
+  isDefault        Boolean  @default(false) // Ruta por defecto de la historia
+  conditions       Json?                    // Condiciones de desbloqueo para rutas alternativas
+  status           String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
 
+  story           Story           @relation(fields: [storyId], references: [id], onDelete: Cascade)
   city            City            @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  missions        Mission[]
   checkpoints     Checkpoint[]
   qrCodes         QRCode[]
   teams           Team[]
   gameSessions    GameSession[]
   rankings        Ranking[]
 
+  @@index([storyId])
   @@index([cityId])
   @@map("Route")
 }
 
 // ──────────────────────────────────────────────
-// Checkpoint
+// Mission (Unidad jugable completa — MEJORADA)
+// ──────────────────────────────────────────────
+model Mission {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  routeId       String   @db.Uuid
+  title         String
+  narrative     String?  @db.Text  // Texto narrativo de la misión
+  description   String?  @db.Text  // Instrucciones para el jugador
+  orderIndex    Int
+  difficulty    Int      @default(5) // 1-10
+  timeLimit     Int?                // Minutos límite (opcional)
+  status        String   @default("ACTIVE")
+  checkpointId  String?  @db.Uuid  // Opcional: punto GPS asociado
+  mediaUrl      String?             // URL de video/audio/imagen
+  isLastMission Boolean  @default(false) // ¿Es la última misión? (permite repetición)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  route       Route       @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  checkpoint  Checkpoint? @relation(fields: [checkpointId], references: [id], onDelete: SetNull)
+  challenges  Challenge[]
+
+  @@index([routeId])
+  @@map("Mission")
+}
+
+// ──────────────────────────────────────────────
+// Checkpoint (Geolocalización — EXISTENTE)
 // ──────────────────────────────────────────────
 model Checkpoint {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -79,6 +164,7 @@ model Checkpoint {
   orderIndex  Int
 
   route           Route           @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  missions        Mission[]
   qrCodes         QRCode[]
   gameSessions    GameSession[]   @relation("CurrentCheckpoint")
 
@@ -87,7 +173,7 @@ model Checkpoint {
 }
 
 // ──────────────────────────────────────────────
-// QRCode
+// QRCode (EXISTENTE)
 // ──────────────────────────────────────────────
 model QRCode {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -102,6 +188,87 @@ model QRCode {
   @@index([routeId])
   @@index([checkpointId])
   @@map("QRCode")
+}
+
+// ──────────────────────────────────────────────
+// Challenge (Reto/Enigma — NUEVO)
+// ──────────────────────────────────────────────
+model Challenge {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  missionId   String   @db.Uuid
+  type        String   // SECRET_CODE, QR, NFC, TEXT, IMAGE, AUDIO, GEOLOCATION, AI, PHYSICAL_OBJECT
+  prompt      String   @db.Text  // Enunciado del reto
+  hint1       String?  @db.Text // Pista gratuita 1
+  hint2       String?  @db.Text // Pista gratuita 2
+  hint3       String?  @db.Text // Pista con penalización
+  hint4       String?  @db.Text // Pista con penalización mayor
+  orderIndex  Int      @default(0)
+  penalty     Int      @default(0) // Penalización por fallo (-puntos)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  mission    Mission            @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  answers    ChallengeAnswer[]
+  unlockKeys UnlockKey[]
+
+  @@index([missionId])
+  @@map("Challenge")
+}
+
+// ──────────────────────────────────────────────
+// ChallengeAnswer (Respuestas válidas — NUEVO)
+// ──────────────────────────────────────────────
+model ChallengeAnswer {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  challengeId String   @db.Uuid
+  value       String   @db.Text  // Respuesta esperada (normalizada)
+  label       String?            // Etiqueta descriptiva
+  isCorrect   Boolean  @default(true)
+  penalty     Int      @default(0)  // Penalización en puntos si se selecciona esta respuesta
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@index([challengeId])
+  @@map("ChallengeAnswer")
+}
+
+// ──────────────────────────────────────────────
+// UnlockKey (Motor de desbloqueo — NUEVO)
+// ──────────────────────────────────────────────
+model UnlockKey {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  challengeId String    @db.Uuid
+  type        String    // DYNAMIC_QR, TEMPORAL_TOKEN, UNIQUE_CODE, NARRATIVE_VARIABLE
+  keyValue    String    @unique  // El valor de la llave
+  expiresAt   DateTime?          // Opcional: expiración
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@index([challengeId])
+  @@map("UnlockKey")
+}
+
+// ──────────────────────────────────────────────
+// StoryEnding (Finales alternativos — NUEVO)
+// ──────────────────────────────────────────────
+model StoryEnding {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storyId     String   @db.Uuid
+  name        String
+  description String   @db.Text
+  conditions  Json     // Condiciones para activar este final (score mínimo, misiones específicas, etc.)
+  narrative   String?  @db.Text // Texto/video de desenlace
+  mediaUrl    String?            // Video/audio del final
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@index([storyId])
+  @@map("StoryEnding")
 }
 
 // ──────────────────────────────────────────────
@@ -148,11 +315,15 @@ model GameSession {
   teamId              String    @db.Uuid
   routeId             String    @db.Uuid
   cityId              String    @db.Uuid
+  storyId             String?   @db.Uuid // NUEVO: historia asociada
   status              String    @default("ACTIVE")
   startedAt           DateTime  @default(now()) @db.Timestamptz(6)
   finishedAt          DateTime? @db.Timestamptz(6)
   currentCheckpointId String?   @db.Uuid
+  currentMissionId    String?   @db.Uuid // NUEVO: misión actual
   score               Int       @default(0)
+  hintsUsed           Int       @default(0) // NUEVO: ayudas usadas
+  errors              Int       @default(0) // NUEVO: errores cometidos
   metadata            Json?
 
   team              Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)

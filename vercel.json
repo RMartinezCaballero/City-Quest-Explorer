@@ -1,0 +1,16 @@
+{
+  "services": {
+    "city-quest-explorer-api": {
+      "root": "."
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "city-quest-explorer-api"
+      }
+    }
+  ]
+}
