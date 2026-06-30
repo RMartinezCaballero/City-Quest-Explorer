@@ -206,9 +206,11 @@ export default function StoryDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/admin/games-template/${gameId}`}><ArrowLeft className="h-5 w-5" /></Link>
-          </Button>
+          <Link href={`/admin/games-template/${gameId}`}>
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{story.name}</h1>
             <p className="text-muted-foreground mt-1">{story.game.name} — {story.game.city?.name}</p>
@@ -256,9 +258,7 @@ export default function StoryDetailPage() {
               <CardDescription>Rutas jugables con misiones ordenadas</CardDescription>
             </div>
             <Dialog open={openRoute} onOpenChange={setOpenRoute}>
-              <DialogTrigger asChild>
-                <Button><Plus className="h-4 w-4 mr-2" />Nueva Ruta</Button>
-              </DialogTrigger>
+              <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Ruta</Button>} />
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Crear Nueva Ruta</DialogTitle>
@@ -307,11 +307,11 @@ export default function StoryDetailPage() {
                         <Badge variant="outline" className="bg-green-50 text-green-700">Publicada</Badge>
                       )}
                     </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/admin/games-template/${gameId}/stories/${storyId}/routes/${route.id}`}>
+                    <Link href={`/admin/games-template/${gameId}/stories/${storyId}/routes/${route.id}`}>
+                      <Button variant="outline" size="sm">
                         Ver Misiones
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                   </div>
                   <div className="flex gap-4 text-sm text-muted-foreground">
                     <span>📍 {route.distanceMeters}m</span>
@@ -347,9 +347,7 @@ export default function StoryDetailPage() {
               <CardDescription>Desenlaces configurables según condiciones</CardDescription>
             </div>
             <Dialog open={openEnding} onOpenChange={setOpenEnding}>
-              <DialogTrigger asChild>
-                <Button><Plus className="h-4 w-4 mr-2" />Nuevo Final</Button>
-              </DialogTrigger>
+              <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nuevo Final</Button>} />
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Crear Final Alternativo</DialogTitle>

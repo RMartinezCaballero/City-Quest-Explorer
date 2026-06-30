@@ -196,11 +196,11 @@ export default function RouteDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/admin/games-template/${gameId}/stories/${storyId}`}>
+          <Link href={`/admin/games-template/${gameId}/stories/${storyId}`}>
+            <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{route.name}</h1>
             <p className="text-muted-foreground mt-1">
@@ -224,9 +224,7 @@ export default function RouteDetailPage() {
               </CardDescription>
             </div>
             <Dialog open={openMission} onOpenChange={setOpenMission}>
-              <DialogTrigger asChild>
-                <Button><Plus className="h-4 w-4 mr-2" />Nueva Misión</Button>
-              </DialogTrigger>
+              <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Misión</Button>} />
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Crear Misión</DialogTitle>

@@ -162,9 +162,11 @@ export default function GameDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/admin/games-template"><ArrowLeft className="h-5 w-5" /></Link>
-          </Button>
+          <Link href="/admin/games-template">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{game.name}</h1>
             <p className="text-muted-foreground mt-1 flex items-center gap-2">
@@ -220,9 +222,7 @@ export default function GameDetailPage() {
               <CardDescription>Historias narrativas asociadas a este juego</CardDescription>
             </div>
             <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-              <DialogTrigger asChild>
-                <Button><Plus className="h-4 w-4 mr-2" />Nueva Historia</Button>
-              </DialogTrigger>
+              <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Historia</Button>} />
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Crear Nueva Historia</DialogTitle>
@@ -277,12 +277,12 @@ export default function GameDetailPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/admin/games-template/${gameId}/stories/${story.id}`}>
+                    <Link href={`/admin/games-template/${gameId}/stories/${story.id}`}>
+                      <Button variant="ghost" size="sm">
                         <BookOpen className="h-4 w-4 mr-1" />
                         Ver Historia
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}

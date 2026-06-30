@@ -95,12 +95,12 @@ export default function GamesTemplatePage() {
             Juegos configurables por ciudad
           </p>
         </div>
-        <Button asChild>
-          <Link href="/admin/locations">
+        <Link href="/admin/locations">
+          <Button>
             <Plus className="h-4 w-4 mr-2" />
             Nuevo Juego
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
 
       <Card>
@@ -153,12 +153,12 @@ export default function GamesTemplatePage() {
                   </TableCell>
                   <TableCell>{(game.stories ?? []).length}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/admin/games-template/${game.id}`}>
+                    <Link href={`/admin/games-template/${game.id}`}>
+                      <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4 mr-1" />
                         Ver
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
