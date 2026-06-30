@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import dynamic from "next/dynamic";
 import {
   ArrowLeft,
   Route,
@@ -41,6 +42,11 @@ import {
   Trophy,
   GripVertical,
 } from "lucide-react";
+
+const LeafletMap = dynamic(() => import("@/components/map/leaflet-map"), {
+  ssr: false,
+  loading: () => <div className="h-[400px] bg-muted animate-pulse rounded-lg flex items-center justify-center"><span className="text-muted-foreground">Cargando mapa...</span></div>
+});
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
@@ -61,6 +67,7 @@ interface StoryRoute {
   status: string;
   distanceMeters: number;
   estimatedMinutes: number;
+  checkpoints?: Array<{ id: string; name: string; latitude: number; longitude: number }>;
   missions?: Array<{
     id: string;
     title: string;
@@ -82,6 +89,8 @@ interface Story {
   routes: StoryRoute[];
   endings: StoryEnding[];
 }
+
+const routeColors = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"];
 
 const difficultyColors: Record<string, string> = {
   EASY: "bg-green-50 text-green-700 border-green-200",
@@ -108,6 +117,7 @@ export default function StoryDetailPage() {
 
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mapPoints, setMapPoints] = useState<Array<{id: string; name: string; latitude: number; longitude: number; description: string; color: string}>>([]);
 
   // Create route dialog
   const [openRoute, setOpenRoute] = useState(false);
@@ -126,7 +136,36 @@ export default function StoryDetailPage() {
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/games/${gameId}/stories/${storyId}`);
-      if (res.ok) setStory(await res.json());
+      if (res.ok) {
+        const storyData: Story = await res.json();
+        setStory(storyData);
+
+        // Load checkpoints for each route
+        if (storyData.routes.length > 0) {
+          const cpPromises = storyData.routes.map(async (route, i) => {
+            try {
+              const cpRes = await fetch(`${API_BASE}/routes/${route.id}`);
+              if (cpRes.ok) {
+                const routeDetail = await cpRes.json();
+                const checkpoints = routeDetail.checkpoints ?? [];
+                return checkpoints.map((cp: {id: string; name: string; latitude: number; longitude: number}, cpIdx: number) => ({
+                  id: cp.id,
+                  name: cp.name,
+                  latitude: cp.latitude,
+                  longitude: cp.longitude,
+                  description: route.name + " #" + (cpIdx + 1),
+                  color: routeColors[i % routeColors.length],
+                }));
+              }
+              return [];
+            } catch {
+              return [];
+            }
+          });
+          const allPoints = await Promise.all(cpPromises);
+          setMapPoints(allPoints.flat());
+        }
+      }
     } catch (e) {
       console.error("Error loading story:", e);
     } finally {
@@ -337,6 +376,31 @@ export default function StoryDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Map of all routes */}
+      {mapPoints.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Mapa de Todas las Rutas
+            </CardTitle>
+            <CardDescription>
+              {story.routes.length + " rutas · " + mapPoints.length + " checkpoints. Cada ruta tiene su propio color."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {story.routes.map((r, i) => (
+                <Badge key={r.id} variant="secondary" className="text-xs" style={{borderLeftColor: routeColors[i % routeColors.length], borderLeftWidth: "3px"}}>
+                  {r.name}
+                </Badge>
+              ))}
+            </div>
+            <LeafletMap points={mapPoints} height="400px" zoom={12} />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Endings */}
       <Card>

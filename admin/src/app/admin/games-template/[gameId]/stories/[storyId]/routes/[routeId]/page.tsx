@@ -351,10 +351,13 @@ export default function RouteDetailPage() {
                 name: cp.name,
                 latitude: cp.latitude,
                 longitude: cp.longitude,
+                description: "Orden: " + (i + 1),
                 color: i === 0 ? "#22c55e" : "#3b82f6",
               }))}
               height="400px"
               zoom={15}
+              polyline={true}
+              polylineColor="#22c55e"
             />
             <Table>
               <TableHeader>

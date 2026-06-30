@@ -28,6 +28,8 @@ interface LeafletMapProps {
   zoom?: number;
   height?: string;
   className?: string;
+  polyline?: boolean;
+  polylineColor?: string;
 }
 
 export default function LeafletMap({
@@ -36,6 +38,8 @@ export default function LeafletMap({
   zoom = 13,
   height = "400px",
   className = "",
+  polyline = false,
+  polylineColor = "#3b82f6",
 }: LeafletMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
@@ -101,6 +105,17 @@ export default function LeafletMap({
     if (points.length > 1) {
       const bounds = L.latLngBounds(points.map((p) => [p.latitude, p.longitude]));
       map.fitBounds(bounds, { padding: [50, 50] });
+    }
+
+    // Draw polyline connecting points in order
+    if (polyline && points.length > 1) {
+      const latlngs = points.map((p) => [p.latitude, p.longitude] as [number, number]);
+      L.polyline(latlngs, {
+        color: polylineColor,
+        weight: 3,
+        opacity: 0.7,
+        dashArray: "8, 8",
+      }).addTo(map);
     }
 
     mapInstance.current = map;
