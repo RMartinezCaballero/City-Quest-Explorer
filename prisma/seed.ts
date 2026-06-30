@@ -62,7 +62,7 @@ async function main() {
   // ── Route: Ruta Principal ──
   const route = await prisma.route.upsert({
     where: { id: ROUTE_ID },
-    update: {},
+    update: { storyId: story.id, name: 'Ruta Principal - Centro Histórico', description: 'Recorrido por el centro histórico de Cartagena siguiendo las pistas del Manuscrito.' },
     create: {
       id: ROUTE_ID,
       storyId: story.id,
