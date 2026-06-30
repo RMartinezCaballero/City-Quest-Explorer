@@ -43,6 +43,8 @@ import { useParams } from "next/navigation";
 
 import { routesApi, citiesApi, type Route, type City } from "@/lib/api";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com/api";
+
 const difficultyColors: Record<string, string> = {
     EASY: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300",
     MEDIUM:
@@ -114,8 +116,19 @@ export default function HistoriesPage() {
         if (!cityId) return;
         setCreating(true);
         try {
+            // Get the first available story for this city
+            const gamesRes = await fetch(`${API_BASE}/cities/${cityId}/games`);
+            const games = gamesRes.ok ? await gamesRes.json() : [];
+            let storyId = "";
+            if (games.length > 0 && games[0].stories?.length > 0) {
+                storyId = games[0].stories[0].id;
+            }
+            if (!storyId) {
+                alert("No hay historias disponibles. Crea un juego con una historia primero.");
+                return;
+            }
             await routesApi.createByCity(cityId, {
-                storyId: "550e8400-e29b-41d4-a716-446655440003", // Historia Principal
+                storyId,
                 name: form.name,
                 description: form.description,
                 distanceMeters: Number(form.distanceMeters),
