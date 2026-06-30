@@ -1,8 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UnlockKeysService } from './unlock-keys.service';
 import { CreateUnlockKeyDto } from './dto/create-unlock-key.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @ApiTags('unlock-keys')
 @Controller()
@@ -10,8 +9,6 @@ export class UnlockKeysController {
   constructor(private readonly unlockKeysService: UnlockKeysService) {}
 
   @Post('challenges/:challengeId/keys')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear una llave de desbloqueo para un reto' })
   create(@Param('challengeId') challengeId: string, @Body() payload: CreateUnlockKeyDto) {
     return this.unlockKeysService.create(challengeId, payload);
@@ -36,8 +33,6 @@ export class UnlockKeysController {
   }
 
   @Delete('keys/:keyId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar una llave de desbloqueo' })
   remove(@Param('keyId') keyId: string) {
     return this.unlockKeysService.remove(keyId);

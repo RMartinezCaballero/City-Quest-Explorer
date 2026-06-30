@@ -1,9 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StoryEndingsService } from './story-endings.service';
 import { CreateStoryEndingDto } from './dto/create-story-ending.dto';
 import { UpdateStoryEndingDto } from './dto/update-story-ending.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @ApiTags('story-endings')
 @Controller('stories/:storyId/endings')
@@ -11,8 +10,6 @@ export class StoryEndingsController {
   constructor(private readonly endingsService: StoryEndingsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear un final alternativo para una historia' })
   create(@Param('storyId') storyId: string, @Body() payload: CreateStoryEndingDto) {
     return this.endingsService.create(storyId, payload);
@@ -31,16 +28,12 @@ export class StoryEndingsController {
   }
 
   @Patch(':endingId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar un final' })
   update(@Param('endingId') endingId: string, @Body() payload: UpdateStoryEndingDto) {
     return this.endingsService.update(endingId, payload);
   }
 
   @Delete(':endingId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar un final' })
   remove(@Param('endingId') endingId: string) {
     return this.endingsService.remove(endingId);

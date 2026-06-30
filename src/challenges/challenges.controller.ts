@@ -1,9 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @ApiTags('challenges')
 @Controller('missions/:missionId/challenges')
@@ -11,8 +10,6 @@ export class ChallengesController {
   constructor(private readonly challengesService: ChallengesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear un reto en una misión' })
   create(@Param('missionId') missionId: string, @Body() payload: CreateChallengeDto) {
     return this.challengesService.create(missionId, payload);
@@ -31,16 +28,12 @@ export class ChallengesController {
   }
 
   @Patch(':challengeId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar un reto' })
   update(@Param('challengeId') challengeId: string, @Body() payload: UpdateChallengeDto) {
     return this.challengesService.update(challengeId, payload);
   }
 
   @Delete(':challengeId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar un reto' })
   remove(@Param('challengeId') challengeId: string) {
     return this.challengesService.remove(challengeId);
