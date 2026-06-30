@@ -43,7 +43,7 @@ import { useParams } from "next/navigation";
 
 import { routesApi, citiesApi, type Route, type City } from "@/lib/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
 const difficultyColors: Record<string, string> = {
     EASY: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300",

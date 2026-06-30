@@ -20,10 +20,26 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Gamepad2, BookOpen, Eye, MapPin } from "lucide-react";
-import { citiesApi, type City } from "@/lib/api";
+import { Search, Plus, Gamepad2, BookOpen, Eye, MapPin, Globe } from "lucide-react";
+import { citiesApi, gamesTemplateApi, type City } from "@/lib/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
 interface Game {
   id: string;
@@ -55,6 +71,26 @@ export default function GamesTemplatePage() {
   const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [openCreate, setOpenCreate] = useState(false);
+  const [selectedCityId, setSelectedCityId] = useState("");
+  const [gameName, setGameName] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  async function handleCreateGame() {
+    if (!selectedCityId || !gameName.trim()) return;
+    setCreating(true);
+    try {
+      await gamesTemplateApi.create(selectedCityId, { name: gameName });
+      setOpenCreate(false);
+      setGameName("");
+      setSelectedCityId("");
+      await loadAllGames();
+    } catch (e) {
+      console.error("Error creating game:", e);
+    } finally {
+      setCreating(false);
+    }
+  }
 
   async function loadAllGames() {
     setLoading(true);
@@ -95,12 +131,50 @@ export default function GamesTemplatePage() {
             Juegos configurables por ciudad
           </p>
         </div>
-        <Link href="/admin/locations">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Nuevo Juego
-          </Button>
-        </Link>
+        <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+          <DialogTrigger>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Juego
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Crear Nuevo Juego</DialogTitle>
+              <DialogDescription>Selecciona la ciudad y escribe el nombre del juego</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label>Ciudad</label>
+                <Select value={selectedCityId} onValueChange={(v) => { if (v !== null) setSelectedCityId(v); }}>
+                  <SelectTrigger>
+                    <Globe className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Seleccionar ciudad" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map((city) => (
+                      <SelectItem key={city.id} value={city.id}>{city.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label>Nombre del Juego</label>
+                <Input
+                  placeholder="Ej: El Misterio de Barranquilla"
+                  value={gameName}
+                  onChange={(e) => setGameName(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpenCreate(false)}>Cancelar</Button>
+              <Button disabled={creating || !selectedCityId || !gameName.trim()} onClick={handleCreateGame}>
+                {creating ? "Creando..." : "Crear Juego"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card>
