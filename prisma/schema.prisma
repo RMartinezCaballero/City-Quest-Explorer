@@ -99,7 +99,7 @@ model Story {
 // ──────────────────────────────────────────────
 model Route {
   id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  storyId          String   @db.Uuid
+  storyId          String?  @db.Uuid
   cityId           String   @db.Uuid
   name             String
   description      String
@@ -111,7 +111,7 @@ model Route {
   status           String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
 
-  story           Story           @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  story           Story?          @relation(fields: [storyId], references: [id], onDelete: SetNull)
   city            City            @relation(fields: [cityId], references: [id], onDelete: Cascade)
   missions        Mission[]
   checkpoints     Checkpoint[]

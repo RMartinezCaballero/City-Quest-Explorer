@@ -7,12 +7,19 @@
 --       Usamos ::text en AMBOS lados para comparación segura.
 -- ============================================================
 
--- Enable RLS on all tables
+-- Enable RLS on all tables (incluyendo nuevas)
 ALTER TABLE "User" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "City" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Game" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Story" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Route" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Mission" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Checkpoint" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "QRCode" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Challenge" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "ChallengeAnswer" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "UnlockKey" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "StoryEnding" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Team" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "TeamMember" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "GameSession" ENABLE ROW LEVEL SECURITY;
@@ -42,28 +49,77 @@ CREATE POLICY "Cities are admin write"
   WITH CHECK (auth.role() = 'service_role' OR auth.role() = 'supabase_admin');
 
 -- ============================================================
--- 3. Route: pública lectura
+-- 3. Game: pública lectura
+-- ============================================================
+CREATE POLICY "Games are public read"
+  ON "Game" FOR SELECT
+  USING (true);
+
+-- ============================================================
+-- 4. Story: pública lectura
+-- ============================================================
+CREATE POLICY "Stories are public read"
+  ON "Story" FOR SELECT
+  USING (true);
+
+-- ============================================================
+-- 5. Route: pública lectura
 -- ============================================================
 CREATE POLICY "Routes are public read"
   ON "Route" FOR SELECT
   USING (true);
 
 -- ============================================================
--- 4. Checkpoint: pública lectura
+-- 6. Mission: pública lectura
+-- ============================================================
+CREATE POLICY "Missions are public read"
+  ON "Mission" FOR SELECT
+  USING (true);
+
+-- ============================================================
+-- 7. Checkpoint: pública lectura
 -- ============================================================
 CREATE POLICY "Checkpoints are public read"
   ON "Checkpoint" FOR SELECT
   USING (true);
 
 -- ============================================================
--- 5. QRCode: pública lectura
+-- 8. QRCode: pública lectura
 -- ============================================================
 CREATE POLICY "QRCodes are public read"
   ON "QRCode" FOR SELECT
   USING (true);
 
 -- ============================================================
--- 6. Team: miembros ven su equipo, captain puede crear/editar
+-- 9. Challenge: pública lectura
+-- ============================================================
+CREATE POLICY "Challenges are public read"
+  ON "Challenge" FOR SELECT
+  USING (true);
+
+-- ============================================================
+-- 10. ChallengeAnswer: pública lectura
+-- ============================================================
+CREATE POLICY "ChallengeAnswers are public read"
+  ON "ChallengeAnswer" FOR SELECT
+  USING (true);
+
+-- ============================================================
+-- 11. UnlockKey: solo lectura por token válido
+-- ============================================================
+CREATE POLICY "UnlockKeys are readable by valid token"
+  ON "UnlockKey" FOR SELECT
+  USING ("usedAt" IS NULL AND ("expiresAt" IS NULL OR "expiresAt" > now()));
+
+-- ============================================================
+-- 12. StoryEnding: pública lectura
+-- ============================================================
+CREATE POLICY "StoryEndings are public read"
+  ON "StoryEnding" FOR SELECT
+  USING (true);
+
+-- ============================================================
+-- 13. Team: miembros ven su equipo, captain puede crear/editar
 -- ============================================================
 CREATE POLICY "Teams are viewable by members"
   ON "Team" FOR SELECT
@@ -78,7 +134,7 @@ CREATE POLICY "Teams can be created by any authenticated user"
   WITH CHECK (auth.role() = 'authenticated');
 
 -- ============================================================
--- 7. TeamMember: miembros ven su membresía
+-- 14. TeamMember: miembros ven su membresía
 -- ============================================================
 CREATE POLICY "TeamMembers viewable by own user"
   ON "TeamMember" FOR SELECT
@@ -93,7 +149,7 @@ CREATE POLICY "TeamMembers insertable by captain"
   );
 
 -- ============================================================
--- 8. GameSession: equipo ve sus sesiones
+-- 15. GameSession: equipo ve sus sesiones
 -- ============================================================
 CREATE POLICY "Sessions viewable by team members"
   ON "GameSession" FOR SELECT
@@ -114,7 +170,7 @@ CREATE POLICY "Sessions insertable by team members"
   );
 
 -- ============================================================
--- 9. SessionEvent: visible para miembros del equipo
+-- 16. SessionEvent: visible para miembros del equipo
 -- ============================================================
 CREATE POLICY "Events viewable by session team members"
   ON "SessionEvent" FOR SELECT
@@ -127,7 +183,7 @@ CREATE POLICY "Events viewable by session team members"
   );
 
 -- ============================================================
--- 10. Ranking: público (todos ven el leaderboard)
+-- 17. Ranking: público (todos ven el leaderboard)
 -- ============================================================
 CREATE POLICY "Rankings are public read"
   ON "Ranking" FOR SELECT
