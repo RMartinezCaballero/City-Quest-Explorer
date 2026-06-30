@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
+// Strip trailing /api if present (legacy Vercel env var bug)
+const rawBase = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
+const API_BASE = rawBase.replace(/\/api\/?$/i, "");
 
 // Auth token management
 let authToken: string | null = null;
