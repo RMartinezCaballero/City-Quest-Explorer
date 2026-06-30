@@ -263,7 +263,7 @@ export default function RouteDetailPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{mission.title}</h3>
-                          <Badge variant="secondary" className="text-xs">D{if (mission.difficulty)}</Badge>
+                          <Badge variant="secondary" className="text-xs">{mission.difficulty}</Badge>
                           {mission.isLastMission && (
                             <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs">Última</Badge>
                           )}
