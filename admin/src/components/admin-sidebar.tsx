@@ -24,7 +24,7 @@ import { useAuth } from "@/components/auth-provider";
 const navItems = [
   { href: "/admin", icon: Home, label: "Dashboard" },
   { href: "/admin/games-template", icon: Gamepad2, label: "Juegos" },
-  { href: "/admin/locations", icon: MapPin, label: "Ciudades" },
+  { href: "/admin/cities", icon: MapPin, label: "Ciudades" },
   { href: "/admin/missions", icon: BookOpen, label: "Misiones" },
   { href: "/admin/games", icon: Gamepad2, label: "Sesiones" },
   { href: "/admin/qr-codes", icon: QrCode, label: "QR Codes" },
@@ -37,6 +37,11 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { user, signOut } = useAuth();
+
+  const isActive = (href: string) => {
+    if (href === "/admin") return pathname === href;
+    return pathname.startsWith(href);
+  };
 
   return (
     <aside
@@ -67,14 +72,14 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                isActive
+                active
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}

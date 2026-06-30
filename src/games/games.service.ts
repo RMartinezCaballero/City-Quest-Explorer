@@ -17,7 +17,6 @@ export class GamesService {
       include: { team: true, route: true, city: true },
     });
 
-    // Emitir evento de notificación para actores freelance
     await this.emitSessionStartedNotification(session);
 
     return session;
@@ -29,8 +28,6 @@ export class GamesService {
       throw new NotFoundException('Ruta no encontrada');
     }
 
-    // Solo identificado por: captainId === userId y miembro count === 1.
-    // (Sin campo extra en schema.)
     let team = await this.prisma.team.findFirst({
       where: {
         routeId: data.routeId,
@@ -40,7 +37,6 @@ export class GamesService {
     });
 
     if (!team || team.members.length !== 1) {
-      // Crear un Team nuevo "Solo".
       team = await this.prisma.team.create({
         data: {
           name: 'Solo',
@@ -66,7 +62,6 @@ export class GamesService {
       include: { team: true, route: true, city: true },
     });
 
-    // Emitir evento de notificación para actores freelance
     await this.emitSessionStartedNotification(session);
 
     return session;
@@ -87,9 +82,20 @@ export class GamesService {
         },
       });
     } catch (error) {
-      // No fallar la creación de la sesión si la notificación falla
       console.warn('⚠️ No se pudo emitir notificación de inicio de sesión:', error);
     }
+  }
+
+  findAllSessions() {
+    return this.prisma.gameSession.findMany({
+      orderBy: { startedAt: 'desc' },
+      take: 100,
+      include: {
+        team: true,
+        route: { select: { id: true, name: true } },
+        city: { select: { id: true, name: true } },
+      },
+    });
   }
 
   findSession(sessionId: string) {
@@ -115,8 +121,6 @@ export class GamesService {
       throw new NotFoundException('Sesión de juego no encontrada');
     }
 
-    // ── IDEMPOTENCIA ──
-    // Si la sesión ya está COMPLETED, rechazar eventos de scoring
     if (session.status === 'COMPLETED' &&
       (payload.eventType === EventType.SESSION_FINISHED ||
         payload.eventType === EventType.CHECKPOINT_REACHED ||
@@ -124,7 +128,6 @@ export class GamesService {
       throw new NotFoundException('La sesión ya fue completada. No se pueden registrar más eventos.');
     }
 
-    // Para QR_SCANNED: verificar si el mismo código QR ya fue escaneado
     if (payload.eventType === EventType.QR_SCANNED) {
       const qrCode = payload.eventData?.['qrCode'];
       if (qrCode) {
@@ -141,11 +144,9 @@ export class GamesService {
       }
     }
 
-    // Para CHECKPOINT_REACHED: si el checkpoint ya es el actual, no duplicar puntos
     if (payload.eventType === EventType.CHECKPOINT_REACHED &&
       payload.checkpointId &&
       session.currentCheckpointId === payload.checkpointId) {
-      // El checkpoint ya fue alcanzado, devolver el último evento sin modificar
       const lastEvent = session.events[session.events.length - 1];
       return lastEvent;
     }
@@ -161,7 +162,6 @@ export class GamesService {
     const updateData: Record<string, unknown> = {};
 
     if (payload.eventType === EventType.CHECKPOINT_REACHED && payload.checkpointId) {
-      // Idempotencia: no actualizar si ya está en ese checkpoint
       if (session.currentCheckpointId !== payload.checkpointId) {
         updateData.currentCheckpointId = payload.checkpointId;
         updateData.score = { increment: 10 };
@@ -169,23 +169,17 @@ export class GamesService {
     }
 
     if (payload.eventType === EventType.QR_SCANNED) {
-      // Si el cliente manda checkpointId, alineamos el QR con la misión actual.
-      // MVP compatible: si no viene checkpointId, mantenemos idempotencia por qrCode.
       if (payload.checkpointId) {
         if (!session.currentCheckpointId || session.currentCheckpointId !== payload.checkpointId) {
-          // QR no corresponde a la misión/checkpoint actual => no sumar puntos.
           return event;
         }
       }
-
       updateData.score = { increment: 15 };
     }
-
 
     if (payload.eventType === EventType.SESSION_FINISHED) {
       updateData.status = 'COMPLETED';
       updateData.finishedAt = new Date();
-      // Bonus de misión completa (Mission Pack canónico)
       updateData.score = { increment: 100 };
     }
 

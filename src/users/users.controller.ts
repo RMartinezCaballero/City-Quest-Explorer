@@ -12,6 +12,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get()
+  @ApiOperation({ summary: 'Listar todos los usuarios (admin)' })
+  findAll() {
+    return this.usersService.findAll();
+  }
+
   @Get('me')
   @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
   getProfile(@User('id') userId: string) {

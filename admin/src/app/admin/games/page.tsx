@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -20,90 +20,54 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, Filter, Eye, MoreHorizontal } from "lucide-react";
-
-const mockGames = [
-  {
-    id: "1",
-    team: "Los Buscadores",
-    route: "El Manuscrito Prohibido",
-    status: "ACTIVE",
-    score: 450,
-    startedAt: "2026-06-28 10:30",
-    members: 4,
-  },
-  {
-    id: "2",
-    team: "Aventureros",
-    route: "El Manuscrito Prohibido",
-    status: "COMPLETED",
-    score: 850,
-    startedAt: "2026-06-28 09:00",
-    members: 3,
-  },
-  {
-    id: "3",
-    team: "Exploradores",
-    route: "El Manuscrito Prohibido",
-    status: "ACTIVE",
-    score: 320,
-    startedAt: "2026-06-28 11:15",
-    members: 5,
-  },
-  {
-    id: "4",
-    team: "Cartagena Team",
-    route: "El Manuscrito Prohibido",
-    status: "ABANDONED",
-    score: 120,
-    startedAt: "2026-06-27 14:00",
-    members: 2,
-  },
-  {
-    id: "5",
-    team: "Los Piratas",
-    route: "El Manuscrito Prohibido",
-    status: "COMPLETED",
-    score: 920,
-    startedAt: "2026-06-27 08:30",
-    members: 4,
-  },
-];
+import { Search, Filter, Eye, Play, CheckCircle, XCircle, Clock } from "lucide-react";
+import { sessionsApi, type GameSession } from "@/lib/api";
 
 const statusColors: Record<string, string> = {
-  ACTIVE:
-    "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800",
-  COMPLETED:
-    "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800",
-  ABANDONED:
-    "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800",
+  ACTIVE: "bg-blue-50 text-blue-700 border-blue-200",
+  COMPLETED: "bg-green-50 text-green-700 border-green-200",
+  ABANDONED: "bg-red-50 text-red-700 border-red-200",
 };
 
-export default function GamesPage() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+const statusIcons: Record<string, React.ReactNode> = {
+  ACTIVE: <Play className="h-3 w-3 mr-1" />,
+  COMPLETED: <CheckCircle className="h-3 w-3 mr-1" />,
+  ABANDONED: <XCircle className="h-3 w-3 mr-1" />,
+};
 
-  const filtered = mockGames.filter((g) => {
+export default function GamesSessionsPage() {
+  const [sessions, setSessions] = useState<GameSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  async function loadSessions() {
+    setLoading(true);
+    try {
+      const data = await sessionsApi.list();
+      setSessions(data);
+    } catch (e) {
+      console.error("Error loading sessions:", e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadSessions();
+  }, []);
+
+  const filtered = sessions.filter((s) => {
     const matchesSearch =
-      g.team.toLowerCase().includes(search.toLowerCase()) ||
-      g.route.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || g.status === statusFilter;
+      (s.team?.name || "").toLowerCase().includes(search.toLowerCase()) ||
+      (s.route?.name || "").toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === "all" || s.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -111,57 +75,13 @@ export default function GamesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Juegos</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Sesiones de Juego</h1>
           <p className="text-muted-foreground mt-1">
-            Gestiona las sesiones de juego activas y finalizadas
+            {loading ? "Cargando..." : `${filtered.length} sesiones encontradas`}
           </p>
         </div>
-        <Dialog>
-          <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nuevo Juego</Button>} />
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Crear Nuevo Juego</DialogTitle>
-              <DialogDescription>
-                Inicia una nueva sesión de juego para un equipo
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label>Equipo</label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar equipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Los Buscadores</SelectItem>
-                    <SelectItem value="2">Aventureros</SelectItem>
-                    <SelectItem value="3">Exploradores</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <label>Ruta</label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar ruta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">
-                      El Manuscrito Prohibido
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline">Cancelar</Button>
-              <Button>Crear Juego</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex gap-4 flex-wrap">
@@ -174,7 +94,7 @@ export default function GamesPage() {
                 className="pl-9"
               />
             </div>
-            <Select value={statusFilter} onValueChange={(v) => v && setStatusFilter(v)}>
+            <Select value={statusFilter} onValueChange={(v) => { if (v !== null) setStatusFilter(v); }}>
               <SelectTrigger className="w-[150px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
@@ -190,12 +110,12 @@ export default function GamesPage() {
         </CardContent>
       </Card>
 
-      {/* Games Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Sesiones de Juego</CardTitle>
+          <CardTitle>Sesiones</CardTitle>
           <CardDescription>
-            {filtered.length} sesiones encontradas
+            {sessions.filter(s => s.status === "ACTIVE").length} activas,{' '}
+            {sessions.filter(s => s.status === "COMPLETED").length} completadas
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -204,45 +124,44 @@ export default function GamesPage() {
               <TableRow>
                 <TableHead>Equipo</TableHead>
                 <TableHead>Ruta</TableHead>
+                <TableHead>Ciudad</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Puntaje</TableHead>
-                <TableHead>Miembros</TableHead>
                 <TableHead>Inicio</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((game) => (
-                <TableRow key={game.id}>
-                  <TableCell className="font-medium">{game.team}</TableCell>
-                  <TableCell>{game.route}</TableCell>
+              {filtered.map((session) => (
+                <TableRow key={session.id}>
+                  <TableCell className="font-medium">{session.team?.name || "—"}</TableCell>
+                  <TableCell>{session.route?.name || "—"}</TableCell>
+                  <TableCell>{session.city?.name || "—"}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={statusColors[game.status]}
-                    >
-                      {game.status === "ACTIVE"
-                        ? "Activo"
-                        : game.status === "COMPLETED"
-                          ? "Completado"
-                          : "Abandonado"}
+                    <Badge variant="outline" className={statusColors[session.status]}>
+                      {statusIcons[session.status]}
+                      {session.status === "ACTIVE" ? "Activo" : session.status === "COMPLETED" ? "Completado" : "Abandonado"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-mono">{game.score}</TableCell>
-                  <TableCell>{game.members}</TableCell>
+                  <TableCell className="font-mono font-bold">{session.score}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {game.startedAt}
+                    <Clock className="h-3 w-3 inline mr-1" />
+                    {new Date(session.startedAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="sm">
                       <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
               ))}
+              {!loading && filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    No hay sesiones de juego
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

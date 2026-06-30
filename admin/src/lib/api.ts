@@ -5,17 +5,26 @@ export interface City {
   name: string;
   slug: string;
   country: string;
+  state?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  imageUrl?: string | null;
   createdAt: string;
 }
 
 export interface Route {
   id: string;
   cityId: string;
+  storyId: string;
   name: string;
   description: string;
   difficulty: "EASY" | "MEDIUM" | "HARD";
   distanceMeters: number;
   estimatedMinutes: number;
+  isDefault?: boolean;
+  status?: string;
+  story?: { id: string; name: string };
+  missions?: Mission[];
   checkpoints?: Checkpoint[];
 }
 
@@ -27,6 +36,7 @@ export interface Checkpoint {
   latitude: number;
   longitude: number;
   orderIndex: number;
+  qrCodes?: Array<{ id: string; code: string }>;
 }
 
 export interface Team {
@@ -61,11 +71,16 @@ export interface GameSession {
   teamId: string;
   routeId: string;
   cityId: string;
+  storyId?: string;
   status: "ACTIVE" | "COMPLETED" | "ABANDONED";
   startedAt: string;
   finishedAt?: string;
   score: number;
+  hintsUsed?: number;
+  errors?: number;
   team?: Team;
+  route?: { id: string; name: string };
+  city?: { id: string; name: string };
 }
 
 export interface Ranking {
@@ -75,6 +90,81 @@ export interface Ranking {
   score: number;
   position: number;
   team?: Team;
+}
+
+export interface Game {
+  id: string;
+  cityId: string;
+  name: string;
+  description: string | null;
+  durationMinutes: number;
+  difficulty: string;
+  status: string;
+  maxPlayers: number;
+  imageUrl: string | null;
+  city?: City;
+  stories?: Array<{ id: string; name: string; status: string; routes?: Array<{ id: string; name: string }> }>;
+}
+
+export interface Story {
+  id: string;
+  gameId: string;
+  name: string;
+  introduction: string | null;
+  lore: string | null;
+  objectives: string[] | null;
+  rules: string | null;
+  status: string;
+  routes?: Array<{ id: string; name: string; difficulty: string; status: string }>;
+  endings?: Array<{ id: string; name: string; orderIndex: number }>;
+}
+
+export interface Mission {
+  id: string;
+  routeId: string;
+  title: string;
+  narrative: string | null;
+  description: string | null;
+  orderIndex: number;
+  difficulty: number;
+  isLastMission: boolean;
+  checkpoint?: Checkpoint | null;
+  challenges?: Challenge[];
+}
+
+export interface Challenge {
+  id: string;
+  missionId: string;
+  type: string;
+  prompt: string;
+  hint1?: string | null;
+  hint2?: string | null;
+  hint3?: string | null;
+  hint4?: string | null;
+  orderIndex: number;
+  penalty: number;
+  answers?: ChallengeAnswer[];
+}
+
+export interface ChallengeAnswer {
+  id: string;
+  challengeId: string;
+  value: string;
+  label?: string | null;
+  isCorrect: boolean;
+  penalty: number;
+  orderIndex: number;
+}
+
+export interface Notification {
+  id: string;
+  type: string;
+  teamName: string;
+  location: string;
+  actors: string[];
+  message: string;
+  status: string;
+  createdAt: string;
 }
 
 async function fetchApi<T>(
@@ -106,18 +196,40 @@ export const citiesApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+  update: (id: string, data: Partial<City>) =>
+    fetchApi<City>(`/cities/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  remove: (id: string) =>
+    fetchApi<void>(`/cities/${id}`, {
+      method: "DELETE",
+    }),
 };
 
-// ── Routes ──
+// ── Routes (BC = backward compatible w/ old 2-arg create) ──
 export const routesApi = {
   list: (cityId: string) => fetchApi<Route[]>(`/cities/${cityId}/routes`),
-  get: (cityId: string, routeId: string) =>
-    fetchApi<Route>(`/cities/${cityId}/routes/${routeId}`),
-  create: (cityId: string, data: Partial<Route>) =>
+  get: (routeId: string) => fetchApi<Route>(`/routes/${routeId}`),
+  getByCity: (cityId: string, routeId: string) => fetchApi<Route>(`/cities/${cityId}/routes/${routeId}`),
+  create: (storyId: string, cityId: string, data: Partial<Route>) =>
+    fetchApi<Route>(`/stories/${storyId}/cities/${cityId}/routes`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  createByCity: (cityId: string, data: Partial<Route> & { storyId: string }) =>
     fetchApi<Route>(`/cities/${cityId}/routes`, {
       method: "POST",
       body: JSON.stringify(data),
     }),
+  update: (routeId: string, data: Partial<Route>) =>
+    fetchApi<Route>(`/routes/${routeId}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  remove: (routeId: string) =>
+    fetchApi<void>(`/routes/${routeId}`, { method: "DELETE" }),
+  listByStory: (storyId: string) => fetchApi<Route[]>(`/stories/${storyId}/routes`),
 };
 
 // ── Teams ──
@@ -143,21 +255,37 @@ export const rankingsApi = {
     }),
 };
 
-// ── NEW: Game Templates ──
-export interface Game {
-  id: string;
-  cityId: string;
-  name: string;
-  description: string | null;
-  durationMinutes: number;
-  difficulty: string;
-  status: string;
-  maxPlayers: number;
-  imageUrl: string | null;
-  city?: City;
-  stories?: Array<{ id: string; name: string; status: string }>;
-}
+// ── Users ──
+export const usersApi = {
+  list: () => fetchApi<User[]>("/users"),
+  getMe: () => fetchApi<User>("/users/me"),
+  updateMe: (data: Partial<User>) =>
+    fetchApi<User>("/users/me", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+};
 
+// ── Game Sessions ──
+export const sessionsApi = {
+  list: () => fetchApi<GameSession[]>("/games/sessions"),
+  get: (sessionId: string) =>
+    fetchApi<GameSession>(`/games/sessions/${sessionId}`),
+  listByTeam: (teamId: string) =>
+    fetchApi<GameSession[]>(`/games/teams/${teamId}/sessions`),
+};
+
+// ── Notifications ──
+export const notificationsApi = {
+  list: () => fetchApi<Notification[]>("/notifications"),
+  create: (data: Partial<Notification>) =>
+    fetchApi<Notification>("/notifications", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};
+
+// ── Game Templates ──
 export const gamesTemplateApi = {
   listByCity: (cityId: string) => fetchApi<Game[]>(`/cities/${cityId}/games`),
   get: (gameId: string) => fetchApi<Game>(`/games/${gameId}`),
@@ -169,39 +297,17 @@ export const gamesTemplateApi = {
   clone: (gameId: string) => fetchApi<Game>(`/games/${gameId}/clone`, { method: "POST" }),
 };
 
-// ── NEW: Stories ──
-export interface Story {
-  id: string;
-  gameId: string;
-  name: string;
-  introduction: string | null;
-  lore: string | null;
-  objectives: string[] | null;
-  rules: string | null;
-  status: string;
-  routes?: Array<{ id: string; name: string; difficulty: string; status: string }>;
-  endings?: Array<{ id: string; name: string; orderIndex: number }>;
-}
-
+// ── Stories ──
 export const storiesApi = {
   listByGame: (gameId: string) => fetchApi<Story[]>(`/games/${gameId}/stories`),
-  get: (gameId: string, storyId: string) => fetchApi<Story>(`/games/${gameId}/stories/${storyId}`),
+  get: (storyId: string) => fetchApi<Story>(`/stories/${storyId}`),
   create: (gameId: string, data: Partial<Story>) =>
     fetchApi<Story>(`/games/${gameId}/stories`, { method: "POST", body: JSON.stringify(data) }),
+  update: (storyId: string, data: Partial<Story>) =>
+    fetchApi<Story>(`/stories/${storyId}`, { method: "PATCH", body: JSON.stringify(data) }),
 };
 
-// ── NEW: Missions ──
-export interface Mission {
-  id: string;
-  routeId: string;
-  title: string;
-  narrative: string | null;
-  description: string | null;
-  orderIndex: number;
-  difficulty: number;
-  isLastMission: boolean;
-}
-
+// ── Missions ──
 export const missionsApi = {
   listByRoute: (routeId: string) => fetchApi<Mission[]>(`/routes/${routeId}/missions`),
   get: (missionId: string) => fetchApi<Mission>(`/missions/${missionId}`),
@@ -211,7 +317,13 @@ export const missionsApi = {
     }),
 };
 
-// ── Game Sessions ──
+// ── Challenges ──
+export const challengesApi = {
+  listByMission: (missionId: string) => fetchApi<Challenge[]>(`/missions/${missionId}/challenges`),
+  get: (challengeId: string) => fetchApi<Challenge>(`/challenges/${challengeId}`),
+};
+
+// ── Old Game Sessions (backward compat) ──
 export const gamesApi = {
   getSession: (sessionId: string) =>
     fetchApi<GameSession>(`/games/sessions/${sessionId}`),

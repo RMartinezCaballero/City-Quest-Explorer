@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CityService } from './city.service';
 import { CreateCityDto } from './dto/create-city.dto';
@@ -27,5 +27,21 @@ export class CityController {
   @ApiOperation({ summary: 'Crear una ciudad' })
   create(@Body() payload: CreateCityDto) {
     return this.cityService.create(payload);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Actualizar una ciudad' })
+  update(@Param('id') id: string, @Body() payload: Partial<CreateCityDto>) {
+    return this.cityService.update(id, payload);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Eliminar una ciudad' })
+  remove(@Param('id') id: string) {
+    return this.cityService.remove(id);
   }
 }

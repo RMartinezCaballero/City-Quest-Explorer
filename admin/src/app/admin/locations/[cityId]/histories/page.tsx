@@ -114,7 +114,8 @@ export default function HistoriesPage() {
         if (!cityId) return;
         setCreating(true);
         try {
-            await routesApi.create(cityId, {
+            await routesApi.createByCity(cityId, {
+                storyId: "550e8400-e29b-41d4-a716-446655440003", // Historia Principal
                 name: form.name,
                 description: form.description,
                 distanceMeters: Number(form.distanceMeters),

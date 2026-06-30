@@ -22,6 +22,14 @@ export class RoutesController {
     return this.routesService.findOne(routeId);
   }
 
+  @Post('cities/:cityId/routes')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Crear ruta en ciudad (BC) - requiere storyId en body' })
+  createByCity(@Param('cityId') cityId: string, @Body() payload: CreateRouteDto & { storyId: string }) {
+    return this.routesService.create(payload.storyId, cityId, payload);
+  }
+
   // ── Nuevos endpoints con jerarquía Story ──
   @Get('routes/:routeId')
   @ApiOperation({ summary: 'Obtener ruta por id' })

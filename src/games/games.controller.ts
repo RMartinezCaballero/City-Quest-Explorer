@@ -23,9 +23,15 @@ export class GamesController {
   @Post('solo/sessions')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Iniciar una nueva sesión de juego (modo solo: crea Team con 1 miembro)' })
+  @ApiOperation({ summary: 'Iniciar una nueva sesión de juego (modo solo)' })
   createSoloSession(@User('id') userId: string, @Body() payload: CreateSoloSessionDto) {
     return this.gamesService.createSoloSession({ ...payload, userId });
+  }
+
+  @Get('sessions')
+  @ApiOperation({ summary: 'Listar todas las sesiones de juego' })
+  findAllSessions() {
+    return this.gamesService.findAllSessions();
   }
 
   @Get('sessions/:sessionId')
@@ -48,4 +54,3 @@ export class GamesController {
     return this.gamesService.addSessionEvent(sessionId, payload);
   }
 }
-

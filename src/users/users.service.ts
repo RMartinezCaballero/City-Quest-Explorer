@@ -7,6 +7,19 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) { }
 
+  findAll() {
+    return this.prisma.user.findMany({
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+  }
+
   findById(id: string) {
     return this.prisma.user.findUnique({ where: { id } });
   }
@@ -16,7 +29,6 @@ export class UsersService {
   }
 
   async updateProfile(userId: string, payload: UpdateUserDto) {
-    // Validar que el usuario existe primero
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -25,12 +37,10 @@ export class UsersService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    // Preparar datos para actualizar
     const updateData: any = {
       name: payload.name,
     };
 
-    // Si se proporciona password, hashearla y guardarla
     if (payload.password) {
       updateData.passwordHash = await bcrypt.hash(payload.password, 12);
     }

@@ -53,7 +53,7 @@ export default function HistoryDetailPage() {
             setLoading(true);
             try {
                 if (!cityId || !routeId) return;
-                const data = await routesApi.get(cityId, routeId);
+                const data = await routesApi.get(routeId);
                 if (cancelled) return;
                 setRoute(data);
             } finally {
