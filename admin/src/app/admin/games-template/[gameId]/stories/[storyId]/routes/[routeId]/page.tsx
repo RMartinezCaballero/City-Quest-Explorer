@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import dynamic from "next/dynamic";
 import {
   ArrowLeft,
   Plus,
@@ -41,7 +42,13 @@ import {
   Puzzle,
   MapPin,
   CheckCircle2,
+  Navigation,
 } from "lucide-react";
+
+const LeafletMap = dynamic(() => import("@/components/map/leaflet-map"), {
+  ssr: false,
+  loading: () => <div className="h-[400px] bg-muted animate-pulse rounded-lg flex items-center justify-center"><span className="text-muted-foreground">Cargando mapa...</span></div>
+});
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
@@ -325,33 +332,69 @@ export default function RouteDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Checkpoints Reference */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            Checkpoints de Referencia
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Coordenadas</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {(route.checkpoints ?? []).map((cp) => (
-                <TableRow key={cp.id}>
-                  <TableCell className="font-medium">{cp.name}</TableCell>
-                  <TableCell className="font-mono text-sm">{cp.latitude.toFixed(4)}, {cp.longitude.toFixed(4)}</TableCell>
+      {/* Map + Checkpoints */}
+      {(route.checkpoints ?? []).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Mapa de Ruta — {(route.checkpoints ?? []).length} checkpoints
+            </CardTitle>
+            <CardDescription>
+              Marcadores en orden de recorrido. Primer checkpoint en verde.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <LeafletMap
+              points={(route.checkpoints ?? []).map((cp, i) => ({
+                id: cp.id,
+                name: cp.name,
+                latitude: cp.latitude,
+                longitude: cp.longitude,
+                color: i === 0 ? "#22c55e" : "#3b82f6",
+              }))}
+              height="400px"
+              zoom={15}
+            />
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">#</TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Coordenadas</TableHead>
+                  <TableHead className="w-16"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {(route.checkpoints ?? []).map((cp, i) => (
+                  <TableRow key={cp.id}>
+                    <TableCell>
+                      <div className={"w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white " + (i === 0 ? "bg-green-500" : "bg-blue-500")}>
+                        {i + 1}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{cp.name}</TableCell>
+                    <TableCell className="font-mono text-sm text-muted-foreground">
+                      {cp.latitude.toFixed(4)}, {cp.longitude.toFixed(4)}
+                    </TableCell>
+                    <TableCell>
+                      <a
+                        href={"https://www.google.com/maps?q=" + cp.latitude + "," + cp.longitude}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                          <Navigation className="h-3.5 w-3.5" />
+                        </Button>
+                      </a>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Create Challenge Dialog */}
       <Dialog open={openChallenge} onOpenChange={setOpenChallenge}>
