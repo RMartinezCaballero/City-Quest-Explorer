@@ -11,6 +11,7 @@ services:
     buildCommand: npm install --include=dev && npm run build
     startCommand: npm run start:prod
     healthCheckPath: /health
+    entrypoint: dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
