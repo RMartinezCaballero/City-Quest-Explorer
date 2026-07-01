@@ -15,6 +15,7 @@ import { ChallengesModule } from './challenges/challenges.module';
 import { UnlockKeysModule } from './unlock-keys/unlock-keys.module';
 import { StoryEndingsModule } from './story-endings/story-endings.module';
 import { HealthController } from './health.controller';
+import { RootController } from './root.controller';
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { HealthController } from './health.controller';
     UnlockKeysModule,
     StoryEndingsModule,
   ],
-  controllers: [HealthController],
+  controllers: [HealthController, RootController],
 })
 export class AppModule {}
