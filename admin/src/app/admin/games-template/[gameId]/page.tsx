@@ -30,6 +30,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   BookOpen,
   Plus,
@@ -38,6 +46,7 @@ import {
   MapPin,
   Share2,
   Trash2,
+  Pencil,
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
@@ -82,6 +91,16 @@ export default function GameDetailPage() {
 
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Edit game dialog
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    description: "",
+    difficulty: "MEDIUM",
+    durationMinutes: 120,
+    maxPlayers: 5,
+  });
 
   // Create story dialog
   const [openCreate, setOpenCreate] = useState(false);
@@ -149,6 +168,40 @@ export default function GameDetailPage() {
     }
   }
 
+  function openEditDialog() {
+    if (!game) return;
+    setEditForm({
+      name: game.name,
+      description: game.description || "",
+      difficulty: game.difficulty,
+      durationMinutes: game.durationMinutes,
+      maxPlayers: game.maxPlayers,
+    });
+    setOpenEdit(true);
+  }
+
+  async function handleEditGame() {
+    try {
+      const res = await fetch(`${API_BASE}/games/${gameId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editForm.name,
+          description: editForm.description || null,
+          difficulty: editForm.difficulty,
+          durationMinutes: Number(editForm.durationMinutes),
+          maxPlayers: Number(editForm.maxPlayers),
+        }),
+      });
+      if (res.ok) {
+        setOpenEdit(false);
+        loadGame();
+      }
+    } catch (e) {
+      console.error("Error updating game:", e);
+    }
+  }
+
   if (loading) {
     return <div className="p-8 text-center text-muted-foreground animate-pulse">Cargando juego...</div>;
   }
@@ -176,6 +229,10 @@ export default function GameDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={openEditDialog}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Editar
+          </Button>
           <Button variant="outline" onClick={handleClone}>
             <Share2 className="h-4 w-4 mr-2" />
             Clonar
@@ -297,6 +354,73 @@ export default function GameDetailPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Edit Game Dialog */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Juego</DialogTitle>
+            <DialogDescription>
+              Modifica los datos del juego
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label>Nombre</label>
+              <Input
+                value={editForm.name}
+                onChange={(e) => setEditForm(p => ({ ...p, name: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label>Descripción</label>
+              <Textarea
+                value={editForm.description}
+                onChange={(e) => setEditForm(p => ({ ...p, description: e.target.value }))}
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label>Dificultad</label>
+                <Select
+                  value={editForm.difficulty}
+                  onValueChange={(v) => { if (v !== null) setEditForm(p => ({ ...p, difficulty: v })); }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EASY">Fácil</SelectItem>
+                    <SelectItem value="MEDIUM">Media</SelectItem>
+                    <SelectItem value="HARD">Difícil</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label>Duración (min)</label>
+                <Input
+                  type="number"
+                  value={editForm.durationMinutes}
+                  onChange={(e) => setEditForm(p => ({ ...p, durationMinutes: Number(e.target.value) }))}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <label>Máximo de jugadores</label>
+              <Input
+                type="number"
+                value={editForm.maxPlayers}
+                onChange={(e) => setEditForm(p => ({ ...p, maxPlayers: Number(e.target.value) }))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>Cancelar</Button>
+            <Button disabled={!editForm.name.trim()} onClick={handleEditGame}>Guardar Cambios</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

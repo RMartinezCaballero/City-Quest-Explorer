@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_client.dart';
+import 'package:mobile/core/network/api_client.dart';
 
 final qrEventApiProvider = Provider(
   (ref) => QrEventApi(ref.watch(apiClientProvider)),

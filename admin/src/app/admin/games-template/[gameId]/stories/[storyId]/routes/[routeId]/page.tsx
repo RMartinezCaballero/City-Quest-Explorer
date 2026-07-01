@@ -31,6 +31,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import dynamic from "next/dynamic";
 import {
   ArrowLeft,
@@ -43,6 +50,7 @@ import {
   MapPin,
   CheckCircle2,
   Navigation,
+  Pencil,
 } from "lucide-react";
 
 const LeafletMap = dynamic(() => import("@/components/map/leaflet-map"), {
@@ -113,6 +121,16 @@ export default function RouteDetailPage() {
   const [route, setRoute] = useState<RouteDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Edit route dialog
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    description: "",
+    difficulty: "MEDIUM",
+    distanceMeters: 4000,
+    estimatedMinutes: 120,
+  });
+
   // Create mission dialog
   const [openMission, setOpenMission] = useState(false);
   const [missionTitle, setMissionTitle] = useState("");
@@ -162,6 +180,40 @@ export default function RouteDetailPage() {
       }
     } catch (e) {
       console.error("Error creating mission:", e);
+    }
+  }
+
+  function openEditDialog() {
+    if (!route) return;
+    setEditForm({
+      name: route.name,
+      description: route.description,
+      difficulty: route.difficulty,
+      distanceMeters: route.distanceMeters,
+      estimatedMinutes: route.estimatedMinutes,
+    });
+    setOpenEdit(true);
+  }
+
+  async function handleEditRoute() {
+    try {
+      const res = await fetch(`${API_BASE}/routes/${routeId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editForm.name,
+          description: editForm.description,
+          difficulty: editForm.difficulty,
+          distanceMeters: Number(editForm.distanceMeters),
+          estimatedMinutes: Number(editForm.estimatedMinutes),
+        }),
+      });
+      if (res.ok) {
+        setOpenEdit(false);
+        loadRoute();
+      }
+    } catch (e) {
+      console.error("Error updating route:", e);
     }
   }
 
@@ -215,6 +267,10 @@ export default function RouteDetailPage() {
             </p>
           </div>
         </div>
+        <Button variant="outline" onClick={openEditDialog}>
+          <Pencil className="h-4 w-4 mr-2" />
+          Editar
+        </Button>
       </div>
 
       {/* Missions List */}
@@ -437,6 +493,73 @@ export default function RouteDetailPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpenChallenge(false)}>Cancelar</Button>
             <Button disabled={!challengePrompt.trim()} onClick={handleCreateChallenge}>Crear Reto</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Route Dialog */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Ruta</DialogTitle>
+            <DialogDescription>
+              Modifica los datos de la ruta
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label>Nombre</label>
+              <Input
+                value={editForm.name}
+                onChange={(e) => setEditForm(p => ({ ...p, name: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label>Descripción</label>
+              <Textarea
+                value={editForm.description}
+                onChange={(e) => setEditForm(p => ({ ...p, description: e.target.value }))}
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label>Dificultad</label>
+                <Select
+                  value={editForm.difficulty}
+                  onValueChange={(v) => { if (v !== null) setEditForm(p => ({ ...p, difficulty: v })); }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EASY">Fácil</SelectItem>
+                    <SelectItem value="MEDIUM">Media</SelectItem>
+                    <SelectItem value="HARD">Difícil</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label>Distancia (m)</label>
+                <Input
+                  type="number"
+                  value={editForm.distanceMeters}
+                  onChange={(e) => setEditForm(p => ({ ...p, distanceMeters: Number(e.target.value) }))}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <label>Minutos estimados</label>
+              <Input
+                type="number"
+                value={editForm.estimatedMinutes}
+                onChange={(e) => setEditForm(p => ({ ...p, estimatedMinutes: Number(e.target.value) }))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>Cancelar</Button>
+            <Button disabled={!editForm.name.trim()} onClick={handleEditRoute}>Guardar Cambios</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

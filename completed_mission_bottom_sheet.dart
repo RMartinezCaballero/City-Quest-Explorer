@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../map/domain/checkpoint_marker.dart';
+import 'package:mobile/features/map/domain/checkpoint_marker.dart';
 
 class CompletedMissionBottomSheet extends StatelessWidget {
   final CheckpointMarker checkpoint;

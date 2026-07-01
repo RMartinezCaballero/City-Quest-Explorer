@@ -130,7 +130,7 @@ export default function CitiesPage() {
           <p className="text-muted-foreground mt-1">{loading ? "Cargando..." : filtered.length + " ciudades"}</p>
         </div>
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-          <DialogTrigger><Button><Plus className="h-4 w-4 mr-2" />Nueva Ciudad</Button></DialogTrigger>
+          <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Ciudad</Button>} />
           <DialogContent>
             <DialogHeader><DialogTitle>Crear Ciudad</DialogTitle><DialogDescription>Una ciudad puede tener múltiples juegos</DialogDescription></DialogHeader>
             <div className="grid gap-4 py-4">

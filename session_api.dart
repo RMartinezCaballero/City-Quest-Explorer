@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import '../domain/models/game_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/network/api_client.dart';
+import 'package:mobile/features/games/domain/models/game_session.dart';
 
 final sessionApiProvider = Provider(
   (ref) => SessionApi(ref.watch(apiClientProvider)),

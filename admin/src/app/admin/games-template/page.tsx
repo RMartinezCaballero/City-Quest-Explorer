@@ -131,13 +131,7 @@ export default function GamesTemplatePage() {
             Juegos configurables por ciudad
           </p>
         </div>
-        <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-          <DialogTrigger>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Juego
-            </Button>
-          </DialogTrigger>
+        <Dialog open={openCreate} onOpenChange={setOpenCreate}>                        <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nuevo Juego</Button>} />
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Crear Nuevo Juego</DialogTitle>

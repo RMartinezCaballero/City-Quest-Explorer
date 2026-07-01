@@ -1,7 +1,11 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/core/network/api_client.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+
+final mediaCacheServiceProvider = Provider((ref) => MediaCacheService(ref.watch(apiClientProvider)));
 
 class MediaCacheService {
   final Dio _dio;
@@ -45,8 +49,3 @@ class MediaCacheService {
     }
   }
 }
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile/core/network/api_client.dart';
-
-final mediaCacheServiceProvider = Provider((ref) => MediaCacheService(ref.watch(apiClientProvider)));

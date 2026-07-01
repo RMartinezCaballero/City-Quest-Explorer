@@ -164,12 +164,7 @@ export default function HistoriesPage() {
                     </p>
                 </div>
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger>
-                        <Button>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Nueva Historia
-                        </Button>
-                    </DialogTrigger>
+                    <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Historia</Button>} />
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>Crear Nueva Historia</DialogTitle>

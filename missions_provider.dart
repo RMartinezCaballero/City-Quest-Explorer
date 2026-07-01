@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/core/network/api_client.dart';
-import '../../domain/models/station.dart';
-import '../../../core/services/media_cache_service.dart';
+import 'package:mobile/features/missions/domain/models/station.dart';
+import 'package:mobile/core/services/media_cache_service.dart';
 
 /// Provider que gestiona la lista de misiones con soporte offline (caché local)
 final missionsProvider =

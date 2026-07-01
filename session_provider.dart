@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/session_api.dart';
-import '../../domain/models/game_session.dart';
+import 'package:mobile/features/games/data/session_api.dart';
+import 'package:mobile/features/games/domain/models/game_session.dart';
 
 final sessionProvider =
     StateNotifierProvider<SessionNotifier, AsyncValue<GameSession?>>((ref) {

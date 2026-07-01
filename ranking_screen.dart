@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/ranking_api.dart';
-import '../../domain/models/ranking.dart';
+import 'package:mobile/features/ranking/data/ranking_api.dart';
+import 'package:mobile/features/ranking/domain/models/ranking.dart';
 
 class RankingScreen extends ConsumerWidget {
   final String routeId;
