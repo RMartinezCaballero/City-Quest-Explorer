@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@n
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { AdminGuard } from '../common/guards/admin.guard';
 import { User } from '../common/decorators/user.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -13,13 +14,15 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Listar todos los usuarios (admin)' })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener usuario por ID' })
+  @UseGuards(AdminGuard)
+  @ApiOperation({ summary: 'Obtener usuario por ID (admin)' })
   findById(@Param('id') id: string) {
     return this.usersService.findById(id);
   }
@@ -31,6 +34,7 @@ export class UsersController {
   }
 
   @Post()
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Crear un nuevo usuario (admin)' })
   create(@Body() payload: { email: string; name: string; password: string; role?: string }) {
     return this.usersService.create(payload);
@@ -43,12 +47,14 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Actualizar un usuario (admin)' })
   update(@Param('id') id: string, @Body() payload: UpdateUserDto) {
     return this.usersService.update(id, payload);
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Eliminar un usuario (admin)' })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
