@@ -46,6 +46,8 @@ import {
   Target,
   AlertCircle,
   CheckCircle2,
+  Wand2,
+  Loader2,
 } from "lucide-react";
 import { routesApi, citiesApi, missionsApi, type Route, type City, type Mission } from "@/lib/api";
 
@@ -114,6 +116,9 @@ export default function RoutesPage() {
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
   const [selectedMissionIds, setSelectedMissionIds] = useState<string[]>([]);
   const [loadingMissions, setLoadingMissions] = useState(false);
+
+  // Generate missions state
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
 
   // Difficulty-based mission range
   const createConfig = difficultyConfig[createForm.difficulty];
@@ -288,6 +293,26 @@ export default function RoutesPage() {
       missionCount,
     });
     setOpenEdit(true);
+  }
+
+  async function handleGenerateMissions(routeId: string) {
+    setGeneratingId(routeId);
+    try {
+      const res = await fetch(
+        `${API_BASE}/routes/${routeId}/missions/generate`,
+        { method: "POST" }
+      );
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`Error ${res.status}: ${res.statusText}${body ? " - " + body : ""}`);
+      }
+      await loadAllRoutes();
+    } catch (e) {
+      console.error("Error generating missions:", e);
+      alert("Error al generar misiones");
+    } finally {
+      setGeneratingId(null);
+    }
   }
 
   async function handleEdit() {
@@ -624,6 +649,19 @@ export default function RoutesPage() {
                           }
                         >
                           <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={generatingId === route.id}
+                          onClick={() => handleGenerateMissions(route.id)}
+                          title="Generar misiones automáticamente"
+                        >
+                          {generatingId === route.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-amber-500" />
+                          ) : (
+                            <Wand2 className="h-4 w-4 text-amber-500" />
+                          )}
                         </Button>
                         <Button
                           variant="ghost"

@@ -160,4 +160,84 @@ export class RoutesService {
     }
     return this.prisma.route.delete({ where: { id: routeId } });
   }
+
+  /**
+   * Genera misiones placeholder para una ruta basándose en su missionCount (conditions).
+   * Solo crea las misiones faltantes si actualmente hay menos del target.
+   */
+  async generateMissions(routeId: string) {
+    const route = await this.prisma.route.findUnique({
+      where: { id: routeId },
+      include: { missions: { orderBy: { orderIndex: 'asc' } } },
+    });
+    if (!route) {
+      throw new NotFoundException('Ruta no encontrada');
+    }
+
+    // Read missionCount from conditions
+    const conditions = (route.conditions ?? {}) as Record<string, unknown>;
+    const targetCount =
+      typeof conditions.missionCount === 'number'
+        ? conditions.missionCount
+        : 10;
+
+    const existingCount = route.missions.length;
+    if (existingCount >= targetCount) {
+      // Already at or above target — just return existing missions
+      return route.missions;
+    }
+
+    const missionsToCreate = targetCount - existingCount;
+    const startIndex = existingCount;
+
+    // Reset isLastMission on existing missions to avoid duplicates
+    if (existingCount > 0) {
+      await this.prisma.mission.updateMany({
+        where: { routeId },
+        data: { isLastMission: false },
+      });
+    }
+
+    // Sample narrative templates for variety
+    const narrativeTemplates = [
+      'Explora los alrededores y descubre los secretos que esconde este lugar.',
+      'Sigue las pistas y resuelve el enigma para avanzar en tu misión.',
+      'El tiempo corre. Encuentra el punto exacto y completa el desafío.',
+      'La historia te espera. Descubre qué ocurrió aquí y actúa en consecuencia.',
+      'Observa con atención. No todo es lo que parece en este escenario.',
+      'Solo los más astutos lograrán descifrar el mensaje oculto.',
+      'Cada paso cuenta. Reúne las pruebas necesarias para continuar.',
+      'La ciudad guarda secretos. Hoy es tu misión descubrir uno de ellos.',
+    ];
+
+    for (let i = 0; i < missionsToCreate; i++) {
+      const orderIndex = startIndex + i;
+      const isLast = orderIndex === targetCount - 1;
+      const missionSeed = (orderIndex % narrativeTemplates.length);
+
+      await this.prisma.mission.create({
+        data: {
+          routeId,
+          title: `Misión #${orderIndex + 1}`,
+          narrative: narrativeTemplates[missionSeed],
+          description: 'Completa los objetivos de esta misión para avanzar.',
+          orderIndex,
+          difficulty: 5,
+          isLastMission: isLast,
+        },
+      });
+    }
+
+    return this.prisma.mission.findMany({
+      where: { routeId },
+      orderBy: { orderIndex: 'asc' },
+      include: {
+        checkpoint: true,
+        challenges: {
+          include: { answers: true, unlockKeys: true },
+          orderBy: { orderIndex: 'asc' },
+        },
+      },
+    });
+  }
 }

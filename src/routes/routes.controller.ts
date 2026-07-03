@@ -57,4 +57,10 @@ export class RoutesController {
   remove(@Param('routeId') routeId: string) {
     return this.routesService.remove(routeId);
   }
+
+  @Post('routes/:routeId/missions/generate')
+  @ApiOperation({ summary: 'Generar automáticamente misiones placeholder según el missionCount de la ruta' })
+  generateMissions(@Param('routeId') routeId: string) {
+    return this.routesService.generateMissions(routeId);
+  }
 }
