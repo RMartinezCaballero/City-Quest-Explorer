@@ -287,11 +287,26 @@ export const rankingsApi = {
 // ── Users ──
 export const usersApi = {
   list: () => fetchApi<User[]>("/users"),
+  get: (id: string) => fetchApi<User>(`/users/${id}`),
   getMe: () => fetchApi<User>("/users/me"),
+  create: (data: { email: string; name: string; password: string; role?: string }) =>
+    fetchApi<User>("/users", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  update: (id: string, data: { name?: string; password?: string; role?: string }) =>
+    fetchApi<User>(`/users/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
   updateMe: (data: Partial<User>) =>
     fetchApi<User>("/users/me", {
       method: "PATCH",
       body: JSON.stringify(data),
+    }),
+  remove: (id: string) =>
+    fetchApi<void>(`/users/${id}`, {
+      method: "DELETE",
     }),
 };
 
@@ -340,6 +355,18 @@ export const storiesApi = {
 export const missionsApi = {
   listByRoute: (routeId: string) => fetchApi<Mission[]>(`/routes/${routeId}/missions`),
   get: (missionId: string) => fetchApi<Mission>(`/missions/${missionId}`),
+  create: (routeId: string, data: { title: string; narrative?: string | null; description?: string | null; difficulty?: number; orderIndex: number }) =>
+    fetchApi<Mission>(`/routes/${routeId}/missions`, {
+      method: "POST", body: JSON.stringify(data),
+    }),
+  update: (routeId: string, missionId: string, data: { title?: string; narrative?: string | null; description?: string | null; difficulty?: number; orderIndex?: number }) =>
+    fetchApi<Mission>(`/routes/${routeId}/missions/${missionId}`, {
+      method: "PATCH", body: JSON.stringify(data),
+    }),
+  remove: (routeId: string, missionId: string) =>
+    fetchApi<void>(`/routes/${routeId}/missions/${missionId}`, {
+      method: "DELETE",
+    }),
   reorder: (routeId: string, missionIds: string[]) =>
     fetchApi<Mission[]>(`/routes/${routeId}/missions/reorder`, {
       method: "POST", body: JSON.stringify({ missionIds }),

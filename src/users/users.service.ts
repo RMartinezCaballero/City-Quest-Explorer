@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -28,6 +28,23 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
+  async create(payload: { email: string; name: string; password: string; role?: string }) {
+    const existing = await this.prisma.user.findUnique({ where: { email: payload.email } });
+    if (existing) {
+      throw new ConflictException('Ya existe un usuario con ese email');
+    }
+    const passwordHash = await bcrypt.hash(payload.password, 12);
+    return this.prisma.user.create({
+      data: {
+        email: payload.email,
+        name: payload.name,
+        passwordHash,
+        role: payload.role || 'USER',
+      },
+      select: { id: true, email: true, name: true, role: true, createdAt: true },
+    });
+  }
+
   async updateProfile(userId: string, payload: UpdateUserDto) {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -51,5 +68,30 @@ export class UsersService {
     });
 
     return { id: user.id, email: user.email, name: user.name, role: user.role };
+  }
+
+  async update(id: string, payload: UpdateUserDto) {
+    const existing = await this.prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    const updateData: any = { name: payload.name };
+    if (payload.password) {
+      updateData.passwordHash = await bcrypt.hash(payload.password, 12);
+    }
+    return this.prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: { id: true, email: true, name: true, role: true, createdAt: true },
+    });
+  }
+
+  async remove(id: string) {
+    const existing = await this.prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    await this.prisma.user.delete({ where: { id } });
+    return { deleted: true, id };
   }
 }

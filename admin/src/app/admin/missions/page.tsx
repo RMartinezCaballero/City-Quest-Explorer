@@ -16,9 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -26,8 +32,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, MapPin, Filter } from "lucide-react";
-import { missionsApi, routesApi, citiesApi, type Mission, type City } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Search, MapPin, Filter, Plus, Edit3, Trash2 } from "lucide-react";
+import CitySelect from "@/components/city-select";
+import { missionsApi, routesApi, citiesApi, type Mission, type City, type Route } from "@/lib/api";
 
 const difficultyLabels: Record<number, string> = {
   1: "Muy Fácil", 3: "Fácil", 5: "Media", 7: "Difícil", 9: "Muy Difícil",
@@ -47,6 +58,22 @@ export default function MissionsPage() {
   const [search, setSearch] = useState("");
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCity, setSelectedCity] = useState<string>("all");
+
+  // Create dialog
+  const [openCreate, setOpenCreate] = useState(false);
+  const [createCityId, setCreateCityId] = useState("");
+  const [createRouteId, setCreateRouteId] = useState("");
+  const [availableRoutes, setAvailableRoutes] = useState<Route[]>([]);
+  const [createForm, setCreateForm] = useState({
+    title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1,
+  });
+  const [creating, setCreating] = useState(false);
+
+  // Edit dialog
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editForm, setEditForm] = useState({
+    id: "", routeId: "", title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1,
+  });
 
   async function loadAllMissions() {
     setLoading(true);
@@ -90,6 +117,85 @@ export default function MissionsPage() {
     return matchesSearch && matchesCity;
   });
 
+  async function handleCityChange(cityId: string) {
+    setCreateCityId(cityId);
+    if (cityId) {
+      const routes = await routesApi.list(cityId);
+      setAvailableRoutes(routes);
+    } else {
+      setAvailableRoutes([]);
+    }
+    setCreateRouteId("");
+  }
+
+  async function handleCreate() {
+    if (!createRouteId || !createForm.title) return;
+    setCreating(true);
+    try {
+      await missionsApi.create(createRouteId, {
+        title: createForm.title,
+        narrative: createForm.narrative || null,
+        description: createForm.description || null,
+        difficulty: Number(createForm.difficulty),
+        orderIndex: Number(createForm.orderIndex),
+      });
+      setOpenCreate(false);
+      setCreateForm({ title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1 });
+      setCreateCityId("");
+      setCreateRouteId("");
+      await loadAllMissions();
+    } catch (e) {
+      console.error("Error creating mission:", e);
+      alert("Error al crear misión");
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  function openEditDialog(mission: Mission & { routeName?: string; cityName?: string }) {
+    setEditForm({
+      id: mission.id,
+      routeId: mission.routeId,
+      title: mission.title,
+      narrative: mission.narrative || "",
+      description: mission.description || "",
+      difficulty: mission.difficulty,
+      orderIndex: mission.orderIndex,
+    });
+    setOpenEdit(true);
+  }
+
+  async function handleEdit() {
+    if (!editForm.title) return;
+    try {
+      await missionsApi.update(editForm.routeId, editForm.id, {
+        title: editForm.title,
+        narrative: editForm.narrative || null,
+        description: editForm.description || null,
+        difficulty: Number(editForm.difficulty),
+        orderIndex: Number(editForm.orderIndex),
+      });
+      setOpenEdit(false);
+      await loadAllMissions();
+    } catch (e) {
+      console.error("Error updating mission:", e);
+      alert("Error al actualizar misión");
+    }
+  }
+
+  async function handleDelete(missionId: string, title: string) {
+    const mission = missions.find(m => m.id === missionId);
+    if (!mission) return;
+    if (!confirm(`¿Eliminar misión "${title}"? Esta acción no se puede deshacer.`)) return;
+    try {
+      await missionsApi.remove(mission.routeId, missionId);
+      await loadAllMissions();
+    } catch (e) {
+      console.error("Error deleting mission:", e);
+      alert("Error al eliminar misión");
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -99,6 +205,66 @@ export default function MissionsPage() {
             {loading ? "Cargando..." : `${filtered.length} misiones en total`}
           </p>
         </div>
+        <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+          <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Misión</Button>} />
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Crear Misión</DialogTitle>
+              <DialogDescription>Agrega una nueva misión a una ruta existente</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label>Ciudad</label>
+                <CitySelect
+                  value={createCityId}
+                  onChange={handleCityChange}
+                  placeholder="Seleccionar ciudad"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label>Ruta</label>
+                <Select value={createRouteId} onValueChange={(v) => { if (v !== null) setCreateRouteId(v); }} disabled={!createCityId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={createCityId ? "Seleccionar ruta" : "Primero selecciona una ciudad"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableRoutes.map((route) => (
+                      <SelectItem key={route.id} value={route.id}>{route.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label>Título de la Misión</label>
+                <Input value={createForm.title} onChange={(e) => setCreateForm(p => ({ ...p, title: e.target.value }))} placeholder="Ej: El Enigma del Faro" />
+              </div>
+              <div className="grid gap-2">
+                <label>Narrativa (opcional)</label>
+                <Textarea value={createForm.narrative} onChange={(e) => setCreateForm(p => ({ ...p, narrative: e.target.value }))} rows={2} placeholder="Texto narrativo de la misión..." />
+              </div>
+              <div className="grid gap-2">
+                <label>Descripción</label>
+                <Input value={createForm.description} onChange={(e) => setCreateForm(p => ({ ...p, description: e.target.value }))} placeholder="Descripción breve" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <label>Dificultad (1-10)</label>
+                  <Input type="number" min={1} max={10} value={createForm.difficulty} onChange={(e) => setCreateForm(p => ({ ...p, difficulty: Number(e.target.value) }))} />
+                </div>
+                <div className="grid gap-2">
+                  <label>Orden</label>
+                  <Input type="number" min={1} value={createForm.orderIndex} onChange={(e) => setCreateForm(p => ({ ...p, orderIndex: Number(e.target.value) }))} />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpenCreate(false)}>Cancelar</Button>
+              <Button disabled={creating || !createRouteId || !createForm.title} onClick={handleCreate}>
+                {creating ? "Creando..." : "Crear Misión"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card>
@@ -113,18 +279,14 @@ export default function MissionsPage() {
                 className="pl-9"
               />
             </div>
-            <Select value={selectedCity} onValueChange={(v) => { if (v !== null) setSelectedCity(v); }}>
-              <SelectTrigger className="w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filtrar ciudad" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las ciudades</SelectItem>
-                {cities.map((city) => (
-                  <SelectItem key={city.id} value={city.id}>{city.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CitySelect
+              value={selectedCity}
+              onChange={setSelectedCity}
+              placeholder="Filtrar ciudad"
+              className="w-[200px]"
+              includeAll
+              allLabel="Todas las ciudades"
+            />
           </div>
         </CardContent>
       </Card>
@@ -143,7 +305,8 @@ export default function MissionsPage() {
                 <TableHead><MapPin className="h-4 w-4 inline mr-1" />Ruta</TableHead>
                 <TableHead>Ciudad</TableHead>
                 <TableHead>Dificultad</TableHead>
-                <TableHead className="text-right">Orden</TableHead>
+                <TableHead>Orden</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -160,14 +323,24 @@ export default function MissionsPage() {
                       {difficultyLabels[mission.difficulty] || `Nivel ${mission.difficulty}`}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
+                  <TableCell className="text-muted-foreground">
                     {mission.isLastMission ? "🔚 Final" : `M${mission.orderIndex}`}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-1 justify-end">
+                      <Button variant="ghost" size="sm" onClick={() => openEditDialog(mission)}>
+                        <Edit3 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(mission.id, mission.title)}>
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
               {!loading && filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
                     No hay misiones disponibles
                   </TableCell>
                 </TableRow>
@@ -176,6 +349,44 @@ export default function MissionsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Editar Misión</DialogTitle>
+            <DialogDescription>Modifica los datos de la misión</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label>Título</label>
+              <Input value={editForm.title} onChange={(e) => setEditForm(p => ({ ...p, title: e.target.value }))} />
+            </div>
+            <div className="grid gap-2">
+              <label>Narrativa</label>
+              <Textarea value={editForm.narrative} onChange={(e) => setEditForm(p => ({ ...p, narrative: e.target.value }))} rows={2} />
+            </div>
+            <div className="grid gap-2">
+              <label>Descripción</label>
+              <Input value={editForm.description} onChange={(e) => setEditForm(p => ({ ...p, description: e.target.value }))} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label>Dificultad (1-10)</label>
+                <Input type="number" min={1} max={10} value={editForm.difficulty} onChange={(e) => setEditForm(p => ({ ...p, difficulty: Number(e.target.value) }))} />
+              </div>
+              <div className="grid gap-2">
+                <label>Orden</label>
+                <Input type="number" min={1} value={editForm.orderIndex} onChange={(e) => setEditForm(p => ({ ...p, orderIndex: Number(e.target.value) }))} />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>Cancelar</Button>
+            <Button disabled={!editForm.title} onClick={handleEdit}>Guardar Cambios</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

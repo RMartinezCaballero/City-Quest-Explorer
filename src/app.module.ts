@@ -14,6 +14,7 @@ import { MissionsModule } from './missions/missions.module';
 import { ChallengesModule } from './challenges/challenges.module';
 import { UnlockKeysModule } from './unlock-keys/unlock-keys.module';
 import { StoryEndingsModule } from './story-endings/story-endings.module';
+import { PaymentsModule } from './payments/payments.module';
 import { HealthController } from './health.controller';
 import { RootController } from './root.controller';
 
@@ -34,6 +35,7 @@ import { RootController } from './root.controller';
     ChallengesModule,
     UnlockKeysModule,
     StoryEndingsModule,
+    PaymentsModule,
   ],
   controllers: [HealthController, RootController],
 })

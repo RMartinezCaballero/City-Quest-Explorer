@@ -14,7 +14,10 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Route,
+  Globe,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -24,7 +27,8 @@ import { useAuth } from "@/components/auth-provider";
 const navItems = [
   { href: "/admin", icon: Home, label: "Dashboard" },
   { href: "/admin/games-template", icon: Gamepad2, label: "Juegos" },
-  { href: "/admin/cities", icon: MapPin, label: "Ciudades" },
+  { href: "/admin/cities", icon: Globe, label: "Ciudades" },
+  { href: "/admin/routes", icon: Route, label: "Rutas" },
   { href: "/admin/missions", icon: BookOpen, label: "Misiones" },
   { href: "/admin/games", icon: Gamepad2, label: "Sesiones" },
   { href: "/admin/qr-codes", icon: QrCode, label: "QR Codes" },

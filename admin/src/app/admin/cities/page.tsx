@@ -30,12 +30,6 @@ import {
 } from "@/components/ui/dialog";
 import { Search, Plus, MapPin, Globe, Edit3, Trash2, Gamepad2, Eye } from "lucide-react";
 import { citiesApi, type City } from "@/lib/api";
-import dynamic from "next/dynamic";
-
-const LeafletMap = dynamic(() => import("@/components/map/leaflet-map"), { 
-  ssr: false,
-  loading: () => <div className="h-[350px] bg-muted animate-pulse rounded-lg flex items-center justify-center"><span className="text-muted-foreground">Cargando mapa...</span></div>
-});
 
 const statusColors: Record<string, string> = {
   ACTIVE: "bg-green-50 text-green-700 border-green-200",
@@ -106,17 +100,6 @@ export default function CitiesPage() {
     }
   }
 
-  const mapPoints = cities
-    .filter((c) => c.latitude && c.longitude)
-    .map((c) => ({
-      id: c.id,
-      name: c.name,
-      latitude: c.latitude as number,
-      longitude: c.longitude as number,
-      description: c.country,
-      color: c.state === "INACTIVE" ? "#ef4444" : "#3b82f6",
-    }));
-
   function openEditDialog(city: City) {
     setEditForm({ id: city.id, name: city.name, slug: city.slug, country: city.country });
     setOpenEdit(true);
@@ -145,17 +128,6 @@ export default function CitiesPage() {
           </DialogContent>
         </Dialog>
       </div>
-
-      {mapPoints.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium"><MapPin className="h-4 w-4 inline mr-1" />Vista General</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LeafletMap points={mapPoints} height="350px" center={[10.5, -75.5]} zoom={7} />
-          </CardContent>
-        </Card>
-      )}
 
       <Card>
         <CardHeader>

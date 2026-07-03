@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Plus, Gamepad2, BookOpen, Eye, MapPin, Globe } from "lucide-react";
+import CitySelect from "@/components/city-select";
 import { citiesApi, gamesTemplateApi, type City } from "@/lib/api";
 import {
   Dialog,
@@ -31,13 +32,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
@@ -140,17 +134,11 @@ export default function GamesTemplatePage() {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <label>Ciudad</label>
-                <Select value={selectedCityId} onValueChange={(v) => { if (v !== null) setSelectedCityId(v); }}>
-                  <SelectTrigger>
-                    <Globe className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Seleccionar ciudad" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map((city) => (
-                      <SelectItem key={city.id} value={city.id}>{city.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <CitySelect
+                  value={selectedCityId}
+                  onChange={setSelectedCityId}
+                  placeholder="Seleccionar ciudad"
+                />
               </div>
               <div className="grid gap-2">
                 <label>Nombre del Juego</label>

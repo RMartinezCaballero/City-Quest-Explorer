@@ -355,6 +355,30 @@ model SessionEvent {
 }
 
 // ──────────────────────────────────────────────
+// Payment (Mercado Pago)
+// ──────────────────────────────────────────────
+model Payment {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String?   @db.Uuid
+  email           String
+  description     String
+  amount          Int       // Monto en COP
+  currency        String    @default("COP")
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED, REFUNDED
+  mpPaymentId     Int?      @unique              // ID de Mercado Pago
+  mpPreferenceId  String?                         // ID de la preferencia MP
+  mpMerchantOrder Int?                             // ID de la orden en MP
+  paymentMethod   String?                          // Tipo: credit_card, pse, etc.
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(6)
+
+  @@index([userId])
+  @@index([status])
+  @@map("Payment")
+}
+
+// ──────────────────────────────────────────────
 // Ranking
 // ──────────────────────────────────────────────
 model Ranking {
