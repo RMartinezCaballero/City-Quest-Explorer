@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -24,7 +23,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import CitySelect from "@/components/city-select";
 import {
@@ -37,15 +35,46 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Edit3, Trash2, Eye, Globe, Route as RouteIcon, MapPin } from "lucide-react";
-import { routesApi, citiesApi, type Route, type City } from "@/lib/api";
+import {
+  Search,
+  Plus,
+  Edit3,
+  Trash2,
+  Eye,
+  Globe,
+  Route as RouteIcon,
+  Target,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
+import { routesApi, citiesApi, missionsApi, type Route, type City, type Mission } from "@/lib/api";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
-const difficultyColors: Record<string, string> = {
-  EASY: "bg-green-50 text-green-700 border-green-200",
-  MEDIUM: "bg-amber-50 text-amber-700 border-amber-200",
-  HARD: "bg-red-50 text-red-700 border-red-200",
+const difficultyConfig: Record<string, {
+  label: string;
+  color: string;
+  minMissions: number;
+  maxMissions: number;
+}> = {
+  EASY: {
+    label: "Fácil",
+    color: "bg-green-50 text-green-700 border-green-200",
+    minMissions: 5,
+    maxMissions: 8,
+  },
+  MEDIUM: {
+    label: "Media",
+    color: "bg-amber-50 text-amber-700 border-amber-200",
+    minMissions: 8,
+    maxMissions: 12,
+  },
+  HARD: {
+    label: "Difícil",
+    color: "bg-red-50 text-red-700 border-red-200",
+    minMissions: 12,
+    maxMissions: 15,
+  },
 };
 
 export default function RoutesPage() {
@@ -59,17 +88,36 @@ export default function RoutesPage() {
   const [openCreate, setOpenCreate] = useState(false);
   const [createCityId, setCreateCityId] = useState("");
   const [createForm, setCreateForm] = useState({
-    name: "", description: "", difficulty: "MEDIUM" as "EASY" | "MEDIUM" | "HARD",
-    distanceMeters: 4000, estimatedMinutes: 120,
+    name: "",
+    description: "",
+    difficulty: "MEDIUM" as "EASY" | "MEDIUM" | "HARD",
+    distanceMeters: 4000,
+    estimatedMinutes: 120,
+    missionCount: 10,
   });
   const [creating, setCreating] = useState(false);
 
   // Edit dialog
   const [openEdit, setOpenEdit] = useState(false);
   const [editForm, setEditForm] = useState({
-    id: "", cityId: "", name: "", description: "", difficulty: "MEDIUM" as "EASY" | "MEDIUM" | "HARD",
-    distanceMeters: 4000, estimatedMinutes: 120,
+    id: "",
+    cityId: "",
+    name: "",
+    description: "",
+    difficulty: "MEDIUM" as "EASY" | "MEDIUM" | "HARD",
+    distanceMeters: 4000,
+    estimatedMinutes: 120,
+    missionCount: 10,
   });
+
+  // Selected missions for create
+  const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
+  const [selectedMissionIds, setSelectedMissionIds] = useState<string[]>([]);
+  const [loadingMissions, setLoadingMissions] = useState(false);
+
+  // Difficulty-based mission range
+  const createConfig = difficultyConfig[createForm.difficulty];
+  const editConfig = difficultyConfig[editForm.difficulty];
 
   async function loadAllRoutes() {
     setLoading(true);
@@ -80,7 +128,17 @@ export default function RoutesPage() {
       const allRoutes: (Route & { cityName?: string })[] = [];
       for (const city of citiesData) {
         const cityRoutes = await routesApi.list(city.id);
-        allRoutes.push(...cityRoutes.map(r => ({ ...r, cityName: city.name })));
+        allRoutes.push(
+          ...cityRoutes.map((r) => {
+            // Extract missionCount from conditions JSON if present
+            const conditions = (r as Route & { conditions?: Record<string, unknown> }).conditions || {};
+            const missionCount =
+              typeof conditions.missionCount === "number"
+                ? conditions.missionCount
+                : difficultyConfig[r.difficulty]?.maxMissions ?? 10;
+            return { ...r, cityName: city.name, missionCount };
+          })
+        );
       }
       setRoutes(allRoutes);
     } catch (e) {
@@ -90,23 +148,72 @@ export default function RoutesPage() {
     }
   }
 
-  useEffect(() => { loadAllRoutes(); }, []);
+  useEffect(() => {
+    loadAllRoutes();
+  }, []);
+
+  // Load available missions when city changes in create dialog
+  useEffect(() => {
+    if (!createCityId || createCityId === "all") {
+      setAvailableMissions([]);
+      setSelectedMissionIds([]);
+      return;
+    }
+    async function loadMissions() {
+      setLoadingMissions(true);
+      try {
+        const allMissions: Mission[] = [];
+        const cityRoutes = await routesApi.list(createCityId);
+        for (const route of cityRoutes) {
+          const missions = await missionsApi.listByRoute(route.id);
+          allMissions.push(...missions);
+        }
+        setAvailableMissions(allMissions);
+      } catch (e) {
+        console.error("Error loading missions:", e);
+      } finally {
+        setLoadingMissions(false);
+      }
+    }
+    loadMissions();
+  }, [createCityId]);
 
   const filtered = useMemo(() => {
     return routes.filter((r) => {
-      const matchesSearch = !search ||
+      const matchesSearch =
+        !search ||
         r.name.toLowerCase().includes(search.toLowerCase()) ||
         (r.cityName || "").toLowerCase().includes(search.toLowerCase());
-      const matchesCity = selectedCity === "all" || r.cityName === cities.find(c => c.id === selectedCity)?.name;
+      const matchesCity =
+        selectedCity === "all" ||
+        r.cityName === cities.find((c) => c.id === selectedCity)?.name;
       return matchesSearch && matchesCity;
     });
   }, [routes, search, selectedCity, cities]);
+
+  // Update missionCount when difficulty changes in create
+  function handleCreateDifficultyChange(v: string | null) {
+    if (!v) return;
+    const diff = v as "EASY" | "MEDIUM" | "HARD";
+    const config = difficultyConfig[diff];
+    // Set to midpoint of range
+    const mid = Math.round((config.minMissions + config.maxMissions) / 2);
+    setCreateForm((p) => ({ ...p, difficulty: diff, missionCount: mid }));
+  }
+
+  // Update missionCount when difficulty changes in edit
+  function handleEditDifficultyChange(v: string | null) {
+    if (!v) return;
+    const diff = v as "EASY" | "MEDIUM" | "HARD";
+    const config = difficultyConfig[diff];
+    const mid = Math.round((config.minMissions + config.maxMissions) / 2);
+    setEditForm((p) => ({ ...p, difficulty: diff, missionCount: mid }));
+  }
 
   async function handleCreate() {
     if (!createCityId || !createForm.name) return;
     setCreating(true);
     try {
-      // Need to get a story for this city to create the route
       const gamesRes = await fetch(`${API_BASE}/cities/${createCityId}/games`);
       const games = gamesRes.ok ? await gamesRes.json() : [];
       let storyId = "";
@@ -119,11 +226,24 @@ export default function RoutesPage() {
       }
       await routesApi.createByCity(createCityId, {
         storyId,
-        ...createForm,
+        name: createForm.name,
+        description: createForm.description,
+        difficulty: createForm.difficulty,
+        distanceMeters: createForm.distanceMeters,
+        estimatedMinutes: createForm.estimatedMinutes,
+        conditions: { missionCount: createForm.missionCount },
       });
       setOpenCreate(false);
-      setCreateForm({ name: "", description: "", difficulty: "MEDIUM", distanceMeters: 4000, estimatedMinutes: 120 });
+      setCreateForm({
+        name: "",
+        description: "",
+        difficulty: "MEDIUM",
+        distanceMeters: 4000,
+        estimatedMinutes: 120,
+        missionCount: 10,
+      });
       setCreateCityId("");
+      setSelectedMissionIds([]);
       await loadAllRoutes();
     } catch (e) {
       console.error("Error creating route:", e);
@@ -134,7 +254,12 @@ export default function RoutesPage() {
   }
 
   async function handleDelete(routeId: string, name: string) {
-    if (!confirm(`¿Eliminar ruta "${name}"? También se eliminarán sus misiones y checkpoints.`)) return;
+    if (
+      !confirm(
+        `¿Eliminar ruta "${name}"? También se eliminarán sus misiones y checkpoints.`
+      )
+    )
+      return;
     try {
       await routesApi.remove(routeId);
       await loadAllRoutes();
@@ -145,6 +270,13 @@ export default function RoutesPage() {
   }
 
   function openEditDialog(route: Route & { cityName?: string }) {
+    const config = difficultyConfig[route.difficulty];
+    const conditions = (route as Route & { conditions?: Record<string, unknown> }).conditions || {};
+    const missionCount =
+      typeof conditions.missionCount === "number"
+        ? conditions.missionCount
+        : Math.round((config.minMissions + config.maxMissions) / 2);
+
     setEditForm({
       id: route.id,
       cityId: route.cityId,
@@ -153,6 +285,7 @@ export default function RoutesPage() {
       difficulty: route.difficulty,
       distanceMeters: route.distanceMeters,
       estimatedMinutes: route.estimatedMinutes,
+      missionCount,
     });
     setOpenEdit(true);
   }
@@ -166,6 +299,7 @@ export default function RoutesPage() {
         difficulty: editForm.difficulty,
         distanceMeters: Number(editForm.distanceMeters),
         estimatedMinutes: Number(editForm.estimatedMinutes),
+        conditions: { missionCount: editForm.missionCount },
       });
       setOpenEdit(false);
       await loadAllRoutes();
@@ -181,46 +315,67 @@ export default function RoutesPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Rutas</h1>
           <p className="text-muted-foreground mt-1">
-            {loading ? "Cargando..." : `${filtered.length} rutas en total`}
+            {loading
+              ? "Cargando..."
+              : `${filtered.length} rutas en total`}
           </p>
         </div>
+        <Button onClick={() => setOpenCreate(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Nueva Ruta
+        </Button>
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-          <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Ruta</Button>} />
-          <DialogContent>
+          <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>Crear Ruta</DialogTitle>
-              <DialogDescription>Una ruta contiene misiones y checkpoints para una ciudad</DialogDescription>
+              <DialogDescription>
+                Define la ruta, su dificultad y cuántas misiones incluirá
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              {/* Ciudad */}
               <div className="grid gap-2">
-                <label>Ciudad</label>
+                <label className="text-sm font-medium leading-none">Ciudad</label>
                 <CitySelect
                   value={createCityId}
                   onChange={setCreateCityId}
                   placeholder="Seleccionar ciudad"
                 />
               </div>
+
+              {/* Nombre */}
               <div className="grid gap-2">
-                <label>Nombre</label>
-                <Input value={createForm.name} onChange={(e) => setCreateForm(p => ({ ...p, name: e.target.value }))} placeholder="Ruta Principal" />
+                <label className="text-sm font-medium leading-none">Nombre</label>
+                <Input
+                  value={createForm.name}
+                  onChange={(e) =>
+                    setCreateForm((p) => ({ ...p, name: e.target.value }))
+                  }
+                  placeholder="Ruta Principal"
+                />
               </div>
+
+              {/* Descripción */}
               <div className="grid gap-2">
-                <label>Descripción</label>
-                <Input value={createForm.description} onChange={(e) => setCreateForm(p => ({ ...p, description: e.target.value }))} />
+                <label className="text-sm font-medium leading-none">Descripción</label>
+                <Input
+                  value={createForm.description}
+                  onChange={(e) =>
+                    setCreateForm((p) => ({
+                      ...p,
+                      description: e.target.value,
+                    }))
+                  }
+                />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <label>Distancia (m)</label>
-                  <Input type="number" value={createForm.distanceMeters} onChange={(e) => setCreateForm(p => ({ ...p, distanceMeters: Number(e.target.value) }))} />
-                </div>
-                <div className="grid gap-2">
-                  <label>Minutos</label>
-                  <Input type="number" value={createForm.estimatedMinutes} onChange={(e) => setCreateForm(p => ({ ...p, estimatedMinutes: Number(e.target.value) }))} />
-                </div>
-              </div>
+
+              {/* Dificultad */}
               <div className="grid gap-2">
-                <label>Dificultad</label>
-                <Select value={createForm.difficulty} onValueChange={(v) => { if (v !== null) setCreateForm(p => ({ ...p, difficulty: v as "EASY" | "MEDIUM" | "HARD" })); }}>
+                <label className="text-sm font-medium leading-none">Dificultad</label>
+                <Select
+                  value={createForm.difficulty}
+                  onValueChange={handleCreateDifficultyChange}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -231,10 +386,101 @@ export default function RoutesPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Misión Count Slider */}
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-1 text-sm font-medium leading-none">
+                    <Target className="h-4 w-4" />
+                    Cantidad de misiones                    </label>
+                  <Badge
+                    variant="outline"
+                    className={createConfig.color}
+                  >
+                    {createForm.missionCount} misiones
+                  </Badge>
+                </div>
+                <input
+                  type="range"
+                  min={createConfig.minMissions}
+                  max={createConfig.maxMissions}
+                  value={createForm.missionCount}
+                  onChange={(e) =>
+                    setCreateForm((p) => ({
+                      ...p,
+                      missionCount: Number(e.target.value),
+                    }))
+                  }
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-amber-600"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Mín: {createConfig.minMissions}</span>
+                  <span>
+                    {createConfig.label}: {createConfig.minMissions}-
+                    {createConfig.maxMissions} misiones
+                  </span>
+                  <span>Máx: {createConfig.maxMissions}</span>
+                </div>
+              </div>
+
+              {/* Distancia y tiempo */}
+              <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium leading-none">Distancia (m)</label>
+                  <Input
+                    type="number"
+                    value={createForm.distanceMeters}
+                    onChange={(e) =>
+                      setCreateForm((p) => ({
+                        ...p,
+                        distanceMeters: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium leading-none">Minutos estimados</label>
+                  <Input
+                    type="number"
+                    value={createForm.estimatedMinutes}
+                    onChange={(e) =>
+                      setCreateForm((p) => ({
+                        ...p,
+                        estimatedMinutes: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Available missions info */}
+              {createCityId && (
+                <div className="rounded-lg bg-muted/50 p-3 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>
+                      {loadingMissions
+                        ? "Cargando misiones disponibles..."
+                        : `${availableMissions.length} misiones existentes en esta ciudad`}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Las misiones se asignan y gestionan desde la sección{" "}
+                    <strong>Misiones</strong>. Esta ruta tendrá{" "}
+                    <strong>{createForm.missionCount} misiones</strong>.
+                    Puedes ajustar la cantidad según la dificultad.
+                  </p>
+                </div>
+              )}
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpenCreate(false)}>Cancelar</Button>
-              <Button disabled={creating || !createCityId || !createForm.name} onClick={handleCreate}>
+              <Button variant="outline" onClick={() => setOpenCreate(false)}>
+                Cancelar
+              </Button>
+              <Button
+                disabled={creating || !createCityId || !createForm.name}
+                onClick={handleCreate}
+              >
                 {creating ? "Creando..." : "Crear Ruta"}
               </Button>
             </DialogFooter>
@@ -242,6 +488,7 @@ export default function RoutesPage() {
         </Dialog>
       </div>
 
+      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex gap-4 flex-wrap">
@@ -266,6 +513,7 @@ export default function RoutesPage() {
         </CardContent>
       </Card>
 
+      {/* Routes Table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -273,56 +521,139 @@ export default function RoutesPage() {
             Rutas disponibles
           </CardTitle>
           <CardDescription>
-            {loading ? "Cargando..." : `${filtered.length} rutas encontradas`}
+            {loading
+              ? "Cargando..."
+              : `${filtered.length} rutas encontradas`}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><RouteIcon className="h-4 w-4 inline mr-1" />Nombre</TableHead>
-                <TableHead><Globe className="h-4 w-4 inline mr-1" />Ciudad</TableHead>
+                <TableHead>
+                  <RouteIcon className="h-4 w-4 inline mr-1" />
+                  Nombre
+                </TableHead>
+                <TableHead>
+                  <Globe className="h-4 w-4 inline mr-1" />
+                  Ciudad
+                </TableHead>
                 <TableHead>Dificultad</TableHead>
-                <TableHead>Distancia</TableHead>
                 <TableHead>Misiones</TableHead>
+                <TableHead>Distancia</TableHead>
                 <TableHead>Checkpoints</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((route) => (
-                <TableRow key={route.id}>
-                  <TableCell className="font-medium">{route.name}</TableCell>
-                  <TableCell>{route.cityName || "—"}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={difficultyColors[route.difficulty]}>
-                      {route.difficulty === "EASY" ? "Fácil" : route.difficulty === "MEDIUM" ? "Media" : "Difícil"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{Math.round(route.distanceMeters)} m</TableCell>
-                  <TableCell>{route.missions?.length ?? 0}</TableCell>
-                  <TableCell>{route.checkpoints?.length ?? 0}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-1 justify-end">
-                      <Link href={`/admin/cities/${route.cityId}`}>
-                        <Button variant="ghost" size="sm">
+              {filtered.map((route) => {
+                const config = difficultyConfig[route.difficulty];
+                const currentMissions = route.missions?.length ?? 0;
+                const targetMissions = route.missionCount ?? config.maxMissions;
+                const isComplete = currentMissions >= targetMissions;
+                const progressPct = Math.min(
+                  100,
+                  Math.round((currentMissions / targetMissions) * 100)
+                );
+
+                return (
+                  <TableRow key={route.id}>
+                    <TableCell className="font-medium">
+                      {route.name}
+                    </TableCell>
+                    <TableCell>{route.cityName || "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={config.color}>
+                        {config.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-[100px]">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span>
+                              {currentMissions}/{targetMissions}
+                            </span>
+                            {isComplete ? (
+                              <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+                            ) : (
+                              <span className="text-muted-foreground">
+                                {targetMissions - currentMissions} restantes
+                              </span>
+                            )}
+                          </div>
+                          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                isComplete
+                                  ? "bg-green-500"
+                                  : "bg-amber-400"
+                              }`}
+                              style={{ width: `${progressPct}%` }}
+                            />
+                          </div>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={`ml-2 text-xs ${
+                            isComplete
+                              ? "bg-green-50 text-green-700 border-green-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
+                          {isComplete ? "Completa" : `${config.minMissions}-${config.maxMissions}`}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {Math.round(route.distanceMeters)} m
+                    </TableCell>
+                    <TableCell>
+                      {route.checkpoints?.length ?? 0}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex gap-1 justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            window.open(
+                              `/admin/cities/${route.cityId}`,
+                              "_blank"
+                            )
+                          }
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
-                      </Link>
-                      <Button variant="ghost" size="sm" onClick={() => openEditDialog(route)}>
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(route.id, route.name)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditDialog(route)}
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            handleDelete(route.id, route.name)
+                          }
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
               {!loading && filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
-                    No hay rutas disponibles. Crea un juego con una historia primero.
+                  <TableCell
+                    colSpan={7}
+                    className="text-center text-muted-foreground"
+                  >
+                    No hay rutas disponibles. Crea un juego con una historia
+                    primero.
                   </TableCell>
                 </TableRow>
               )}
@@ -333,33 +664,46 @@ export default function RoutesPage() {
 
       {/* Edit Dialog */}
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Editar Ruta</DialogTitle>
-            <DialogDescription>Modifica los datos de la ruta</DialogDescription>
+            <DialogDescription>
+              Modifica los datos de la ruta y la cantidad de misiones
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            {/* Nombre */}
             <div className="grid gap-2">
-              <label>Nombre</label>
-              <Input value={editForm.name} onChange={(e) => setEditForm(p => ({ ...p, name: e.target.value }))} />
+              <label className="text-sm font-medium leading-none">Nombre</label>
+              <Input
+                value={editForm.name}
+                onChange={(e) =>
+                  setEditForm((p) => ({ ...p, name: e.target.value }))
+                }
+              />
             </div>
+
+            {/* Descripción */}
             <div className="grid gap-2">
-              <label>Descripción</label>
-              <Input value={editForm.description} onChange={(e) => setEditForm(p => ({ ...p, description: e.target.value }))} />
+              <label className="text-sm font-medium leading-none">Descripción</label>
+              <Input
+                value={editForm.description}
+                onChange={(e) =>
+                  setEditForm((p) => ({
+                    ...p,
+                    description: e.target.value,
+                  }))
+                }
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <label>Distancia (m)</label>
-                <Input type="number" value={editForm.distanceMeters} onChange={(e) => setEditForm(p => ({ ...p, distanceMeters: Number(e.target.value) }))} />
-              </div>
-              <div className="grid gap-2">
-                <label>Minutos estimados</label>
-                <Input type="number" value={editForm.estimatedMinutes} onChange={(e) => setEditForm(p => ({ ...p, estimatedMinutes: Number(e.target.value) }))} />
-              </div>
-            </div>
+
+            {/* Dificultad */}
             <div className="grid gap-2">
-              <label>Dificultad</label>
-              <Select value={editForm.difficulty} onValueChange={(v) => { if (v !== null) setEditForm(p => ({ ...p, difficulty: v as "EASY" | "MEDIUM" | "HARD" })); }}>
+              <label className="text-sm font-medium leading-none">Dificultad</label>
+              <Select
+                value={editForm.difficulty}
+                onValueChange={handleEditDifficultyChange}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -370,10 +714,78 @@ export default function RoutesPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Mission Count Slider */}
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-1 text-sm font-medium leading-none">
+                  <Target className="h-4 w-4" />
+                  Cantidad de misiones
+                </label>
+                <Badge variant="outline" className={editConfig.color}>
+                  {editForm.missionCount} misiones
+                </Badge>
+              </div>
+              <input
+                type="range"
+                min={editConfig.minMissions}
+                max={editConfig.maxMissions}
+                value={editForm.missionCount}
+                onChange={(e) =>
+                  setEditForm((p) => ({
+                    ...p,
+                    missionCount: Number(e.target.value),
+                  }))
+                }
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-amber-600"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Mín: {editConfig.minMissions}</span>
+                <span>
+                  {editConfig.label}: {editConfig.minMissions}-
+                  {editConfig.maxMissions} misiones
+                </span>
+                <span>Máx: {editConfig.maxMissions}</span>
+              </div>
+            </div>
+
+            {/* Distancia y tiempo */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium leading-none">Distancia (m)</label>
+                <Input
+                  type="number"
+                  value={editForm.distanceMeters}
+                  onChange={(e) =>
+                    setEditForm((p) => ({
+                      ...p,
+                      distanceMeters: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium leading-none">Minutos estimados</label>
+                <Input
+                  type="number"
+                  value={editForm.estimatedMinutes}
+                  onChange={(e) =>
+                    setEditForm((p) => ({
+                      ...p,
+                      estimatedMinutes: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenEdit(false)}>Cancelar</Button>
-            <Button disabled={!editForm.name} onClick={handleEdit}>Guardar Cambios</Button>
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>
+              Cancelar
+            </Button>
+            <Button disabled={!editForm.name} onClick={handleEdit}>
+              Guardar Cambios
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -35,4 +35,10 @@ export class CreateRouteDto {
   @ApiPropertyOptional({ example: { requiredMissions: ['M1', 'M2'] } })
   @IsOptional()
   conditions?: Record<string, unknown>;
+
+  @ApiPropertyOptional({ example: 8, description: 'Número de misiones asignadas (según dificultad: Fácil 5-8, Medio 8-12, Difícil 12-15)' })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  missionCount?: number;
 }

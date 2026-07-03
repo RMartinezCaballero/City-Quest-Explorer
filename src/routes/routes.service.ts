@@ -12,6 +12,12 @@ export class RoutesService {
     if (!story) {
       throw new NotFoundException('Historia no encontrada');
     }
+
+    const conditions = data.conditions ?? {};
+    if (data.missionCount) {
+      (conditions as Record<string, unknown>).missionCount = data.missionCount;
+    }
+
     return this.prisma.route.create({
       data: {
         storyId,
@@ -22,7 +28,7 @@ export class RoutesService {
         distanceMeters: data.distanceMeters,
         estimatedMinutes: data.estimatedMinutes,
         isDefault: data.isDefault ?? false,
-        conditions: (data.conditions ?? undefined) as Prisma.InputJsonValue | undefined,
+        conditions: conditions as Prisma.InputJsonValue,
       },
       include: {
         missions: { orderBy: { orderIndex: 'asc' } },
@@ -126,11 +132,22 @@ export class RoutesService {
     if (!route) {
       throw new NotFoundException('Ruta no encontrada');
     }
+
+    // Extract missionCount and conditions from data, merge properly
+    const { missionCount, conditions: incomingConditions, ...restData } = data;
+    const mergedConditions = {
+      ...(route.conditions ?? {}) as Record<string, unknown>,
+      ...(incomingConditions ?? {}) as Record<string, unknown>,
+    };
+    if (missionCount !== undefined) {
+      mergedConditions.missionCount = missionCount;
+    }
+
     return this.prisma.route.update({
       where: { id: routeId },
       data: {
-        ...data,
-        conditions: (data.conditions ?? undefined) as Prisma.InputJsonValue | undefined,
+        ...restData,
+        conditions: mergedConditions as Prisma.InputJsonValue,
       },
       include: { missions: true },
     });

@@ -37,6 +37,8 @@ export interface Route {
   story?: { id: string; name: string };
   missions?: Mission[];
   checkpoints?: Checkpoint[];
+  conditions?: Record<string, unknown>;
+  missionCount?: number;
 }
 
 export interface Checkpoint {
