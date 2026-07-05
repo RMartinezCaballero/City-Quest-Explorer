@@ -52,3 +52,6 @@ mobile/android/app/build/
 mobile/android/build/
 mobile/.idea/
 mobile/*.iml
+
+# Vercel/admin local copy — ignore for backend deploy cleanliness
+admin/
