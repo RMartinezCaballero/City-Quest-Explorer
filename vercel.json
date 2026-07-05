@@ -1,7 +1,8 @@
 {
   "services": {
     "city-quest-explorer-api": {
-      "root": "."
+      "root": ".",
+      "entrypoint": "dist/main.js"
     }
   },
   "rewrites": [
