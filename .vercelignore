@@ -1,1 +1,3 @@
-admin/
+# Vercel ahora usa rootDirectory: admin, no necesita excludes
+node_modules
+.git
