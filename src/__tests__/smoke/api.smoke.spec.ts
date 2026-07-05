@@ -42,7 +42,6 @@ async function api(path: string, options?: RequestInit) {
 }
 
 let accessToken: string | null = null;
-let testUserId: string | null = null;
 let sessionId: string | null = null;
 let teamId: string | null = null;
 
