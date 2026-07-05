@@ -5,9 +5,11 @@
 services:
   - type: web
     name: city-quest-explorer-api
-    env: docker
+    env: node
     region: ohio
     plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/main.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV

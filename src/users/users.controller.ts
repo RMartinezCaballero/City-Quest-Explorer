@@ -20,17 +20,17 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('me')
+  @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
+  getProfile(@User('id') userId: string) {
+    return this.usersService.findById(userId);
+  }
+
   @Get(':id')
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Obtener usuario por ID (admin)' })
   findById(@Param('id') id: string) {
     return this.usersService.findById(id);
-  }
-
-  @Get('me')
-  @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
-  getProfile(@User('id') userId: string) {
-    return this.usersService.findById(userId);
   }
 
   @Post()

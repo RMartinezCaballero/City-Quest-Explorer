@@ -44,6 +44,7 @@ async function api(path: string, options?: RequestInit) {
 let accessToken: string | null = null;
 let sessionId: string | null = null;
 let teamId: string | null = null;
+let testUserId: string | null = null;
 
 const TEST_EMAIL = `test-${Date.now()}@cityquest-e2e.test`;
 const TEST_PASSWORD = 'SmokeTest2026!';
