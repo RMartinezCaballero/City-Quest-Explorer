@@ -212,7 +212,7 @@ export default function GameDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/admin/games-template">
@@ -239,6 +239,27 @@ export default function GameDetailPage() {
           </Button>
           <Button onClick={handlePublish}>
             {game.status === "PUBLISHED" ? "Despublicar" : "Publicar"}
+          </Button>
+        </div>
+      </div>
+        {/* Route quick actions */}
+        <div className="flex items-center justify-between py-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Rutas del juego
+            </CardTitle>
+            <CardDescription>Asigna y genera rutas automáticas para este juego</CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              if (!game) return;
+              await handleEnsureGameRoutes();
+            }}
+          >
+            <Wand2 className="h-4 w-4 mr-2" />
+            Generar rutas base
           </Button>
         </div>
       </div>

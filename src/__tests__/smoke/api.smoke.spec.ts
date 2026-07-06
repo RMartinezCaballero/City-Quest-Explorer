@@ -44,7 +44,6 @@ async function api(path: string, options?: RequestInit) {
 let accessToken: string | null = null;
 let sessionId: string | null = null;
 let teamId: string | null = null;
-let testUserId: string | null = null;
 
 const TEST_EMAIL = `test-${Date.now()}@cityquest-e2e.test`;
 const TEST_PASSWORD = 'SmokeTest2026!';
@@ -196,7 +195,7 @@ describe('🔑  Endpoints Protegidos (con token)', () => {
     expect(status).toBe(200);
     const user = body as Record<string, unknown>;
     expect(user.email).toBe(TEST_EMAIL);
-    testUserId = user.id as string;
+    expect(user.id).toBeTruthy();
   });
 
   test('PATCH /users/me — actualiza perfil', async () => {

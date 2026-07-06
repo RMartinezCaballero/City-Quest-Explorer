@@ -33,8 +33,6 @@ class SessionApi {
   final ApiClient _client;
   SessionApi(this._client);
 
-  /// Crea o reutiliza sesión solo para el usuario autenticado.
-  /// routeId y cityId son los del piloto de Cartagena.
   Future<GameSession> createSoloSession({
     required String routeId,
     required String cityId,
@@ -49,5 +47,27 @@ class SessionApi {
   Future<GameSession> getSession(String sessionId) async {
     final res = await _client.dio.get('/games/sessions/$sessionId');
     return GameSession.fromJson((res.data as Map).cast<String, dynamic>());
+  }
+
+  Future<Map<String, dynamic>> getCities() async {
+    final res = await _client.dio.get('/cities');
+    final items = res.data as List;
+    return items.first as Map<String, dynamic>;
+  }
+
+  Future<List<Map<String, dynamic>>> getRoutesByCity(String cityId) async {
+    final res = await _client.dio.get('/cities/$cityId/routes');
+    final items = res.data as List;
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  Future<List<Map<String, dynamic>>> getRoutesByCityAndDifficulty(
+      String cityId, String difficulty) async {
+    final res = await _client.dio.get(
+      '/cities/$cityId/routes',
+      queryParameters: {'difficulty': difficulty},
+    );
+    final items = res.data as List;
+    return items.cast<Map<String, dynamic>>();
   }
 }

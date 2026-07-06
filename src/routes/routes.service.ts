@@ -36,9 +36,14 @@ export class RoutesService {
     });
   }
 
-  findByCity(cityId: string) {
+  findByCity(cityId: string, difficulty?: string) {
+    const where: any = { cityId };
+    if (difficulty) {
+      where.difficulty = difficulty;
+    }
+
     return this.prisma.route.findMany({
-      where: { cityId },
+      where,
       orderBy: { name: 'asc' },
       include: {
         story: { select: { id: true, name: true } },

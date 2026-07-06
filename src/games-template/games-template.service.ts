@@ -229,4 +229,106 @@ export class GamesTemplateService {
     }
     return this.prisma.game.delete({ where: { id: gameId } });
   }
+
+  async listPlayableRoutes(gameId: string, difficulty?: string) {
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+      select: { id: true, cityId: true },
+    });
+    if (!game) {
+      throw new NotFoundException('Juego no encontrado');
+    }
+
+    const stories = await this.prisma.story.findMany({
+      where: { gameId },
+      select: { id: true },
+    });
+
+    const storyIds = stories.map((s) => s.id);
+    if (!storyIds.length) {
+      return [];
+    }
+
+    const where: any = { storyId: { in: storyIds } };
+    if (difficulty) {
+      where.difficulty = difficulty;
+    }
+
+    const routes = await this.prisma.route.findMany({
+      where,
+      orderBy: { difficulty: 'asc' },
+      include: {
+        missions: {
+          orderBy: { orderIndex: 'asc' },
+          select: { id: true, title: true, orderIndex: true, difficulty: true },
+        },
+      },
+    });
+
+    return routes.map((route: any) => ({
+      ...route,
+      missionCount:
+        route.conditions &&
+        typeof route.conditions.missionCount === 'number'
+          ? Number(route.conditions.missionCount)
+          : Number(difficultyConfigByRoute[route.difficulty]?.max ?? 10),
+    }));
+  }
+
+  async ensureGameRoutes(gameId: string) {
+    const game = await this.prisma.game.findUnique({ where: { id: gameId }, include: { city: true } });
+    if (!game) {
+      throw new NotFoundException('Juego no encontrado');
+    }
+
+    const normalizedDifficulty = (game.difficulty || 'MEDIUM').toUpperCase();
+    const allowed = ['EASY', 'MEDIUM', 'HARD'];
+    const targetDifficulties = allowed.includes(normalizedDifficulty) ? allowed : ['EASY', 'MEDIUM', 'HARD'];
+
+    let story = await this.prisma.story.findFirst({ where: { gameId } });
+    if (!story) {
+      story = await this.prisma.story.create({
+        data: {
+          gameId,
+          name: `${game.name} — Historia Principal`,
+          introduction: 'Historia generada automáticamente para la experiencia de juego.',
+          status: 'PUBLISHED',
+        },
+      });
+    }
+
+    const createdRoutes: { difficulty: string; created: boolean; routeId?: string; missions?: number }[] = [];
+    for (const diff of targetDifficulties) {
+      const existing = await this.prisma.route.findFirst({ where: { storyId: story.id, difficulty: diff }, include: { missions: true } });
+      if (existing) {
+        createdRoutes.push({ difficulty: diff, created: false, routeId: existing.id, missions: existing.missions.length });
+        continue;
+      }
+
+      const created = await this.prisma.route.create({
+        data: {
+          storyId: story.id,
+          cityId: game.cityId,
+          name: `${game.name} — ${diff}`,
+          description: `Ruta ${diff.toLowerCase()} generada automáticamente.`,
+          difficulty: diff,
+          distanceMeters: diff === 'EASY' ? 2500 : diff === 'MEDIUM' ? 4500 : 7000,
+          estimatedMinutes: diff === 'EASY' ? 60 : diff === 'MEDIUM' ? 120 : 180,
+          isDefault: diff === normalizedDifficulty,
+          status: 'PUBLISHED',
+        },
+        include: { missions: true },
+      });
+
+      createdRoutes.push({ difficulty: diff, created: true, routeId: created.id, missions: created.missions.length });
+    }
+
+    return { gameId, storyId: story.id, createdRoutes };
+  }
 }
+
+const difficultyConfigByRoute: Record<string, { min: number; max: number }> = {
+  EASY: { min: 5, max: 8 },
+  MEDIUM: { min: 8, max: 12 },
+  HARD: { min: 12, max: 15 },
+};

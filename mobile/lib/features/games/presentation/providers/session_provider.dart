@@ -2,11 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/core/cache/offline_cache_service.dart';
 import 'package:mobile/features/games/data/session_api.dart';
 
-/// IDs del piloto de Cartagena — generados por prisma/seed.ts
-/// Deben coincidir con los registros en la DB de Supabase/NestJS.
-const kPilotRouteId = '550e8400-e29b-41d4-a716-446655440010';
-const kPilotCityId = '550e8400-e29b-41d4-a716-446655440001';
-
 class SessionState {
   final GameSession? session;
   final bool isLoading;
