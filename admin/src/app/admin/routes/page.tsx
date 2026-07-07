@@ -48,6 +48,8 @@ import {
   CheckCircle2,
   Wand2,
   Loader2,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { routesApi, citiesApi, missionsApi, type Route, type City, type Mission } from "@/lib/api";
 
@@ -116,6 +118,13 @@ export default function RoutesPage() {
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
   const [selectedMissionIds, setSelectedMissionIds] = useState<string[]>([]);
   const [loadingMissions, setLoadingMissions] = useState(false);
+
+  // Assign missions from routes list
+  const [openAssignMissions, setOpenAssignMissions] = useState(false);
+  const [assigningRouteId, setAssigningRouteId] = useState<string | null>(null);
+  const [assignMissions, setAssignMissions] = useState<Mission[]>([]);
+  const [assignSelectedIds, setAssignSelectedIds] = useState<string[]>([]);
+  const [assignSaving, setAssignSaving] = useState(false);
 
   // Generate missions state
   const [generatingId, setGeneratingId] = useState<string | null>(null);
@@ -312,6 +321,44 @@ export default function RoutesPage() {
       alert("Error al generar misiones");
     } finally {
       setGeneratingId(null);
+    }
+  }
+
+  async function openAssignMissionsDialog(routeId: string) {
+    setAssigningRouteId(routeId);
+    setOpenAssignMissions(true);
+    setAssignSaving(true);
+    setAssignSelectedIds([]);
+    try {
+      const missions = await routesApi.missions(routeId);
+      const route = routes.find((item) => item.id === routeId);
+      const conditions = (route as Route & { conditions?: Record<string, unknown> })?.conditions || {};
+      const preselected =
+        Array.isArray(conditions.selectedMissionIds) && conditions.selectedMissionIds.length > 0
+          ? (conditions.selectedMissionIds as string[])
+          : missions.map((m) => m.id);
+      setAssignMissions(missions);
+      setAssignSelectedIds(preselected);
+    } catch (e) {
+      console.error("Error loading route missions:", e);
+      alert("No se pudieron cargar las misiones de la ruta");
+    } finally {
+      setAssignSaving(false);
+    }
+  }
+
+  async function saveAssignMissions() {
+    if (!assigningRouteId) return;
+    setAssignSaving(true);
+    try {
+      await routesApi.assignMissions(assigningRouteId, assignSelectedIds);
+      await loadAllRoutes();
+      setOpenAssignMissions(false);
+    } catch (e) {
+      console.error("Error assigning missions:", e);
+      alert("No se pudieron guardar las misiones asignadas");
+    } finally {
+      setAssignSaving(false);
     }
   }
 
@@ -666,6 +713,14 @@ export default function RoutesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => openAssignMissionsDialog(route.id)}
+                          title="Asignar misiones a esta ruta"
+                        >
+                          <CheckSquare className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => openEditDialog(route)}
                         >
                           <Edit3 className="h-4 w-4" />
@@ -823,6 +878,73 @@ export default function RoutesPage() {
             </Button>
             <Button disabled={!editForm.name} onClick={handleEdit}>
               Guardar Cambios
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign missions dialog */}
+      <Dialog open={openAssignMissions} onOpenChange={setOpenAssignMissions}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Asignar misiones a la ruta</DialogTitle>
+            <DialogDescription>
+              Seleccioná las misiones que estarán activas para esta ruta. La primera y última siempre estarán
+              incluidas.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-4 max-h-[70vh] overflow-auto">
+            {assignSaving && (
+              <div className="text-sm text-muted-foreground">Cargando misiones...</div>
+            )}
+            {!assignSaving &&
+              assignMissions.map((mission) => {
+                const isFirst = mission.orderIndex === 0;
+                const isLast = mission.isLastMission;
+                const checked = assignSelectedIds.includes(mission.id);
+                return (
+                  <label
+                    key={mission.id}
+                    className="flex items-start gap-3 rounded-lg border px-3 py-2"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-1 h-4 w-4 rounded border-gray-300"
+                      checked={checked}
+                      disabled={isFirst || isLast}
+                      onChange={(e) =>
+                        setAssignSelectedIds((curr) =>
+                          e.target.checked
+                            ? [...curr, mission.id]
+                            : curr.filter((id) => id !== mission.id)
+                        )
+                      }
+                    />
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">
+                        {mission.title || `Misión ${mission.orderIndex + 1}`}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Orden: {mission.orderIndex + 1}
+                        {isFirst ? " · Primera (siempre activa)" : ""}
+                        {isLast ? " · Última (siempre activa)" : ""}
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
+            {!assignSaving && assignMissions.length === 0 && (
+              <div className="text-sm text-muted-foreground">
+                Esta ruta no tiene misiones cargadas. Generalas primero desde el botón de varita.
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenAssignMissions(false)}>
+              Cancelar
+            </Button>
+            <Button disabled={assignSaving} onClick={saveAssignMissions}>
+              Guardar asignaciones
             </Button>
           </DialogFooter>
         </DialogContent>

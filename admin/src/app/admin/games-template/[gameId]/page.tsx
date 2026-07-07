@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
+  BookOpen,
+  Plus,
+  ArrowLeft,
+  Globe,
+  MapPin,
+  Share2,
+  Pencil,
+  ListTodo,
+} from "lucide-react";
+import {
   Card,
   CardContent,
   CardHeader,
@@ -38,15 +48,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  BookOpen,
-  Plus,
-  ArrowLeft,
-  Globe,
-  MapPin,
-  Share2,
-  Pencil,
-} from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
 
@@ -82,7 +83,6 @@ export default function GameDetailPage() {
   const gameId = params.gameId;
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
 
   const [openEdit, setOpenEdit] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -97,19 +97,10 @@ export default function GameDetailPage() {
   const [storyName, setStoryName] = useState("");
   const [storyIntro, setStoryIntro] = useState("");
 
-  const [openRoute, setOpenRoute] = useState(false);
-  const [routeDifficulty, setRouteDifficulty] = useState("MEDIUM");
-  const [routeDistanceMeters, setRouteDistanceMeters] = useState("4000");
-  const [routeEstimatedMinutes, setRouteEstimatedMinutes] = useState("120");
   const [routing, setRouting] = useState(false);
-
-  useEffect(() => {
-    if (gameId) loadGame();
-  }, [gameId]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [regenerating, setRegenerating] = useState(false);
+  const [selectionTarget, setSelectionTarget] = useState<"easy" | "medium" | "hard" | null>(null);
+  const [selectionCounts, setSelectionCounts] = useState<{ easy?: number; medium?: number; hard?: number }>({});
 
   async function loadGame() {
     setLoading(true);
@@ -132,6 +123,10 @@ export default function GameDetailPage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (gameId) loadGame();
+  }, [gameId]);
 
   async function handleCreateStory() {
     if (!game || !storyName.trim()) return;
@@ -157,20 +152,31 @@ export default function GameDetailPage() {
 
   async function handleEditGame() {
     try {
+      const body = {
+        name: editForm.name,
+        description: editForm.description || null,
+        difficulty: editForm.difficulty,
+        durationMinutes: Number(editForm.durationMinutes),
+        maxPlayers: Number(editForm.maxPlayers),
+      };
+
       const res = await fetch(`${API_BASE}/games/${gameId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: editForm.name,
-          description: editForm.description || null,
-          difficulty: editForm.difficulty,
-          durationMinutes: Number(editForm.durationMinutes),
-          maxPlayers: Number(editForm.maxPlayers),
-        }),
+        body: JSON.stringify(body),
       });
+
       if (res.ok) {
         setOpenEdit(false);
         await loadGame();
+        if (game) {
+          await ensureGameRoutesInternal({
+            name: editForm.name,
+            difficulty: editForm.difficulty,
+            cityId: game.cityId,
+            stories: game.stories,
+          });
+        }
       }
     } catch (e) {
       console.error("Error updating game:", e);
@@ -198,55 +204,88 @@ export default function GameDetailPage() {
     }
   }
 
-  async function handleEnsureGameRoutes() {
-    if (!game || routing) return;
-    setRouting(true);
+  async function ensureGameRoutesInternal(context: {
+    name: string;
+    difficulty: string;
+    cityId: string;
+    stories: Game["stories"];
+  }) {
+    const story = context.stories[0];
+    if (!story) return;
+
+    const cityId = context.cityId;
+    const easy = await fetch(`${API_BASE}/cities/${cityId}/routes?difficulty=EASY`).then((r) =>
+      r.ok ? r.json() : []
+    );
+    const medium = await fetch(`${API_BASE}/cities/${cityId}/routes?difficulty=MEDIUM`).then((r) =>
+      r.ok ? r.json() : []
+    );
+    const hard = await fetch(`${API_BASE}/cities/${cityId}/routes?difficulty=HARD`).then((r) =>
+      r.ok ? r.json() : []
+    );
+
+    const easyRoute = easy.find((route: any) => route.difficulty === "EASY");
+    const mediumRoute = medium.find((route: any) => route.difficulty === "MEDIUM");
+    const hardRoute = hard.find((route: any) => route.difficulty === "HARD");
+
+    const missing = [easyRoute ? null : "EASY", mediumRoute ? null : "MEDIUM", hardRoute ? null : "HARD"].filter(
+      (value): value is string => Boolean(value)
+    );
+
+    if (missing.length === 0) return;
+
+    for (const difficulty of missing) {
+      await fetch(`${API_BASE}/stories/${story.id}/cities/${cityId}/routes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${context.name} — ${difficulty}`,
+          description: `Ruta ${difficulty.toLowerCase()} generada automáticamente.`,
+          difficulty,
+          distanceMeters: 5000,
+          estimatedMinutes: 120,
+          missionCount: 10,
+        }),
+      });
+    }
+  }
+
+  async function handleGenerateSelection() {
+    if (!game || !selectionTarget || !selectionCounts[selectionTarget]) return;
+    setRegenerating(true);
     try {
-      const cityId = game.cityId;
-
-      const easy = await fetch(`${API_BASE}/cities/${cityId}/routes?difficulty=EASY`).then((r) =>
-        r.ok ? r.json() : []
-      );
-      const medium = await fetch(`${API_BASE}/cities/${cityId}/routes?difficulty=MEDIUM`).then((r) =>
-        r.ok ? r.json() : []
-      );
-      const hard = await fetch(`${API_BASE}/cities/${cityId}/routes?difficulty=HARD`).then((r) =>
-        r.ok ? r.json() : []
-      );
-
-      const missionTargets = { EASY: "6", MEDIUM: "9", HARD: "12" };
-      const difficulties = [
-        { key: "EASY", items: easy },
-        { key: "MEDIUM", items: medium },
-        { key: "HARD", items: hard },
-      ] as const;
-
-      for (const diff of difficulties) {
-        const hasDiffRoute = diff.items.some((route: any) => route.difficulty === diff.key);
-        if (!hasDiffRoute && game.stories[0]) {
-          await fetch(
-            `${API_BASE}/stories/${game.stories[0].id}/cities/${cityId}/routes`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                name: `${game.name} — ${diff.key}`,
-                description: `Ruta ${diff.key.toLowerCase()} del juego`,
-                difficulty: diff.key,
-                distanceMeters: 5000,
-                estimatedMinutes: 120,
-                missionCount: Number(missionTargets[diff.key]),
-              }),
-            }
-          );
-        }
+      const story = game.stories[0];
+      if (!story) {
+        alert("Necesitás crear una historia antes de generar rutas.");
+        return;
       }
 
+      const requestedCounts = {
+        easy: selectionCounts.easy ?? 7,
+        medium: selectionCounts.medium ?? 10,
+        hard: selectionCounts.hard ?? 15,
+      };
+
+      const payloads = Object.entries(requestedCounts).map(([difficulty, missionCount]) => ({
+        difficulty: difficulty.toUpperCase(),
+        missionCount,
+      }));
+
+      await fetch(`${API_BASE}/games/${gameId}/routes/selection`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storyId: story.id, selections: payloads }),
+      });
+
+      alert("Se generaron las rutas por dificultad.");
+      setSelectionTarget(null);
+      setSelectionCounts({});
       await loadGame();
     } catch (e) {
-      console.error("Error ensuring routes:", e);
+      console.error(e);
+      alert("No se pudo generar la selección.");
     } finally {
-      setRouting(false);
+      setRegenerating(false);
     }
   }
 
@@ -290,62 +329,63 @@ export default function GameDetailPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between py-4">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            Rutas del juego
-          </CardTitle>
-          <CardDescription>Asigna y genera rutas automáticas para este juego</CardDescription>
-        </div>
-        <Button
-          variant="outline"
-          onClick={handleEnsureGameRoutes}
-          disabled={routing || game.stories.length === 0}
-        >
-          <Globe className="h-4 w-4 mr-2" />
-          {routing ? "Generando..." : "Generar rutas base"}
-        </Button>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Duración</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{game.durationMinutes} min</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Dificultad</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge variant="outline" className={difficultyColors[game.difficulty]}>
-              {game.difficulty}
-            </Badge>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Jugadores</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{game.maxPlayers}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Estado</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge variant="outline" className={statusColors[game.status]}>
-              {game.status}
-            </Badge>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Rutas del juego
+              </CardTitle>
+              <CardDescription>Define la cantidad de misiones por dificultad y generá las rutas automáticamente.</CardDescription>
+            </div>
+            <Button onClick={() => setSelectionTarget("easy")} variant="outline">
+              <ListTodo className="h-4 w-4 mr-2" />
+              Elegir misiones por dificultad
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Duración</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{game.durationMinutes} min</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Dificultad</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Badge variant="outline" className={difficultyColors[game.difficulty]}>
+                  {game.difficulty}
+                </Badge>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Jugadores</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{game.maxPlayers}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Estado</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Badge variant="outline" className={statusColors[game.status]}>
+                  {game.status}
+                </Badge>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -355,9 +395,7 @@ export default function GameDetailPage() {
                 <BookOpen className="h-5 w-5" />
                 Historias
               </CardTitle>
-              <CardDescription>
-                Historias narrativas asociadas a este juego
-              </CardDescription>
+              <CardDescription>Historias narrativas asociadas a este juego</CardDescription>
             </div>
             <Dialog open={openCreate} onOpenChange={setOpenCreate}>
               <DialogTrigger render={<Button><Plus className="h-4 w-4 mr-2" />Nueva Historia</Button>} />
@@ -371,28 +409,16 @@ export default function GameDetailPage() {
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
                     <label>Nombre</label>
-                    <Input
-                      placeholder="Nombre de la historia"
-                      value={storyName}
-                      onChange={(e) => setStoryName(e.target.value)}
-                    />
+                    <Input placeholder="Nombre de la historia" value={storyName} onChange={(e) => setStoryName(e.target.value)} />
                   </div>
                   <div className="grid gap-2">
                     <label>Introducción (opcional)</label>
-                    <Input
-                      placeholder="Introducción narrativa"
-                      value={storyIntro}
-                      onChange={(e) => setStoryIntro(e.target.value)}
-                    />
+                    <Input placeholder="Introducción narrativa" value={storyIntro} onChange={(e) => setStoryIntro(e.target.value)} />
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setOpenCreate(false)}>
-                    Cancelar
-                  </Button>
-                  <Button disabled={!storyName.trim()} onClick={handleCreateStory}>
-                    Crear Historia
-                  </Button>
+                  <Button variant="outline" onClick={() => setOpenCreate(false)}>Cancelar</Button>
+                  <Button disabled={!storyName.trim()} onClick={handleCreateStory}>Crear Historia</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -447,34 +473,18 @@ export default function GameDetailPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <label>Nombre</label>
-              <Input
-                value={editForm.name}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
-              />
+              <Input value={editForm.name} onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))} />
             </div>
             <div className="grid gap-2">
               <label>Descripción</label>
-              <Textarea
-                value={editForm.description}
-                onChange={(e) =>
-                  setEditForm((prev) => ({ ...prev, description: e.target.value }))
-                }
-                rows={3}
-              />
+              <Textarea value={editForm.description} onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))} rows={3} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <label>Dificultad</label>
-                <Select
-                  value={editForm.difficulty}
-                  onValueChange={(v) => {
-                    if (v !== null) {
-                      setEditForm((prev) => ({ ...prev, difficulty: v }));
-                    }
-                  }}
-                >
+                <Select value={editForm.difficulty} onValueChange={(v) => setEditForm((prev) => ({ ...prev, difficulty: v as string }))}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Dificultad" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="EASY">Fácil</SelectItem>
@@ -485,38 +495,47 @@ export default function GameDetailPage() {
               </div>
               <div className="grid gap-2">
                 <label>Duración (min)</label>
-                <Input
-                  type="number"
-                  value={String(editForm.durationMinutes)}
-                  onChange={(e) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      durationMinutes: Number(e.target.value),
-                    }))
-                  }
-                />
+                <Input type="number" value={String(editForm.durationMinutes)} onChange={(e) => setEditForm((prev) => ({ ...prev, durationMinutes: Number(e.target.value) }))} />
               </div>
             </div>
             <div className="grid gap-2">
               <label>Máximo de jugadores</label>
-              <Input
-                type="number"
-                value={String(editForm.maxPlayers)}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    maxPlayers: Number(e.target.value),
-                  }))
-                }
-              />
+              <Input type="number" value={String(editForm.maxPlayers)} onChange={(e) => setEditForm((prev) => ({ ...prev, maxPlayers: Number(e.target.value) }))} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenEdit(false)}>
-              Cancelar
-            </Button>
-            <Button disabled={!editForm.name.trim()} onClick={handleEditGame}>
-              Guardar Cambios
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>Cancelar</Button>
+            <Button disabled={!editForm.name.trim()} onClick={handleEditGame}>Guardar Cambios</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!selectionTarget} onOpenChange={(open) => { if (!open) setSelectionTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Elegir misiones por dificultad</DialogTitle>
+            <DialogDescription>
+              Definí la cantidad objetivo por variante. La primera y última misión siempre estarán activas.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label>Fácil · objetivo</label>
+              <Input type="number" value={String(selectionCounts.easy ?? 7)} onChange={(e) => setSelectionCounts((prev) => ({ ...prev, easy: Number(e.target.value) }))} />
+            </div>
+            <div className="grid gap-2">
+              <label>Media · objetivo</label>
+              <Input type="number" value={String(selectionCounts.medium ?? 10)} onChange={(e) => setSelectionCounts((prev) => ({ ...prev, medium: Number(e.target.value) }))} />
+            </div>
+            <div className="grid gap-2">
+              <label>Difícil · objetivo</label>
+              <Input type="number" value={String(selectionCounts.hard ?? 15)} onChange={(e) => setSelectionCounts((prev) => ({ ...prev, hard: Number(e.target.value) }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectionTarget(null)}>Cancelar</Button>
+            <Button onClick={handleGenerateSelection} disabled={regenerating}>
+              {regenerating ? "Generando..." : "Generar rutas"}
             </Button>
           </DialogFooter>
         </DialogContent>
