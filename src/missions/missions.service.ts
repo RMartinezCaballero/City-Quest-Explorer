@@ -109,4 +109,21 @@ export class MissionsService {
     }
     return this.prisma.mission.delete({ where: { id: missionId } });
   }
+
+  async syncByRoute(routeId: string, missionIds: string[]) {
+    const route = await this.prisma.route.findUnique({ where: { id: routeId } });
+    if (!route) throw new NotFoundException('Ruta no encontrada');
+
+    const existing = await this.prisma.mission.findMany({
+      where: { id: { in: missionIds }, routeId },
+      select: { id: true, orderIndex: true },
+      orderBy: { orderIndex: 'asc' },
+    });
+
+    return this.prisma.mission.findMany({
+      where: { routeId },
+      orderBy: { orderIndex: 'asc' },
+      include: { checkpoint: true, challenges: { include: { answers: true, unlockKeys: true }, orderBy: { orderIndex: 'asc' } } },
+    });
+  }
 }

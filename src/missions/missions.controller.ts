@@ -39,6 +39,12 @@ export class MissionsController {
     return this.missionsService.reorder(routeId, payload.missionIds);
   }
 
+  @Post('sync')
+  @ApiOperation({ summary: 'Sincronizar misiones activas de una ruta por ids' })
+  sync(@Param('routeId') routeId: string, @Body() payload: { missionIds: string[] }) {
+    return this.missionsService.syncByRoute(routeId, payload.missionIds ?? []);
+  }
+
   @Delete(':missionId')
   @ApiOperation({ summary: 'Eliminar una misión' })
   remove(@Param('missionId') missionId: string) {

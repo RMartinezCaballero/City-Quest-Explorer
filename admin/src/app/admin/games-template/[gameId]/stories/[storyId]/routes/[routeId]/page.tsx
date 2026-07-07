@@ -55,7 +55,7 @@ import {
 
 const LeafletMap = dynamic(() => import("@/components/map/leaflet-map"), {
   ssr: false,
-  loading: () => <div className="h-[400px] bg-muted animate-pulse rounded-lg flex items-center justify-center"><span className="text-muted-foreground">Cargando mapa...</span></div>
+  loading: () => <div className="h-[400px] bg-muted animate-pulse rounded-lg flex items-center justify-center"><span className="text-muted-foreground">Cargando mapa...</span></div>,
 });
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://city-quest-explorer-api.onrender.com";
@@ -142,6 +142,38 @@ export default function RouteDetailPage() {
   const [challengeType, setChallengeType] = useState("SECRET_CODE");
   const [challengePrompt, setChallengePrompt] = useState("");
 
+  // Mission assignment
+  const missions = route?.missions ?? [];
+  const [selectedEasyIds, setSelectedEasyIds] = useState<string[]>([]);
+  const [selectedMediumIds, setSelectedMediumIds] = useState<string[]>([]);
+  const [selectedHardIds, setSelectedHardIds] = useState<string[]>([]);
+  const [savingAssignments, setSavingAssignments] = useState(false);
+
+  function syncSelectionFromMissions(list: Mission[]) {
+    const first = list[0]?.id ?? null;
+    const last = list[list.length - 1]?.id ?? null;
+    setSelectedEasyIds((prev) => ensureFixed(prev, first, last, list));
+    setSelectedMediumIds((prev) => ensureFixed(prev, first, last, list));
+    setSelectedHardIds((prev) => ensureFixed(prev, first, last, list));
+  }
+
+  useEffect(() => {
+    syncSelectionFromMissions(missions);
+  }, [missions.length, missions[0]?.id, missions[missions.length - 1]?.id]);
+
+  function ensureFixed(prev: string[], first: string | null, last: string | null, list: Mission[]) {
+    const map = new Map(list.map((m) => [m.id, m]));
+    const desired = new Set<string>();
+    if (first) desired.add(first);
+    if (last) desired.add(last);
+    const merged = new Set(prev);
+
+    for (const id of desired) {
+      if (map.has(id)) merged.add(id);
+    }
+    return Array.from(merged);
+  }
+
   async function loadRoute() {
     setLoading(true);
     try {
@@ -161,14 +193,14 @@ export default function RouteDetailPage() {
   async function handleCreateMission() {
     if (!route) return;
     try {
-      const missions = route.missions ?? [];
+      const currentMissions = route.missions ?? [];
       const res = await fetch(`${API_BASE}/routes/${routeId}/missions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: missionTitle,
           narrative: missionNarrative || undefined,
-          orderIndex: missions.length,
+          orderIndex: currentMissions.length,
           difficulty: 5,
         }),
       });
@@ -242,6 +274,49 @@ export default function RouteDetailPage() {
     }
   }
 
+  async function handleSyncAssignments() {
+    if (!routeId) return;
+    const first = missions[0]?.id ?? null;
+    const last = missions[missions.length - 1]?.id ?? null;
+
+    const sanitize = (ids: string[]) => {
+      const set = new Set(ids);
+      if (first) set.add(first);
+      if (last) set.add(last);
+      return missions.filter((m) => set.has(m.id)).map((m) => m.id);
+    };
+
+    const easyIds = sanitize(selectedEasyIds).slice(0, Math.max(5, Math.min(7, missions.length)));
+    const mediumIds = sanitize(selectedMediumIds).slice(0, Math.max(8, Math.min(10, missions.length)));
+    const hardIds = sanitize(selectedHardIds).slice(0, Math.max(10, Math.min(15, missions.length)));
+
+    setSavingAssignments(true);
+    try {
+      const payloads = [
+        { label: "Fácil", ids: easyIds },
+        { label: "Media", ids: mediumIds },
+        { label: "Difícil", ids: hardIds },
+      ] as const;
+
+      for (const batch of payloads) {
+        const res = await fetch(`${API_BASE}/routes/${routeId}/missions`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ missionIds: batch.ids }),
+        });
+        if (!res.ok) throw new Error(`No se pudo guardar la variante ${batch.label}`);
+      }
+
+      alert("Asignaciones guardadas");
+      loadRoute();
+    } catch (e) {
+      console.error(e);
+      alert("Error guardando asignaciones");
+    } finally {
+      setSavingAssignments(false);
+    }
+  }
+
   if (loading) {
     return <div className="p-8 text-center text-muted-foreground animate-pulse">Cargando ruta...</div>;
   }
@@ -280,7 +355,7 @@ export default function RouteDetailPage() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Puzzle className="h-5 w-5" />
-                Misiones ({route.missions?.length ?? 0})
+                Misiones ({missions.length})
               </CardTitle>
               <CardDescription>
                 Misiones ordenadas secuencialmente. Arrastrar para reordenar.
@@ -313,7 +388,7 @@ export default function RouteDetailPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {(route.missions ?? []).map((mission, index) => (
+            {missions.map((mission, index) => (
               <Card key={mission.id} className={`border-l-4 ${mission.isLastMission ? "border-l-amber-500" : "border-l-primary"}`}>
                 <CardContent className="pt-4">
                   <div className="flex items-start justify-between">
@@ -379,12 +454,37 @@ export default function RouteDetailPage() {
                 </CardContent>
               </Card>
             ))}
-            {(route.missions ?? []).length === 0 && (
+            {missions.length === 0 && (
               <p className="text-center text-muted-foreground py-8">
                 No hay misiones en esta ruta. ¡Crea la primera!
               </p>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Mission assignment by difficulty ranges */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Puzzle className="h-5 w-5" />
+                Asignar misiones por dificultad
+              </CardTitle>
+              <CardDescription>
+                Marca las misiones que forman parte de cada variante. La primera y última están fijas.
+              </CardDescription>
+            </div>
+            <Button size="sm" variant="secondary" onClick={handleSyncAssignments} disabled={savingAssignments}>
+              {savingAssignments ? "Guardando..." : "Guardar asignaciones"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <DifficultyMissionGroup title="Fácil" color="border-l-green-500" missions={missions} assignCount={7} selectedIds={selectedEasyIds} onChange={setSelectedEasyIds} />
+          <DifficultyMissionGroup title="Media" color="border-l-blue-500" missions={missions} assignCount={10} selectedIds={selectedMediumIds} onChange={setSelectedMediumIds} />
+          <DifficultyMissionGroup title="Difícil" color="border-l-red-500" missions={missions} assignCount={15} selectedIds={selectedHardIds} onChange={setSelectedHardIds} />
         </CardContent>
       </Card>
 
@@ -509,60 +609,103 @@ export default function RouteDetailPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <label>Nombre</label>
-              <Input
-                value={editForm.name}
-                onChange={(e) => setEditForm(p => ({ ...p, name: e.target.value }))}
-              />
+              <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
             </div>
             <div className="grid gap-2">
               <label>Descripción</label>
-              <Textarea
-                value={editForm.description}
-                onChange={(e) => setEditForm(p => ({ ...p, description: e.target.value }))}
-                rows={3}
-              />
+              <Textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
+            </div>
+            <div className="grid gap-2">
+              <label>Dificultad</label>
+              <Select value={editForm.difficulty} onValueChange={(value) => setEditForm({ ...editForm, difficulty: value as any })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Dificultad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EASY">Fácil</SelectItem>
+                  <SelectItem value="MEDIUM">Media</SelectItem>
+                  <SelectItem value="HARD">Difícil</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <label>Dificultad</label>
-                <Select
-                  value={editForm.difficulty}
-                  onValueChange={(v) => { if (v !== null) setEditForm(p => ({ ...p, difficulty: v })); }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="EASY">Fácil</SelectItem>
-                    <SelectItem value="MEDIUM">Media</SelectItem>
-                    <SelectItem value="HARD">Difícil</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label>Distancia (m)</label>
+                <Input type="number" value={editForm.distanceMeters} onChange={(e) => setEditForm({ ...editForm, distanceMeters: Number(e.target.value) })} />
               </div>
               <div className="grid gap-2">
-                <label>Distancia (m)</label>
-                <Input
-                  type="number"
-                  value={editForm.distanceMeters}
-                  onChange={(e) => setEditForm(p => ({ ...p, distanceMeters: Number(e.target.value) }))}
-                />
+                <label>Duración (min)</label>
+                <Input type="number" value={editForm.estimatedMinutes} onChange={(e) => setEditForm({ ...editForm, estimatedMinutes: Number(e.target.value) })} />
               </div>
-            </div>
-            <div className="grid gap-2">
-              <label>Minutos estimados</label>
-              <Input
-                type="number"
-                value={editForm.estimatedMinutes}
-                onChange={(e) => setEditForm(p => ({ ...p, estimatedMinutes: Number(e.target.value) }))}
-              />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpenEdit(false)}>Cancelar</Button>
-            <Button disabled={!editForm.name.trim()} onClick={handleEditRoute}>Guardar Cambios</Button>
+            <Button onClick={handleEditRoute}>Guardar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function DifficultyMissionGroup({
+  title,
+  color,
+  missions,
+  assignCount,
+  selectedIds,
+  onChange,
+}: {
+  title: string;
+  color: string;
+  missions: Mission[];
+  assignCount: number;
+  selectedIds: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const first = missions[0];
+  const last = missions[missions.length - 1];
+
+  const toggle = (id: string) => {
+    const isFixed = [first?.id, last?.id].includes(id);
+    if (isFixed) return;
+    const set = new Set(selectedIds);
+    if (set.has(id)) set.delete(id);
+    else if (selectedIds.length < assignCount) set.add(id);
+    onChange(Array.from(set));
+  };
+
+  return (
+    <div className={"rounded-md border bg-background/60 p-3 " + color}>
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-sm font-semibold">{title} · objetivo {assignCount}</p>
+        <span className="text-xs text-muted-foreground">{selectedIds.filter((id) => [first?.id, last?.id].includes(id) || selectedIds.includes(id)).length}/{assignCount}</span>
+      </div>
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+        {missions.map((mission, index) => {
+          const isFirst = first?.id === mission.id;
+          const isLast = last?.id === mission.id;
+          const checked = isFirst || isLast || selectedIds.includes(mission.id);
+          return (
+            <label key={mission.id} className={"flex items-center gap-2 rounded-md border p-2 " + (checked ? "bg-muted/50" : "opacity-80")}>
+              <input
+                type="checkbox"
+                className="h-4 w-4"
+                disabled={isFirst || isLast}
+                checked={checked}
+                onChange={() => toggle(mission.id)}
+              />
+              <span className="text-xs">
+                {isFirst ? "Misión 1" : isLast ? "Última" : `#${index + 1}`}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+      {missions.length === 0 && (
+        <p className="text-xs text-muted-foreground">Aún no hay misiones en esta ruta.</p>
+      )}
     </div>
   );
 }

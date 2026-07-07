@@ -55,3 +55,5 @@ mobile/*.iml
 
 # Vercel/admin local copy — ignore for backend deploy cleanliness
 admin/
+.vercel
+.env*

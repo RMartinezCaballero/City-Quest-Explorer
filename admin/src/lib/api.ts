@@ -258,6 +258,11 @@ export const routesApi = {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
+  assignMissions: (routeId: string, missionIds: string[]) =>
+    fetchApi<Route>(`/routes/${routeId}/missions`, {
+      method: "PATCH",
+      body: JSON.stringify({ missionIds }),
+    }),
   remove: (routeId: string) =>
     fetchApi<void>(`/routes/${routeId}`, { method: "DELETE" }),
   listByStory: (storyId: string) => fetchApi<Route[]>(`/stories/${storyId}/routes`),

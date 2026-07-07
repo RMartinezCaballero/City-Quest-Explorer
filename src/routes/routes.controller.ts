@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RoutesService } from './routes.service';
 import { CreateRouteDto } from './dto/create-route.dto';
@@ -70,5 +70,18 @@ export class RoutesController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   generateMissions(@Param('routeId') routeId: string) {
     return this.routesService.generateMissions(routeId);
+  }
+
+  @Patch('routes/:routeId/missions')
+  @ApiOperation({ summary: 'Asignar misiones activas a una ruta por ids' })
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  assignMissions(
+    @Param('routeId') routeId: string,
+    @Body() payload: { missionIds?: string[] },
+  ) {
+    if (!Array.isArray(payload.missionIds)) {
+      throw new BadRequestException('body.missionIds debe ser un array de strings');
+    }
+    return this.routesService.assignMissions(routeId, payload.missionIds);
   }
 }

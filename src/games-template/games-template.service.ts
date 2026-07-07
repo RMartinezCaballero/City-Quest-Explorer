@@ -298,10 +298,66 @@ export class GamesTemplateService {
     }
 
     const createdRoutes: { difficulty: string; created: boolean; routeId?: string; missions?: number }[] = [];
+    const narrativeTemplates = [
+      'Explora los alrededores y descubre los secretos que esconde este lugar.',
+      'Sigue las pistas y resuelve el enigma para avanzar en tu misión.',
+      'El tiempo corre. Encuentra el punto exacto y completa el desafío.',
+      'La historia te espera. Descubre qué ocurrió aquí y actúa en consecuencia.',
+      'Observa con atención. No todo es lo que parece en este escenario.',
+      'Solo los más astutos lograrán descifrar el mensaje oculto.',
+      'Cada paso cuenta. Reúne las pruebas necesarias para continuar.',
+      'La ciudad guarda secretos. Hoy es tu misión descubrir uno de ellos.',
+    ];
+
+    const resolveTargetCount = (route: { conditions?: Record<string, unknown>; difficulty: string }, diff: string) => {
+      const conditions = (route.conditions ?? {}) as Record<string, unknown>;
+      if (typeof conditions.missionCount === 'number') {
+        return Number(conditions.missionCount);
+      }
+      return difficultyConfigByRoute[diff]?.max ?? 10;
+    };
+
+    const generateMissingMissions = async (routeId: string, currentCount: number, targetCount: number) => {
+      if (currentCount >= targetCount) {
+        return;
+      }
+
+      if (currentCount > 0) {
+        await this.prisma.mission.updateMany({
+          where: { routeId },
+          data: { isLastMission: false },
+        });
+      }
+
+      const missionsToCreate = targetCount - currentCount;
+      for (let i = 0; i < missionsToCreate; i++) {
+        const orderIndex = currentCount + i;
+        const isLast = orderIndex === targetCount - 1;
+        const missionSeed = orderIndex % narrativeTemplates.length;
+
+        await this.prisma.mission.create({
+          data: {
+            routeId,
+            title: `Misión #${orderIndex + 1}`,
+            narrative: narrativeTemplates[missionSeed],
+            description: 'Completa los objetivos de esta misión para avanzar.',
+            orderIndex,
+            difficulty: 5,
+            isLastMission: isLast,
+          },
+        });
+      }
+    };
+
     for (const diff of targetDifficulties) {
       const existing = await this.prisma.route.findFirst({ where: { storyId: story.id, difficulty: diff }, include: { missions: true } });
       if (existing) {
-        createdRoutes.push({ difficulty: diff, created: false, routeId: existing.id, missions: existing.missions.length });
+        const targetCount = resolveTargetCount(existing, diff);
+        if (existing.missions.length < targetCount) {
+          await generateMissingMissions(existing.id, existing.missions.length, targetCount);
+        }
+        const missions = await this.prisma.mission.findMany({ where: { routeId: existing.id } });
+        createdRoutes.push({ difficulty: diff, created: false, routeId: existing.id, missions: missions.length });
         continue;
       }
 
@@ -316,11 +372,16 @@ export class GamesTemplateService {
           estimatedMinutes: diff === 'EASY' ? 60 : diff === 'MEDIUM' ? 120 : 180,
           isDefault: diff === normalizedDifficulty,
           status: 'PUBLISHED',
+          conditions: { missionCount: difficultyConfigByRoute[diff]?.max ?? 10 } as any,
         },
         include: { missions: true },
       });
 
-      createdRoutes.push({ difficulty: diff, created: true, routeId: created.id, missions: created.missions.length });
+      const targetCount = difficultyConfigByRoute[diff]?.max ?? 10;
+      await generateMissingMissions(created.id, 0, targetCount);
+
+      const missions = await this.prisma.mission.findMany({ where: { routeId: created.id } });
+      createdRoutes.push({ difficulty: diff, created: true, routeId: created.id, missions: missions.length });
     }
 
     return { gameId, storyId: story.id, createdRoutes };

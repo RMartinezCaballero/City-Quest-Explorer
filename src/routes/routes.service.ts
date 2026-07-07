@@ -166,6 +166,40 @@ export class RoutesService {
     return this.prisma.route.delete({ where: { id: routeId } });
   }
 
+  async assignMissions(routeId: string, missionIds: string[]) {
+    const route = await this.prisma.route.findUnique({ 
+      where: { id: routeId },
+      include: { missions: { orderBy: { orderIndex: 'asc' } } }
+    });
+    if (!route) throw new NotFoundException('Ruta no encontrada');
+
+    const existing = await this.prisma.mission.findMany({
+      where: { id: { in: missionIds }, routeId },
+      select: { id: true },
+    });
+
+    let validIds = existing.map((m) => m.id);
+
+    // Mantener siempre incluida la primera y última misión de la ruta
+    const sorted = route.missions.slice().sort((a, b) => a.orderIndex - b.orderIndex);
+    const firstId = sorted[0]?.id;
+    const lastId = sorted[sorted.length - 1]?.id;
+
+    if (firstId && !validIds.includes(firstId)) validIds.push(firstId);
+    if (lastId && !validIds.includes(lastId)) validIds.push(lastId);
+
+    const conditions = Object.assign(
+      (route.conditions ?? {}) as Record<string, unknown>,
+      { selectedMissionIds: validIds },
+    );
+
+    return this.prisma.route.update({
+      where: { id: routeId },
+      data: { conditions: conditions as Prisma.InputJsonValue },
+      include: { missions: { orderBy: { orderIndex: 'asc' } } },
+    });
+  }
+
   /**
    * Genera misiones placeholder para una ruta basándose en su missionCount (conditions).
    * Solo crea las misiones faltantes si actualmente hay menos del target.
