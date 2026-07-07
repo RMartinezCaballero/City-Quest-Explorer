@@ -135,6 +135,22 @@ export class UsersService {
     });
   }
 
+  async updateVerification(id: string, payload: { verificationMethod?: string; verificationStatus?: string; isVerified?: boolean }) {
+    const existing = await this.prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        verificationMethod: payload.verificationMethod,
+        verificationStatus: payload.verificationStatus,
+        isVerified: payload.isVerified,
+      },
+      select: { id: true, email: true, name: true, role: true, createdAt: true, updatedAt: true, phoneNumber: true, profilePhotoUrl: true, socialAccounts: true, isVerified: true, verificationMethod: true, verificationStatus: true, soloMode: true, teamId: true, playerQrCode: true },
+    });
+  }
+
   async remove(id: string) {
     const existing = await this.prisma.user.findUnique({ where: { id } });
     if (!existing) {

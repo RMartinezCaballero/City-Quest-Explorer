@@ -4,6 +4,27 @@ import { UsersService } from './users.service';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, IsBoolean, IsIn } from 'class-validator';
+
+export class UpdateUserVerificationDto {
+  @ApiPropertyOptional({ enum: ['EMAIL', 'PHONE', 'ADMIN'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['EMAIL', 'PHONE', 'ADMIN'])
+  verificationMethod?: 'EMAIL' | 'PHONE' | 'ADMIN';
+
+  @ApiPropertyOptional({ enum: ['APPROVED', 'PENDING', 'REJECTED'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['APPROVED', 'PENDING', 'REJECTED'])
+  verificationStatus?: 'APPROVED' | 'PENDING' | 'REJECTED';
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isVerified?: boolean;
+}
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -37,6 +58,13 @@ export class UsersController {
   @ApiOperation({ summary: 'Actualizar un usuario (admin)' })
   update(@Param('id') id: string, @Body() payload: UpdateUserDto) {
     return this.usersService.update(id, payload);
+  }
+
+  @Patch(':id/verification')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({ summary: 'Actualizar verificación de usuario (admin)' })
+  updateVerification(@Param('id') id: string, @Body() payload: UpdateUserVerificationDto) {
+    return this.usersService.updateVerification(id, payload);
   }
 
   @Delete(':id')

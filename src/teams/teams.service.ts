@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 
@@ -32,5 +32,29 @@ export class TeamsService {
       where: { id: teamId },
       include: { members: true },
     });
+  }
+
+  async update(teamId: string, payload: Partial<CreateTeamDto>) {
+    const team = await this.prisma.team.findUnique({ where: { id: teamId } });
+    if (!team) {
+      throw new NotFoundException('Equipo no encontrado');
+    }
+    return this.prisma.team.update({
+      where: { id: teamId },
+      data: {
+        name: payload.name,
+        captainId: payload.captainId,
+      },
+      include: { members: true },
+    });
+  }
+
+  async remove(teamId: string) {
+    const team = await this.prisma.team.findUnique({ where: { id: teamId } });
+    if (!team) {
+      throw new NotFoundException('Equipo no encontrado');
+    }
+    await this.prisma.team.delete({ where: { id: teamId } });
+    return { deleted: true, id: teamId };
   }
 }

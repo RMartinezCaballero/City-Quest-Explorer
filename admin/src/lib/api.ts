@@ -279,6 +279,15 @@ export const teamsApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+  update: (routeId: string, teamId: string, data: Partial<Team>) =>
+    fetchApi<Team>(`/routes/${routeId}/teams/${teamId}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  remove: (routeId: string, teamId: string) =>
+    fetchApi<void>(`/routes/${routeId}/teams/${teamId}`, {
+      method: "DELETE",
+    }),
 };
 
 // ── Rankings ──
