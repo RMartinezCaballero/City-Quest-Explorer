@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-import { Search, Users, MapPin, Trophy, QrCode, ShieldCheck } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Search, Users, MapPin, Trophy, QrCode, ShieldCheck, Plus, UserPlus } from "lucide-react";
 import { routesApi, teamsApi, type Route, type Team } from "@/lib/api";
 
 type RouteTeams = {
@@ -20,6 +20,21 @@ export default function AdminTeamsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<RouteTeams | null>(null);
+
+  const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
+  const [createTeamName, setCreateTeamName] = useState("");
+  const [createCaptainId, setCreateCaptainId] = useState("");
+  const [createLoading, setCreateLoading] = useState(false);
+
+  const [editTeam, setEditTeam] = useState<Team | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editCaptainId, setEditCaptainId] = useState("");
+  const [savingTeam, setSavingTeam] = useState(false);
+
+  const [deleteTeamConfirm, setDeleteTeamConfirm] = useState<Team | null>(null);
+
+  const [isSoloFlowOpen, setIsSoloFlowOpen] = useState(false);
+  const [soloMode, setSoloMode] = useState(true);
 
   async function load() {
     setLoading(true);
@@ -62,13 +77,63 @@ export default function AdminTeamsPage() {
     item.route.cityId.toLowerCase().includes(search.toLowerCase())
   );
 
+  const createTeam = async () => {
+    if (!selected || !createTeamName.trim()) return;
+    setCreateLoading(true);
+    try {
+      await teamsApi.create(selected.route.id, {
+        name: createTeamName,
+        captainId: createCaptainId || selected.route.id,
+      });
+      setIsCreateTeamOpen(false);
+      setCreateTeamName("");
+      setCreateCaptainId("");
+      await load();
+    } catch (e) {
+      console.error("Error creating team:", e);
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  function openEditTeam(team: Team) {
+    setEditTeam(team);
+    setEditName(team.name || "");
+    setEditCaptainId(team.captainId || "");
+  }
+
+  async function saveTeam() {
+    if (!selected || !editTeam) return;
+    setSavingTeam(true);
+    try {
+      await teamsApi.update(selected.route.id, editTeam.id, {
+        name: editName,
+        captainId: editCaptainId,
+      });
+      setEditTeam(null);
+      await load();
+    } catch (e) {
+      console.error("Error updating team:", e);
+    } finally {
+      setSavingTeam(false);
+    }
+  }
+
+  async function removeTeam() {
+    if (!selected || !deleteTeamConfirm) return;
+    await teamsApi.remove(selected.route.id, deleteTeamConfirm.id);
+    setDeleteTeamConfirm(null);
+    setSelected(null);
+    await load();
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Equipos</h1>
           <p className="text-muted-foreground mt-1">
-            Solo existen registros como equipo cuando hay un conjunto creado; si no hay equipos, aquí se muestra el flujo/jugador individual por ruta.
+            Si hay equipos, se muestra la información del equipo. Si no existen equipos, se muestra el flujo/jugador individual por ruta.
           </p>
         </div>
       </div>
@@ -122,7 +187,7 @@ export default function AdminTeamsPage() {
 
                   {hasTeams ? (
                     <div className="space-y-2 text-sm">
-                      <div className="font-medium">{team.name || `Equipo ${team.id}`}</div>
+                      <div className="font-medium">{team.name || `Equipo ${team.id}` || `Equipo ${team.id}`}</div>
                       <div className="text-muted-foreground">
                         Capitán: {team.captainId}
                       </div>
@@ -149,7 +214,7 @@ export default function AdminTeamsPage() {
                   )}
 
                   <DialogTrigger>
-                    <Button variant="secondary" className="w-full" onClick={() => setSelected({ route: item.route, teams: item.teams, count: item.count })}>
+                    <Button variant="secondary" className="w-full">
                       <Trophy className="h-4 w-4 mr-1" />
                       Detalle
                     </Button>
@@ -165,43 +230,113 @@ export default function AdminTeamsPage() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-3">
-                  {hasTeams ? (
-                    <>
+                {!hasTeams && (
+                  <div className="space-y-3">
+                    <div>
+                      <div className="text-xs text-muted-foreground uppercase">Modalidad</div>
+                      <div className="font-medium">Jugador en Solo</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground uppercase">Descripción</div>
+                      <div className="text-sm">
+                        Aquí se muestra la información informada del jugador cuando no existe un equipo.
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsSoloFlowOpen(true)}>Iniciar flujo solo</Button>
+                    </DialogFooter>
+                  </div>
+                )}
+
+                {hasTeams && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
                       <div>
                         <div className="text-xs text-muted-foreground uppercase">Nombre del Equipo</div>
-                        <div className="font-medium">{team.name || `Equipo ${team.id}`}</div>
+                        <div className="font-medium">{team?.name || `Equipo ${team?.id}` || `Equipo ${team?.id}`}</div>
                       </div>
-                      <div>
-                        <div className="text-xs text-muted-foreground uppercase">Capitán</div>
-                        <div>{team.captainId}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-muted-foreground uppercase">QR del Equipo</div>
-                        <div className="text-sm">
-                          Escanea para unirte: {team.id ? `team-${team.id}` : "Por definir"}
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div>
-                        <div className="text-xs text-muted-foreground uppercase">Modalidad</div>
-                        <div className="font-medium">Jugador en Solo</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-muted-foreground uppercase">Descripción</div>
-                        <div className="text-sm">
-                          Aquí se muestra la información informada del jugador cuando no existe un equipo.
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+                      <div className="flex gap-2">
+                        <Dialog open={editTeam?.id === team?.id} onOpenChange={(open) => !open && setEditTeam(null)}>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={() => openEditTeam(team!)}>Editar</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Editar equipo</DialogTitle>
+                            </DialogHeader>
+                            {editTeam && (
+                              <div className="grid gap-3">
+                                <Input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Nombre" />
+                                <Input value={editCaptainId} onChange={(e) => setEditCaptainId(e.target.value)} placeholder="Capitán" />
+                              </div>
+                            )}
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setEditTeam(null)}>Cancelar</Button>
+                              <Button onClick={saveTeam} disabled={savingTeam}>Guardar</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
 
-                <DialogFooter>
-                  <Button variant="outline">Cerrar</Button>
-                </DialogFooter>
+                        <Dialog open={deleteTeamConfirm?.id === team?.id} onOpenChange={(open) => !open && setDeleteTeamConfirm(null)}>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={() => setDeleteTeamConfirm(team!)}>Eliminar</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Eliminar equipo</DialogTitle>
+                              <DialogDescription>Esta acción no se puede deshacer.</DialogDescription>
+                            </DialogHeader>
+                            <div className="text-sm">¿Eliminar equipo {team?.name || team?.id}?</div>
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setDeleteTeamConfirm(null)}>Cancelar</Button>
+                              <Button variant="destructive" onClick={removeTeam}>Eliminar</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+
+                        <Dialog open={isCreateTeamOpen} onOpenChange={setIsCreateTeamOpen}>
+                          <DialogTrigger asChild>
+                            <Button size="sm" onClick={() => { setCreateTeamName(""); setCreateCaptainId(""); }}>
+                              <Plus className="h-4 w-4 mr-1" />
+                              Nuevo equipo
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Crear equipo</DialogTitle>
+                              <DialogDescription>Completa los datos del nuevo equipo.</DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-3">
+                              <Input value={createTeamName} onChange={(e) => setCreateTeamName(e.target.value)} placeholder="Nombre" />
+                              <Input value={createCaptainId} onChange={(e) => setCreateCaptainId(e.target.value)} placeholder="ID capitán" />
+                            </div>
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setIsCreateTeamOpen(false)}>Cancelar</Button>
+                              <Button onClick={createTeam} disabled={createLoading || !createTeamName.trim()}>
+                                {createLoading ? "Creando..." : "Crear"}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs text-muted-foreground uppercase">Capitán</div>
+                      <div>{team?.captainId}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground uppercase">QR del Equipo</div>
+                      <div className="text-sm">
+                        Escanea para unirte: {team?.id ? `team-${team.id}` : "Por definir"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground uppercase">Jugadores</div>
+                      <div className="text-sm">Se asignan desde el flujo de jugador.</div>
+                    </div>
+                  </div>
+                )}
               </DialogContent>
             </Dialog>
           );

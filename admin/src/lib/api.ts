@@ -9,8 +9,6 @@ export function setAuthToken(token: string | null) {
   authToken = token;
 }
 
-
-
 export interface City {
   id: string;
   name: string;
@@ -77,6 +75,18 @@ export interface User {
   role: string;
   supabaseUserId?: string;
   createdAt: string;
+}
+
+export interface UserDetail extends User {
+  phoneNumber?: string;
+  profilePhotoUrl?: string;
+  socialAccounts?: Record<string, string | null> | null;
+  verificationStatus?: string | null;
+  verificationMethod?: string | null;
+  isVerified?: boolean | null;
+  soloMode?: boolean | null;
+  teamId?: string | null;
+  team?: Team | null;
 }
 
 export interface GameSession {
@@ -188,12 +198,10 @@ async function fetchApi<T>(
     "Content-Type": "application/json",
   };
 
-  // Include auth token if available
   if (authToken) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  // Merge custom headers
   const customHeaders = options?.headers as Record<string, string> | undefined;
   if (customHeaders) {
     Object.assign(headers, customHeaders);
@@ -210,7 +218,6 @@ async function fetchApi<T>(
     throw new Error(`API Error ${res.status}: ${res.statusText}${body ? " - " + body : ""}`);
   }
 
-  // Handle void responses (e.g., DELETE)
   const contentType = res.headers.get("content-type");
   if (contentType && contentType.includes("application/json")) {
     return res.json();
@@ -303,28 +310,26 @@ export const rankingsApi = {
 
 // ── Users ──
 export const usersApi = {
-  list: () => fetchApi<User[]>("/users"),
-  get: (id: string) => fetchApi<User>(`/users/${id}`),
+  list: () => fetchApi<UserDetail[]>("/users"),
+  get: (id: string) => fetchApi<UserDetail>(`/users/${id}`),
   getMe: () => fetchApi<User>("/users/me"),
   create: (data: { email: string; name: string; password: string; role?: string }) =>
     fetchApi<User>("/users", {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  update: (id: string, data: { name?: string; password?: string; role?: string }) =>
-    fetchApi<User>(`/users/${id}`, {
+  update: (id: string, data: Partial<UserDetail>) =>
+    fetchApi<UserDetail>(`/users/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
-  updateMe: (data: Partial<User>) =>
-    fetchApi<User>("/users/me", {
+  updateVerification: (id: string, data: { verificationMethod?: string; verificationStatus?: string; isVerified?: boolean }) =>
+    fetchApi<UserDetail>(`/users/${id}/verification`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
   remove: (id: string) =>
-    fetchApi<void>(`/users/${id}`, {
-      method: "DELETE",
-    }),
+    fetchApi<void>(`/users/${id}`, { method: "DELETE" }),
 };
 
 // ── Game Sessions ──
@@ -377,17 +382,11 @@ export const missionsApi = {
       method: "POST", body: JSON.stringify(data),
     }),
   update: (routeId: string, missionId: string, data: { title?: string; narrative?: string | null; description?: string | null; difficulty?: number; orderIndex?: number }) =>
-    fetchApi<Mission>(`/routes/${routeId}/missions/${missionId}`, {
-      method: "PATCH", body: JSON.stringify(data),
-    }),
+    fetchApi<Mission>(`/routes/${routeId}/missions/${missionId}`, { method: "PATCH", body: JSON.stringify(data) }),
   remove: (routeId: string, missionId: string) =>
-    fetchApi<void>(`/routes/${routeId}/missions/${missionId}`, {
-      method: "DELETE",
-    }),
+    fetchApi<void>(`/routes/${routeId}/missions/${missionId}`, { method: "DELETE" }),
   reorder: (routeId: string, missionIds: string[]) =>
-    fetchApi<Mission[]>(`/routes/${routeId}/missions/reorder`, {
-      method: "POST", body: JSON.stringify({ missionIds }),
-    }),
+    fetchApi<Mission[]>(`/routes/${routeId}/missions/reorder`, { method: "POST", body: JSON.stringify({ missionIds }) }),
 };
 
 // ── Challenges ──
