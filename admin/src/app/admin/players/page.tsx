@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Mail, QrCode } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Search, Mail, Phone, ShieldCheck, QrCode } from "lucide-react";
 import { usersApi } from "@/lib/api";
 
 interface Player {
@@ -14,6 +14,12 @@ interface Player {
   name: string;
   email: string;
   role: string;
+  createdAt: string;
+  phoneNumber?: string;
+  profilePhotoUrl?: string;
+  verificationStatus?: string;
+  soloMode?: boolean;
+  teamId?: string;
 }
 
 export default function AdminPlayersPage() {
@@ -48,7 +54,7 @@ export default function AdminPlayersPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Jugadores</h1>
           <p className="text-muted-foreground mt-1">
-            Consulta los datos de registro y clasificación de jugadores.
+            Registro completo, verificación, códigos únicos y estado individual/equipo.
           </p>
         </div>
       </div>
@@ -77,19 +83,39 @@ export default function AdminPlayersPage() {
           {filtered.map((player) => (
             <div
               key={player.id}
-              className="flex items-center justify-between py-3 border-b last:border-none"
+              className="grid gap-2 py-3 border-b last:border-none md:grid-cols-[1fr_auto]"
             >
               <div className="space-y-1">
-                <div className="font-medium">{player.name || "Sin nombre"}</div>
-                <div className="text-sm text-muted-foreground">
+                <div className="font-medium">
+                  {player.name || "Sin nombre"}
+                </div>
+                <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-1">
                     <Mail className="h-3 w-3" /> {player.email}
                   </span>
+                  {player.phoneNumber ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Phone className="h-3 w-3" /> {player.phoneNumber}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-2">
+                  <Badge variant="outline">{player.soloMode ? "SOLO" : "TEAM"}</Badge>
+                  <Badge variant="outline">{player.verificationStatus ?? "SIN VERIFICAR"}</Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {player.soloMode
+                    ? "El jugador continuará como individual en la ruta."
+                    : "Pertenece a un equipo; la información del juego se comparte al equipo."}
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <Badge variant="outline">{player.role}</Badge>
+                {player.verificationStatus === "APPROVED" && (
+                  <Badge variant="outline" className="gap-1">
+                    <ShieldCheck className="h-3 w-3" /> Verificado
+                  </Badge>
+                )}
                 <Dialog>
                   <DialogTrigger>
                     <Button variant="ghost" size="sm">
@@ -101,7 +127,7 @@ export default function AdminPlayersPage() {
                     <DialogHeader>
                       <DialogTitle>Jugador</DialogTitle>
                       <DialogDescription>
-                        Información y códigos únicos del jugador.
+                        Datos de registro, QR y modalidad del jugador.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-2 text-sm">
@@ -112,12 +138,16 @@ export default function AdminPlayersPage() {
                         Email: {player.email}
                       </div>
                       <div>
-                        <span className="inline-flex items-center gap-1">
-                          Rol: {player.role}
-                        </span>
+                        Modalidad: {player.soloMode ? "Jugador Solo" : "Equipo"}
+                      </div>
+                      <div>
+                        Redes sociales: asignadas desde el perfil del jugador.
                       </div>
                       <div className="pt-2 text-xs text-muted-foreground">
-                        Aquí se generaría el QR del jugador y el QR del equipo asignado.
+                        QR del jugador: hash único por jugador.
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        QR del equipo: hash único por equipo, si aplica.
                       </div>
                     </div>
                     <DialogFooter>

@@ -21,7 +21,27 @@ model User {
   createdAt       DateTime @default(now()) @db.Timestamptz(6)
   updatedAt       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
+  // Player profile
+  phoneNumber     String?
+  profilePhotoUrl String?
+  socialAccounts  Json? // {facebook?, instagram?, whatsapp?, tiktok?}
+  isVerified      Boolean  @default(false)
+  verificationMethod String? // EMAIL, PHONE, ADMIN
+  verificationStatus String? @default("PENDING") // PENDING, APPROVED, REJECTED
+
+  // Player identity
+  playerQrCode    String?  @unique
+  teamId          String?  @db.Uuid
+  soloMode        Boolean  @default(true)
+
+  // Game participation / stats se consulta por sesiones relacionadas al equipo/ciudad/ruta
+
+  // Safety / medical
+  allergiesNotes  String?  @db.Text
+  sensitivityNotes String? @db.Text
+
   teamMembers TeamMember[]
+  payments    Payment[]
 
   @@map("User")
 }
@@ -38,7 +58,7 @@ model City {
   latitude  Float?
   longitude Float?
   imageUrl  String?
-  config    Json?    // Configuración visual/UI para la ciudad
+  config    Json?
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   games        Game[]
@@ -57,10 +77,11 @@ model Game {
   name            String
   description     String?
   durationMinutes Int      @default(120)
-  difficulty      String   @default("MEDIUM") // EASY, MEDIUM, HARD
-  status          String   @default("DRAFT")  // DRAFT, PUBLISHED, ARCHIVED
+  difficulty      String   @default("MEDIUM")
+  status          String   @default("DRAFT")
   maxPlayers      Int      @default(5)
   imageUrl        String?
+  teamQrCodeHash  String?  @unique
   createdAt       DateTime @default(now()) @db.Timestamptz(6)
   updatedAt       DateTime @updatedAt @db.Timestamptz(6)
 
@@ -78,11 +99,12 @@ model Story {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   gameId       String   @db.Uuid
   name         String
-  introduction String?  @db.Text  // Texto de introducción narrativa
-  lore         String?  @db.Text  // Lore completo de la historia
-  objectives   Json?             // Lista de objetivos narrativos
-  rules        String?  @db.Text // Reglas especiales
-  status       String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  introduction String?  @db.Text
+  lore         String?  @db.Text
+  objectives   Json?
+  rules        String?  @db.Text
+  status       String   @default("DRAFT")
+  difficulty   String   @default("MEDIUM")
   createdAt    DateTime @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime @updatedAt @db.Timestamptz(6)
 
@@ -106,9 +128,9 @@ model Route {
   difficulty       String   @default("EASY")
   distanceMeters   Int
   estimatedMinutes Int
-  isDefault        Boolean  @default(false) // Ruta por defecto de la historia
-  conditions       Json?                    // Condiciones de desbloqueo para rutas alternativas
-  status           String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  isDefault        Boolean  @default(false)
+  conditions       Json?
+  status           String   @default("DRAFT")
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
 
   story           Story           @relation(fields: [storyId], references: [id], onDelete: Cascade)
@@ -132,15 +154,15 @@ model Mission {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   routeId       String   @db.Uuid
   title         String
-  narrative     String?  @db.Text  // Texto narrativo de la misión
-  description   String?  @db.Text  // Instrucciones para el jugador
+  narrative     String?  @db.Text
+  description   String?  @db.Text
   orderIndex    Int
-  difficulty    Int      @default(5) // 1-10
-  timeLimit     Int?                // Minutos límite (opcional)
+  difficulty    Int      @default(5)
+  timeLimit     Int?
   status        String   @default("ACTIVE")
-  checkpointId  String?  @db.Uuid  // Opcional: punto GPS asociado
-  mediaUrl      String?             // URL de video/audio/imagen
-  isLastMission Boolean  @default(false) // ¿Es la última misión? (permite repetición)
+  checkpointId  String?  @db.Uuid
+  mediaUrl      String?
+  isLastMission Boolean  @default(false)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
 
   route       Route       @relation(fields: [routeId], references: [id], onDelete: Cascade)
@@ -196,14 +218,14 @@ model QRCode {
 model Challenge {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   missionId   String   @db.Uuid
-  type        String   // SECRET_CODE, QR, NFC, TEXT, IMAGE, AUDIO, GEOLOCATION, AI, PHYSICAL_OBJECT
-  prompt      String   @db.Text  // Enunciado del reto
-  hint1       String?  @db.Text // Pista gratuita 1
-  hint2       String?  @db.Text // Pista gratuita 2
-  hint3       String?  @db.Text // Pista con penalización
-  hint4       String?  @db.Text // Pista con penalización mayor
+  type        String
+  prompt      String   @db.Text
+  hint1       String?  @db.Text
+  hint2       String?  @db.Text
+  hint3       String?  @db.Text
+  hint4       String?  @db.Text
   orderIndex  Int      @default(0)
-  penalty     Int      @default(0) // Penalización por fallo (-puntos)
+  penalty     Int      @default(0)
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
 
   mission    Mission            @relation(fields: [missionId], references: [id], onDelete: Cascade)
@@ -220,10 +242,10 @@ model Challenge {
 model ChallengeAnswer {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   challengeId String   @db.Uuid
-  value       String   @db.Text  // Respuesta esperada (normalizada)
-  label       String?            // Etiqueta descriptiva
+  value       String   @db.Text
+  label       String?
   isCorrect   Boolean  @default(true)
-  penalty     Int      @default(0)  // Penalización en puntos si se selecciona esta respuesta
+  penalty     Int      @default(0)
   orderIndex  Int      @default(0)
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
 
@@ -239,9 +261,9 @@ model ChallengeAnswer {
 model UnlockKey {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   challengeId String    @db.Uuid
-  type        String    // DYNAMIC_QR, TEMPORAL_TOKEN, UNIQUE_CODE, NARRATIVE_VARIABLE
-  keyValue    String    @unique  // El valor de la llave
-  expiresAt   DateTime?          // Opcional: expiración
+  type        String
+  keyValue    String    @unique
+  expiresAt   DateTime?
   usedAt      DateTime?
   createdAt   DateTime  @default(now()) @db.Timestamptz(6)
 
@@ -259,9 +281,9 @@ model StoryEnding {
   storyId     String   @db.Uuid
   name        String
   description String   @db.Text
-  conditions  Json     // Condiciones para activar este final (score mínimo, misiones específicas, etc.)
-  narrative   String?  @db.Text // Texto/video de desenlace
-  mediaUrl    String?            // Video/audio del final
+  conditions  Json
+  narrative   String?  @db.Text
+  mediaUrl    String?
   orderIndex  Int      @default(0)
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
 
@@ -285,6 +307,12 @@ model Team {
   members         TeamMember[]
   gameSessions    GameSession[]
   rankings        Ranking[]
+
+  qrCodeHash      String? @unique
+  avatarUrl       String?
+  gamesPlayed     Int @default(0)
+  pendingStories  Int @default(0)
+  globalScore     Int @default(0)
 
   @@index([routeId])
   @@map("Team")
@@ -315,15 +343,15 @@ model GameSession {
   teamId              String    @db.Uuid
   routeId             String    @db.Uuid
   cityId              String    @db.Uuid
-  storyId             String?   @db.Uuid // NUEVO: historia asociada
+  storyId             String?   @db.Uuid
   status              String    @default("ACTIVE")
   startedAt           DateTime  @default(now()) @db.Timestamptz(6)
   finishedAt          DateTime? @db.Timestamptz(6)
   currentCheckpointId String?   @db.Uuid
-  currentMissionId    String?   @db.Uuid // NUEVO: misión actual
+  currentMissionId    String?   @db.Uuid
   score               Int       @default(0)
-  hintsUsed           Int       @default(0) // NUEVO: ayudas usadas
-  errors              Int       @default(0) // NUEVO: errores cometidos
+  hintsUsed           Int       @default(0)
+  errors              Int       @default(0)
   metadata            Json?
 
   team              Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -362,16 +390,18 @@ model Payment {
   userId          String?   @db.Uuid
   email           String
   description     String
-  amount          Int       // Monto en COP
+  amount          Int
   currency        String    @default("COP")
-  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED, REFUNDED
-  mpPaymentId     Int?      @unique              // ID de Mercado Pago
-  mpPreferenceId  String?                         // ID de la preferencia MP
-  mpMerchantOrder Int?                             // ID de la orden en MP
-  paymentMethod   String?                          // Tipo: credit_card, pse, etc.
+  status          String    @default("PENDING")
+  mpPaymentId     Int?      @unique
+  mpPreferenceId  String?
+  mpMerchantOrder Int?
+  paymentMethod   String?
   metadata        Json?
-  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt       DateTime  @updatedAt @db.Timestamptz(6)
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(6)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([status])

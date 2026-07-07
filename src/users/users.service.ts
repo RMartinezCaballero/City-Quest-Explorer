@@ -16,12 +16,42 @@ export class UsersService {
         name: true,
         role: true,
         createdAt: true,
+        phoneNumber: true,
+        profilePhotoUrl: true,
+        socialAccounts: true,
+        isVerified: true,
+        verificationMethod: true,
+        verificationStatus: true,
+        soloMode: true,
+        teamId: true,
+        playerQrCode: true,
       },
     });
   }
 
   findById(id: string) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findUnique({ 
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        phoneNumber: true,
+        profilePhotoUrl: true,
+        socialAccounts: true,
+        isVerified: true,
+        verificationMethod: true,
+        verificationStatus: true,
+        soloMode: true,
+        teamId: true,
+        playerQrCode: true,
+        allergiesNotes: true,
+        sensitivityNotes: true,
+      },
+    });
   }
 
   findByEmail(email: string) {
@@ -56,6 +86,14 @@ export class UsersService {
 
     const updateData: any = {
       name: payload.name,
+      phoneNumber: payload.phoneNumber,
+      profilePhotoUrl: payload.profilePhotoUrl,
+      socialAccounts: payload.socialAccounts ?? undefined,
+      isVerified: payload.isVerified,
+      verificationMethod: payload.verificationMethod,
+      verificationStatus: payload.verificationStatus,
+      allergiesNotes: payload.allergiesNotes,
+      sensitivityNotes: payload.sensitivityNotes,
     };
 
     if (payload.password) {
@@ -79,10 +117,21 @@ export class UsersService {
     if (payload.password) {
       updateData.passwordHash = await bcrypt.hash(payload.password, 12);
     }
+    if (payload.phoneNumber !== undefined) updateData.phoneNumber = payload.phoneNumber;
+    if (payload.profilePhotoUrl !== undefined) updateData.profilePhotoUrl = payload.profilePhotoUrl;
+    if (payload.socialAccounts !== undefined) updateData.socialAccounts = payload.socialAccounts;
+    if (payload.isVerified !== undefined) updateData.isVerified = payload.isVerified;
+    if (payload.verificationMethod !== undefined) updateData.verificationMethod = payload.verificationMethod;
+    if (payload.verificationStatus !== undefined) updateData.verificationStatus = payload.verificationStatus;
+    if (payload.allergiesNotes !== undefined) updateData.allergiesNotes = payload.allergiesNotes;
+    if (payload.sensitivityNotes !== undefined) updateData.sensitivityNotes = payload.sensitivityNotes;
+    if (payload.teamStatus !== undefined) {
+      updateData.soloMode = payload.teamStatus !== 'TEAM';
+    }
     return this.prisma.user.update({
       where: { id },
       data: updateData,
-      select: { id: true, email: true, name: true, role: true, createdAt: true },
+      select: { id: true, email: true, name: true, role: true, createdAt: true, updatedAt: true, phoneNumber: true, profilePhotoUrl: true, socialAccounts: true, isVerified: true, verificationMethod: true, verificationStatus: true, soloMode: true, teamId: true, playerQrCode: true },
     });
   }
 
