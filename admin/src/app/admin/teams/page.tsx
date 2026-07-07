@@ -257,7 +257,7 @@ export default function AdminTeamsPage() {
                       </div>
                       <div className="flex gap-2">
                         <Dialog open={editTeam?.id === team?.id} onOpenChange={(open) => !open && setEditTeam(null)}>
-                          <DialogTrigger asChild>
+                          <DialogTrigger>
                             <Button variant="ghost" size="sm" onClick={() => openEditTeam(team!)}>Editar</Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -278,7 +278,7 @@ export default function AdminTeamsPage() {
                         </Dialog>
 
                         <Dialog open={deleteTeamConfirm?.id === team?.id} onOpenChange={(open) => !open && setDeleteTeamConfirm(null)}>
-                          <DialogTrigger asChild>
+                          <DialogTrigger>
                             <Button variant="ghost" size="sm" onClick={() => setDeleteTeamConfirm(team!)}>Eliminar</Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -295,7 +295,7 @@ export default function AdminTeamsPage() {
                         </Dialog>
 
                         <Dialog open={isCreateTeamOpen} onOpenChange={setIsCreateTeamOpen}>
-                          <DialogTrigger asChild>
+                          <DialogTrigger>
                             <Button size="sm" onClick={() => { setCreateTeamName(""); setCreateCaptainId(""); }}>
                               <Plus className="h-4 w-4 mr-1" />
                               Nuevo equipo

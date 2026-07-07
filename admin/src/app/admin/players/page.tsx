@@ -179,7 +179,7 @@ export default function AdminPlayersPage() {
 
               <div className="flex items-center gap-2">
                 <Dialog open={editUser?.id === player.id} onOpenChange={(open) => !open && setEditUser(null)}>
-                  <DialogTrigger asChild>
+                  <DialogTrigger>
                     <Button variant="ghost" size="sm" onClick={() => openEditUser(player)}>Editar</Button>
                   </DialogTrigger>
                   <DialogContent>
@@ -206,8 +206,8 @@ export default function AdminPlayersPage() {
                 </Dialog>
 
                 <Dialog open={editVerification?.id === player.id} onOpenChange={(open) => !open && setEditVerification(null)}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" onClick={() => openVerification(player)}>
+                  <DialogTrigger>
+                                    <Button variant="ghost" size="sm" onClick={() => openVerification(player)}>
                       <ShieldCheck className="h-4 w-4 mr-1" />
                       Verificación
                     </Button>
@@ -241,8 +241,8 @@ export default function AdminPlayersPage() {
                 </Dialog>
 
                 <Dialog open={deleteConfirm?.id === player.id} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm(player)}>Eliminar</Button>
+                  <DialogTrigger>
+                                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm(player)}>Eliminar</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
