@@ -36,7 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Shield, User, Calendar, Plus, Edit3, Trash2 } from "lucide-react";
+import { Search, Shield, User, Calendar, Plus, Edit3, Trash2, ShieldCheck } from "lucide-react";
 import { usersApi, type User as UserType } from "@/lib/api";
 
 export default function UsersPage() {
@@ -52,6 +52,12 @@ export default function UsersPage() {
   // Edit dialog
   const [openEdit, setOpenEdit] = useState(false);
   const [editForm, setEditForm] = useState({ id: "", name: "", email: "", password: "", role: "USER" });
+
+  // Verification dialog
+  const [openVerification, setOpenVerification] = useState(false);
+  const [verificationForm, setVerificationForm] = useState({ id: "", verificationMethod: "EMAIL", verificationStatus: "PENDING", isVerified: false });
+  const [savingVerification, setSavingVerification] = useState(false);
+  const [bulkIds, setBulkIds] = useState<string[]>([]);
 
   async function loadUsers() {
     setLoading(true);
@@ -70,8 +76,8 @@ export default function UsersPage() {
   }, []);
 
   const filtered = users.filter((u) =>
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+    (u.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (u.email || "").toLowerCase().includes(search.toLowerCase())
   );
 
   async function handleCreate() {
@@ -98,14 +104,14 @@ export default function UsersPage() {
   async function handleEdit() {
     if (!editForm.name) return;
     try {
-      const data: { name: string; password?: string; role: string } = { name: editForm.name, role: editForm.role };
+      const data: any = { name: editForm.name, role: editForm.role };
       if (editForm.password) data.password = editForm.password;
       await usersApi.update(editForm.id, data);
       setOpenEdit(false);
       await loadUsers();
     } catch (e) {
       console.error("Error updating user:", e);
-      alert("Error al actualizar usuario: " + (e as Error).message);
+      alert("Error al actualizar usuario");
     }
   }
 
@@ -113,11 +119,68 @@ export default function UsersPage() {
     if (!confirm(`¿Eliminar usuario "${name}"? Esta acción no se puede deshacer.`)) return;
     try {
       await usersApi.remove(id);
+      setBulkIds((prev) => prev.filter((item) => item !== id));
       await loadUsers();
     } catch (e) {
       console.error("Error deleting user:", e);
       alert("Error al eliminar usuario");
     }
+  }
+
+  function openVerificationDialog(user: UserType) {
+    setVerificationForm({
+      id: user.id,
+      verificationMethod: (user as any).verificationMethod || "EMAIL",
+      verificationStatus: (user as any).verificationStatus || "PENDING",
+      isVerified: !!(user as any).isVerified,
+    });
+    setOpenVerification(true);
+  }
+
+  async function handleSaveVerification() {
+    setSavingVerification(true);
+    try {
+      const updated = await usersApi.updateVerification(verificationForm.id, {
+        verificationMethod: verificationForm.verificationMethod,
+        verificationStatus: verificationForm.verificationStatus,
+        isVerified: verificationForm.isVerified,
+      });
+      setUsers((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+      setOpenVerification(false);
+      setBulkIds((prev) => prev.filter((item) => item !== verificationForm.id));
+    } catch (e) {
+      console.error("Error updating verification:", e);
+      alert("Error al actualizar verificación");
+    } finally {
+      setSavingVerification(false);
+    }
+  }
+
+  async function handleBulkVerification() {
+    if (bulkIds.length === 0) return;
+    setSavingVerification(true);
+    try {
+      await Promise.all(
+        bulkIds.map((id) =>
+          usersApi.updateVerification(id, {
+            verificationMethod: "ADMIN",
+            verificationStatus: "APPROVED",
+            isVerified: true,
+          })
+        )
+      );
+      await loadUsers();
+      setBulkIds([]);
+    } catch (e) {
+      console.error("Error bulk verification:", e);
+      alert("Error al actualizar verificación masiva");
+    } finally {
+      setSavingVerification(false);
+    }
+  }
+
+  function toggleBulkId(id: string) {
+    setBulkIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
   }
 
   return (
@@ -192,6 +255,14 @@ export default function UsersPage() {
           <CardDescription>{filtered.length} usuarios</CardDescription>
         </CardHeader>
         <CardContent>
+          {bulkIds.length > 0 && (
+            <div className="mb-4 flex items-center justify-between rounded-md border p-2">
+              <div className="text-sm">{bulkIds.length} seleccionados</div>
+              <Button size="sm" onClick={handleBulkVerification} disabled={savingVerification}>
+                {savingVerification ? "Guardando..." : "Marcar verificación masiva"}
+              </Button>
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow>
@@ -235,6 +306,12 @@ export default function UsersPage() {
                     <div className="flex gap-1 justify-end">
                       <Button variant="ghost" size="sm" onClick={() => openEditDialog(user)}>
                         <Edit3 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => openVerificationDialog(user)}>
+                        <ShieldCheck className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => toggleBulkId(user.id)}>
+                        {bulkIds.includes(user.id) ? "✓" : "+"}
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => handleDelete(user.id, user.name)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
