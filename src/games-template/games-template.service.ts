@@ -309,9 +309,8 @@ export class GamesTemplateService {
       'La ciudad guarda secretos. Hoy es tu misión descubrir uno de ellos.',
     ];
 
-    const resolveTargetCount = (route: { conditions?: Record<string, unknown>; difficulty: string }, diff: string) => {
-      const conditions = (route.conditions ?? {}) as Record<string, unknown>;
-      if (typeof conditions.missionCount === 'number') {
+    const resolveTargetCount = (conditions: Record<string, unknown> | undefined, diff: string) => {
+      if (typeof conditions?.missionCount === 'number') {
         return Number(conditions.missionCount);
       }
       return difficultyConfigByRoute[diff]?.max ?? 10;
@@ -374,7 +373,6 @@ export class GamesTemplateService {
           status: 'PUBLISHED',
           conditions: { missionCount: difficultyConfigByRoute[diff]?.max ?? 10 } as any,
         },
-        include: { missions: true },
       });
 
       const targetCount = difficultyConfigByRoute[diff]?.max ?? 10;
