@@ -1,0 +1,167 @@
+RUTA Manuscrito Prohibido Este es el Juego # 1
+	Ruta Facil
+		 [x] Mision 1
+		 [ ] Mision 2
+		 [x] Mision 3
+		 [ ] Mision 4
+		 [x] Mision 5
+		 [ ] Mision 6
+		 [x] Mision 7
+		 [ ] Mision 8
+		 [ ] Mision 9
+		 [x] Mision 10
+		 
+		 
+		 	Ruta Media
+		 [x] Mision 1
+		 [x] Mision 2
+		 [x] Mision 3
+		 [ ] Mision 4
+		 [x] Mision 5
+		 [x] Mision 6
+		 [x] Mision 7
+		 [x] Mision 8
+		 [ ] Mision 9
+		 [x] Mision 10
+		 
+		 
+	 	Ruta Dificil
+		 [x] Mision 1
+		 [x] Mision 2
+		 [x] Mision 3
+		 [x] Mision 4
+		 [x] Mision 5
+		 [x] Mision 6
+		 [x] Mision 7
+		 [x] Mision 8
+		 [x] Mision 9
+		 [x] Mision 10
+		 
+RUTA El via Crusis Este es el Juego #2
+		Ruta Facil
+		 [x] Mision 1
+		 [ ] Mision 2
+		 [x] Mision 3
+		 [ ] Mision 4
+		 [x] Mision 5
+		 [ ] Mision 6
+		 [x] Mision 7
+		 [ ] Mision 8
+		 [ ] Mision 9
+		 [x] Mision 10
+		 
+		 
+		 	Ruta Media
+		 [x] Mision 1
+		 [x] Mision 2
+		 [x] Mision 3
+		 [ ] Mision 4
+		 [x] Mision 5
+		 [x] Mision 6
+		 [x] Mision 7
+		 [x] Mision 8
+		 [ ] Mision 9
+		 [x] Mision 10
+		 
+		 
+	 	Ruta Dificil
+		 [x] Mision 1
+		 [x] Mision 2
+		 [x] Mision 3
+		 [x] Mision 4
+		 [x] Mision 5
+		 [x] Mision 6
+		 [x] Mision 7
+		 [x] Mision 8
+		 [x] Mision 9
+		 [x] Mision 10
+		 
+		 
+		 
+		 
+		 Recordadr Mision 1 y Ultima Siempre Son Estaran en ese Orden
+		 
+		 
+		 
+Ciudad
+	Cartagena
+		Historias
+			El Manuscrito
+				Misiones 1 ... Mision # segun las creadas por el admin
+				Rutas FAcil Cantidad de Misiones 5 a 7
+				Ruta Medium Cantidad de Misiones 8 a 10
+				Ruta Dificil Cantidad de Misiones de 10 a # segun las creadas por el admin
+			El Via Crusis
+				Misiones 1 ... Mision # segun las creadas por el admin
+				Rutas FAcil Cantidad de Misiones 5 a 7
+				Ruta Medium Cantidad de Misiones 8 a 10
+				Ruta Dificil Cantidad de Misiones de 10 a # segun las creadas por el admin
+	Barranquilla
+		Historias
+			El Caiman
+				Misiones 1 ... Mision # segun las creadas por el admin
+				Rutas FAcil Cantidad de Misiones 5 a 7
+				Ruta Medium Cantidad de Misiones 8 a 10
+				Ruta Dificil Cantidad de Misiones de 10 a # segun las creadas por el admin
+				en el modulo de rutas se pueden elegir las misiones de manera global que van a tener las rutas a generar
+			Viva el Carnaval
+				Misiones 1 ... Mision # segun las creadas por el admin
+				Rutas FAcil Cantidad de Misiones 5 a 7
+				Ruta Medium Cantidad de Misiones 8 a 10
+				Ruta Dificil Cantidad de Misiones de 10 a # segun las creadas por el admin
+	Sincelejo
+		Historias 
+			20 de Enero
+				Misiones 1 ... Mision # segun las creadas por el admin
+				Rutas FAcil Cantidad de Misiones 5 a 7
+				Ruta Medium Cantidad de Misiones 8 a 10
+				Ruta Dificil Cantidad de Misiones de 10 a # segun las creadas por el admin
+			
+	
+	Menu - Jugadores
+		Datos de Jugador
+			Nombre Completo*
+			Numero de Celular*
+			Correo Electronico*
+			Historias Jugadas
+			CODIGO QR DE JUGADOR HASH UNICO POR JUGADOR
+			CODIGO QR DE EQUIPO HASH UNICO POR EQUIPO 
+			Tiene Equipo: Si No Cual equipo Tambien aqui se podra crear el equipo en este momento podra escanear el codigo de Jugador Con quien podra jugar la informacion del juego se compartira a todos los jugadore del equipo y asi solo usaran un solo dispositivo para jugar.
+			Ciudad Actual: La Ciudad donde se encuentre el Jugador en el momento Podra Leer la informacion del GPS Directamente del dispositivo de registro.
+			Ciudad donde Deseas Jugar: Lista de Seleccion de Ciudades Disponibles y Juegos disponibles.
+			Clasificacion General (Se Validara segun los puntos y tiempo de Ejecucion de cada mision se calculara un promedio y este sera el dato de clasificacion y se le asignara un Avatar segun los que estan programados en el sistema backend.
+			Foto de Perfil:
+			Redes Sociales (Conectar con Facebook, Instagram, Whatsapp, Tik Tok)
+			Para poder Jugar debe estar el Registro con La informacion Completa y verificada. en algunos casos se preguntara por alergias o algun tipo de reaccion a sustos y temas delicados.
+			Seleccionar Historia a Jugar
+			Validacion de Seguridad. Cuestionario de Preguntas de Seguridad e integridad.
+			CODIGO DE ACCESO AL JUEGO se envia al correo, Para poder abrir la app mobile y poder jugar Este Codigo se Generar maximo 24 horas antes del juego o si la fecha y hora de juego es el mismo dia se actuvara de manera inmediata este codigo la app solo lo validara cuando el juego solo se activa en un lapso de 15Minutos antes o despues de la hora es decir Ej: Si el jugador decide jugar a las 6:00 pm Podra ingresar el codigo de 5:46 pm a 6:15 pm y solo asi podra jugar
+			
+		Equipos
+			Nombre de Equipos
+			Ciudad de Juegos
+			Historias Jugadas
+			Puntajes Global
+			CODIGO QR DE EQUIPO HASH UNICO POR EQUIPO Este Al ser leido por la app del jugador permitira adicionarse al equipo o no segun su validacion personal.
+			Puntaje por Misiones
+			Historias pendientes por jugar
+			AVATAR de EQUIPO
+				
+
+	JUGADOR
+		Solo
+			Selecciona Ruta Segun Dificultad Se Genera al Azar las Misiones asignadas a esta Historia Segun la dificultad Manteniendo la primera y ultima fija en la ruta. El Jugador Decide La fecha y hora de juego al terminar este proceso se le enviara al jugador un correo con la informacion y codigo de ingreso a la aplicacion y asi poder iniciar el juego, el juego solo se activa en un lapso de 15Minutos antes o despues de la hora es decir Ej: Si el jugador decide jugar a las 6:00 pm Podra ingresar el codigo de 5:46 pm a 6:15 pm y solo asi podra jugar
+		Esquipos
+			Selecciona Ruta Segun Dificultad Medium y Dificil Se Genera al Azar las Misiones asignadas a esta Historia Segun la dificultad Manteniendo la primera y ultima fija en la ruta. El Jugador Decide La fecha y hora de juego al terminar este proceso se le enviara al jugador un correo con la informacion y codigo de ingreso a la aplicacion y asi poder iniciar el juego el juego solo se activa en un lapso de 15Minutos antes o despues de la hora es decir Ej: Si el jugador decide jugar a las 6:00 pm Podra ingresar el codigo de 5:46 pm a 6:15 pm y solo asi podra jugar
+			
+			
+	Menu - Juegos Activos
+		Juego #
+			Misiones
+				Sin Completar
+				Completadas
+				Ayudas En Misiones Usadas
+				Tiempo x Mision
+				Tiempo Global
+				Puntaje
+				

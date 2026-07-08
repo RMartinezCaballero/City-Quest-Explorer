@@ -101,9 +101,37 @@ export interface GameSession {
   score: number;
   hintsUsed?: number;
   errors?: number;
+  accessCode?: string | null;
+  scheduledStartAt?: string | null;
   team?: Team;
   route?: { id: string; name: string };
   city?: { id: string; name: string };
+  missions?: GameSessionMission[];
+}
+
+export interface GameSessionMission {
+  id: string;
+  sessionId: string;
+  missionId: string;
+  title: string;
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+  hintsUsed: number;
+  startedAt?: string;
+  finishedAt?: string;
+  timeMs?: number;
+}
+
+export interface GameAccessCodePayload {
+  sessionId: string;
+  code: string;
+  validFrom: string;
+  validUntil: string;
+  gameStartsAt?: string | null;
+}
+
+export interface GameSessionDetail extends GameSession {
+  checkpoints?: Checkpoint[];
+  events?: Array<{ id: string; eventType: string; occurredAt: string }>;
 }
 
 export interface Ranking {
@@ -113,6 +141,7 @@ export interface Ranking {
   score: number;
   position: number;
   team?: Team;
+  route?: { id: string; name: string };
 }
 
 export interface Game {
