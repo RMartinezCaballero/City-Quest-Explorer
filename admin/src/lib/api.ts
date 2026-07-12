@@ -180,6 +180,11 @@ export interface Mission {
   orderIndex: number;
   difficulty: number;
   isLastMission: boolean;
+  cityId?: string | null;
+  cityName?: string | null;
+  routeName?: string | null;
+  mediaUrl?: string | null;
+  checkpointMediaUrl?: string | null;
   checkpoint?: Checkpoint | null;
   challenges?: Challenge[];
 }
@@ -406,16 +411,14 @@ export const storiesApi = {
 export const missionsApi = {
   listByRoute: (routeId: string) => fetchApi<Mission[]>(`/routes/${routeId}/missions`),
   get: (missionId: string) => fetchApi<Mission>(`/missions/${missionId}`),
-  create: (routeId: string, data: { title: string; narrative?: string | null; description?: string | null; difficulty?: number; orderIndex: number }) =>
+  create: (routeId: string, data: { title: string; narrative?: string | null; description?: string | null; difficulty?: number; orderIndex: number; mediaUrl?: string | null; checkpointMediaUrl?: string | null }) =>
     fetchApi<Mission>(`/routes/${routeId}/missions`, {
       method: "POST", body: JSON.stringify(data),
     }),
-  update: (routeId: string, missionId: string, data: { title?: string; narrative?: string | null; description?: string | null; difficulty?: number; orderIndex?: number }) =>
+  update: (routeId: string, missionId: string, data: { title?: string; narrative?: string | null; description?: string | null; difficulty?: number; orderIndex?: number; mediaUrl?: string | null; checkpointMediaUrl?: string | null }) =>
     fetchApi<Mission>(`/routes/${routeId}/missions/${missionId}`, { method: "PATCH", body: JSON.stringify(data) }),
-  remove: (routeId: string, missionId: string) =>
-    fetchApi<void>(`/routes/${routeId}/missions/${missionId}`, { method: "DELETE" }),
-  reorder: (routeId: string, missionIds: string[]) =>
-    fetchApi<Mission[]>(`/routes/${routeId}/missions/reorder`, { method: "POST", body: JSON.stringify({ missionIds }) }),
+  remove: (missionId: string) => fetchApi<void>(`/missions/${missionId}`, { method: "DELETE" }),
+  reorder: (routeId: string, missionIds: string[]) => fetchApi<Mission[]>(`/routes/${routeId}/missions/reorder`, { method: "POST", body: JSON.stringify({ missionIds }) }),
 };
 
 // ── Challenges ──
@@ -424,7 +427,7 @@ export const challengesApi = {
   get: (challengeId: string) => fetchApi<Challenge>(`/challenges/${challengeId}`),
 };
 
-// ── Old Game Sessions (backward compat) ──
+// ── Old Game Sessions (backward compat) ─-
 export const gamesApi = {
   getSession: (sessionId: string) =>
     fetchApi<GameSession>(`/games/sessions/${sessionId}`),

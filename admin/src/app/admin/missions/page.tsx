@@ -39,6 +39,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Search, MapPin, Filter, Plus, Edit3, Trash2 } from "lucide-react";
 import CitySelect from "@/components/city-select";
 import { missionsApi, routesApi, citiesApi, type Mission, type City, type Route } from "@/lib/api";
+import { uploadMedia } from "@/lib/supabase";
 
 const difficultyLabels: Record<number, string> = {
   1: "Muy Fácil", 3: "Fácil", 5: "Media", 7: "Difícil", 9: "Muy Difícil",
@@ -64,16 +65,22 @@ export default function MissionsPage() {
   const [createCityId, setCreateCityId] = useState("");
   const [createRouteId, setCreateRouteId] = useState("");
   const [availableRoutes, setAvailableRoutes] = useState<Route[]>([]);
-  const [createForm, setCreateForm] = useState({
+  const [createForm, setCreateForm] = useState<{
+    title: string; narrative: string; description: string; difficulty: number; orderIndex: number; mediaUrl: string | null;
+  }>({
     title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1, mediaUrl: "",
   });
+  const [createFile, setCreateFile] = useState<File | null>(null);
   const [creating, setCreating] = useState(false);
 
   // Edit dialog
   const [openEdit, setOpenEdit] = useState(false);
-  const [editForm, setEditForm] = useState({
+  const [editForm, setEditForm] = useState<{
+    id: string; routeId: string; title: string; narrative: string; description: string; difficulty: number; orderIndex: number; mediaUrl: string | null;
+  }>({
     id: "", routeId: "", title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1, mediaUrl: "",
   });
+  const [editFile, setEditFile] = useState<File | null>(null);
 
   async function loadAllMissions() {
     setLoading(true);
@@ -133,16 +140,22 @@ export default function MissionsPage() {
     if (!createRouteId || !createForm.title) return;
     setCreating(true);
     try {
+      let mediaUrl = createForm.mediaUrl || null;
+      if (createFile) {
+        mediaUrl = await uploadMedia(createFile, "missions");
+        setCreateForm((p) => ({ ...p, mediaUrl }));
+      }
       await missionsApi.create(createRouteId, {
         title: createForm.title,
         narrative: createForm.narrative || null,
         description: createForm.description || null,
         difficulty: Number(createForm.difficulty),
         orderIndex: Number(createForm.orderIndex),
-        mediaUrl: createForm.mediaUrl || null,
+        mediaUrl,
       });
       setOpenCreate(false);
       setCreateForm({ title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1, mediaUrl: "" });
+      setCreateFile(null);
       setCreateCityId("");
       setCreateRouteId("");
       await loadAllMissions();
@@ -171,14 +184,21 @@ export default function MissionsPage() {
   async function handleEdit() {
     if (!editForm.title) return;
     try {
+      let mediaUrl = editForm.mediaUrl || null;
+      if (editFile) {
+        mediaUrl = await uploadMedia(editFile, "missions");
+        setEditForm((p) => ({ ...p, mediaUrl }));
+      }
       await missionsApi.update(editForm.routeId, editForm.id, {
         title: editForm.title,
         narrative: editForm.narrative || null,
         description: editForm.description || null,
         difficulty: Number(editForm.difficulty),
         orderIndex: Number(editForm.orderIndex),
+        mediaUrl,
       });
       setOpenEdit(false);
+      setEditFile(null);
       await loadAllMissions();
     } catch (e) {
       console.error("Error updating mission:", e);
@@ -191,7 +211,7 @@ export default function MissionsPage() {
     if (!mission) return;
     if (!confirm(`¿Eliminar misión "${title}"? Esta acción no se puede deshacer.`)) return;
     try {
-      await missionsApi.remove(mission.routeId, missionId);
+      await missionsApi.remove(missionId);
       await loadAllMissions();
     } catch (e) {
       console.error("Error deleting mission:", e);
@@ -261,7 +281,19 @@ export default function MissionsPage() {
               </div>
               <div className="grid gap-2">
                 <label>URL de media (imagen/video)</label>
-                <Input value={createForm.mediaUrl} onChange={(e) => setCreateForm(p => ({ ...p, mediaUrl: e.target.value }))} placeholder="https://... o ruta local" />
+                <Input value={createForm.mediaUrl || ""} onChange={(e) => setCreateForm(p => ({ ...p, mediaUrl: e.target.value }))} placeholder="https://... o ruta local" />
+              </div>
+              <div className="grid gap-2">
+                <label>Subir media</label>
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  className="text-sm"
+                  onChange={(e) => setCreateFile(e.target.files?.[0] || null)}
+                />
+                {createFile && (
+                  <p className="text-xs text-muted-foreground">{createFile.name}</p>
+                )}
               </div>
             </div>
             <DialogFooter>
@@ -388,7 +420,19 @@ export default function MissionsPage() {
               </div>
               <div className="grid gap-2">
                 <label>URL de media (imagen/video)</label>
-                <Input value={editForm.mediaUrl} onChange={(e) => setEditForm(p => ({ ...p, mediaUrl: e.target.value }))} placeholder="https://... o ruta local" />
+                <Input value={editForm.mediaUrl || ""} onChange={(e) => setEditForm(p => ({ ...p, mediaUrl: e.target.value }))} placeholder="https://... o ruta local" />
+              </div>
+              <div className="grid gap-2">
+                <label>Subir media</label>
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  className="text-sm"
+                  onChange={(e) => setEditFile(e.target.files?.[0] || null)}
+                />
+                {editFile && (
+                  <p className="text-xs text-muted-foreground">{editFile.name}</p>
+                )}
               </div>
             </div>
           </div>
