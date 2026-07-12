@@ -65,14 +65,14 @@ export default function MissionsPage() {
   const [createRouteId, setCreateRouteId] = useState("");
   const [availableRoutes, setAvailableRoutes] = useState<Route[]>([]);
   const [createForm, setCreateForm] = useState({
-    title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1,
+    title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1, mediaUrl: "",
   });
   const [creating, setCreating] = useState(false);
 
   // Edit dialog
   const [openEdit, setOpenEdit] = useState(false);
   const [editForm, setEditForm] = useState({
-    id: "", routeId: "", title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1,
+    id: "", routeId: "", title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1, mediaUrl: "",
   });
 
   async function loadAllMissions() {
@@ -139,9 +139,10 @@ export default function MissionsPage() {
         description: createForm.description || null,
         difficulty: Number(createForm.difficulty),
         orderIndex: Number(createForm.orderIndex),
+        mediaUrl: createForm.mediaUrl || null,
       });
       setOpenCreate(false);
-      setCreateForm({ title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1 });
+      setCreateForm({ title: "", narrative: "", description: "", difficulty: 5, orderIndex: 1, mediaUrl: "" });
       setCreateCityId("");
       setCreateRouteId("");
       await loadAllMissions();
@@ -162,6 +163,7 @@ export default function MissionsPage() {
       description: mission.description || "",
       difficulty: mission.difficulty,
       orderIndex: mission.orderIndex,
+      mediaUrl: mission.mediaUrl || "",
     });
     setOpenEdit(true);
   }
@@ -256,6 +258,10 @@ export default function MissionsPage() {
                   <label>Orden</label>
                   <Input type="number" min={1} value={createForm.orderIndex} onChange={(e) => setCreateForm(p => ({ ...p, orderIndex: Number(e.target.value) }))} />
                 </div>
+              </div>
+              <div className="grid gap-2">
+                <label>URL de media (imagen/video)</label>
+                <Input value={createForm.mediaUrl} onChange={(e) => setCreateForm(p => ({ ...p, mediaUrl: e.target.value }))} placeholder="https://... o ruta local" />
               </div>
             </div>
             <DialogFooter>
@@ -379,6 +385,10 @@ export default function MissionsPage() {
               <div className="grid gap-2">
                 <label>Orden</label>
                 <Input type="number" min={1} value={editForm.orderIndex} onChange={(e) => setEditForm(p => ({ ...p, orderIndex: Number(e.target.value) }))} />
+              </div>
+              <div className="grid gap-2">
+                <label>URL de media (imagen/video)</label>
+                <Input value={editForm.mediaUrl} onChange={(e) => setEditForm(p => ({ ...p, mediaUrl: e.target.value }))} placeholder="https://... o ruta local" />
               </div>
             </div>
           </div>

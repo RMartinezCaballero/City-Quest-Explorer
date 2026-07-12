@@ -325,19 +325,29 @@ export default function RoutesPage() {
   }
 
   async function openAssignMissionsDialog(routeId: string) {
+    const route = routes.find((item) => item.id === routeId);
+    if (!route?.cityId) {
+      alert("La ruta no tiene ciudad asociada.");
+      return;
+    }
     setAssigningRouteId(routeId);
     setOpenAssignMissions(true);
     setAssignSaving(true);
     setAssignSelectedIds([]);
     try {
-      const missions = await routesApi.missions(routeId);
-      const route = routes.find((item) => item.id === routeId);
+      const cityId = route.cityId;
+      const cityMissions: Mission[] = [];
+      const cityRoutes = await routesApi.list(cityId);
+      for (const r of cityRoutes) {
+        const missions = await missionsApi.listByRoute(r.id);
+        cityMissions.push(...missions);
+      }
       const conditions = (route as Route & { conditions?: Record<string, unknown> })?.conditions || {};
       const preselected =
         Array.isArray(conditions.selectedMissionIds) && conditions.selectedMissionIds.length > 0
           ? (conditions.selectedMissionIds as string[])
-          : missions.map((m) => m.id);
-      setAssignMissions(missions);
+          : cityMissions.map((m) => m.id);
+      setAssignMissions(cityMissions);
       setAssignSelectedIds(preselected);
     } catch (e) {
       console.error("Error loading route missions:", e);

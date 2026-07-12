@@ -46,6 +46,11 @@ export class CreateMissionDto {
   @IsOptional()
   mediaUrl?: string;
 
+  @ApiPropertyOptional({ example: 'https://example.com/image.jpg' })
+  @IsString()
+  @IsOptional()
+  checkpointMediaUrl?: string;
+
   @ApiPropertyOptional({ example: false })
   @IsBoolean()
   @IsOptional()
