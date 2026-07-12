@@ -26,12 +26,14 @@ import { useAuth } from "@/components/auth-provider";
 
 const navItems = [
   { href: "/admin", icon: Home, label: "Dashboard" },
-  { href: "/admin/games-template", icon: Gamepad2, label: "Juegos" },
   { href: "/admin/cities", icon: Globe, label: "Ciudades" },
   { href: "/admin/routes", icon: Route, label: "Rutas" },
   { href: "/admin/missions", icon: BookOpen, label: "Misiones" },
+  { href: "/admin/stories", icon: BookOpen, label: "Historias" },
   { href: "/admin/players", icon: Users, label: "Jugadores" },
   { href: "/admin/teams", icon: Users, label: "Equipos" },
+  { href: "/admin/games-template", icon: Gamepad2, label: "Juegos (Plantilla)" },
+  { href: "/admin/games", icon: Gamepad2, label: "Juegos" },
   { href: "/admin/active-games", icon: Gamepad2, label: "Juegos Activos" },
   { href: "/admin/qr-codes", icon: QrCode, label: "QR Codes" },
   { href: "/admin/users", icon: Users, label: "Usuarios" },
