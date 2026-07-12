@@ -6,10 +6,12 @@
 **API deploy:** Render (`https://city-quest-explorer-api.onrender.com`)
 **DB:** Supabase (`ylyajclxleqkfdpyregz`)
 **Backend payments:** módulo implementado (`PaymentsModule`, controller, service y providers MP/Wompi)
-**Último commit:** `2134942` feat(admin/backend): session missions model, access code types, updated todo tracker
+**Último commit:** `7a9efc4` fix(admin): suspense wrapper for pago/exito and pago/fallo pages
 
 ### Lo ya verificado o cerrado
 - [x] Backend compila: `npm run build`
+- [x] Admin compila: `npm run build` verde, 21/21 páginas
+- [x] Fix build admin: `/pago/exito` y `/pago/fallo` envueltos en `Suspense`
 - [x] API health: `GET /health` ok y DB conectada
 - [x] Swagger/docs: `GET /api` 200 OK
 - [x] Endpoints públicos y rankings operativos
@@ -20,7 +22,8 @@
 - [x] Providers base para Mercado Pago y Wompi
 
 ### ⚠️ Pendiente de verificar manual
-- [ ] Preview actual de admin en Vercel tras el último push
+- [ ] Preview actual de admin en Vercel tras el push `7a9efc4`
+- [ ] Verificar `/health` backend en producción desde tu entorno
 - [ ] Verify checkout real end-to-end contra `/payments/*`
 
 ---

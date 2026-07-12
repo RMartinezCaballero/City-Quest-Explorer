@@ -122,10 +122,11 @@ export default function MissionsPage() {
     if (cityId) {
       const routes = await routesApi.list(cityId);
       setAvailableRoutes(routes);
+      setCreateRouteId((current) => (routes.some((r) => r.id === current) ? current : ""));
     } else {
       setAvailableRoutes([]);
+      setCreateRouteId("");
     }
-    setCreateRouteId("");
   }
 
   async function handleCreate() {
