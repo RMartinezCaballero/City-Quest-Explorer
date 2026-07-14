@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homenaje Tula y Roberto - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#fffbff",
+                    "inverse-primary": "#ffb4a2",
+                    "tertiary-container": "#a96428",
+                    "on-secondary-fixed": "#001f23",
+                    "primary-container": "#b9573e",
+                    "surface-variant": "#e3e2df",
+                    "surface-container-low": "#f4f4f0",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#89726c",
+                    "inverse-surface": "#2f312e",
+                    "on-primary-fixed": "#3c0800",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#2f1400",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#dbdad6",
+                    "secondary-container": "#9ff0fb",
+                    "tertiary": "#8b4c11",
+                    "on-secondary-fixed-variant": "#004f56",
+                    "secondary-fixed": "#9ff0fb",
+                    "outline-variant": "#dcc0ba",
+                    "background": "#faf9f5",
+                    "primary": "#9a4028",
+                    "surface-container-highest": "#e3e2df",
+                    "primary-fixed-dim": "#ffb4a2",
+                    "on-tertiary-fixed-variant": "#6f3800",
+                    "on-background": "#1b1c1a",
+                    "on-surface-variant": "#56423d",
+                    "tertiary-fixed-dim": "#ffb780",
+                    "on-surface": "#1b1c1a",
+                    "error": "#ba1a1a",
+                    "surface-container": "#efeeea",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e9e8e4",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#ffdbd2",
+                    "surface-bright": "#faf9f5",
+                    "on-tertiary-container": "#fffbff",
+                    "secondary-fixed-dim": "#82d3de",
+                    "secondary": "#006972",
+                    "surface": "#faf9f5",
+                    "surface-tint": "#9d422b",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#7e2b16",
+                    "tertiary-fixed": "#ffdcc4",
+                    "on-secondary-container": "#066f79"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "16px",
+                    "container-max-width": "1200px",
+                    "gutter": "24px",
+                    "stack-sm": "8px",
+                    "stack-lg": "32px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Libre Caslon Text"],
+                    "headline-md": ["Libre Caslon Text"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "display-lg-mobile": ["Libre Caslon Text"],
+                    "display-lg": ["Libre Caslon Text"],
+                    "label-bold": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .arabesque-pattern {
+            background-color: #faf9f5;
+            background-image: radial-gradient(#9a4028 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+            opacity: 0.04;
+        }
+        .grain-texture {
+            filter: contrast(150%) brightness(100%);
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+        }
+        .active-tab-indicator {
+            height: 3px;
+            background-color: #9a4028;
+            border-radius: 99px;
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed-variant">
+<!-- Top AppBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-dim shadow-sm shadow-primary/10">
+<div class="flex items-center gap-4">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim tracking-tight">Homenaje Tula y Roberto</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="pt-24 pb-32 min-h-screen relative overflow-hidden">
+<!-- Background Decoration -->
+<div class="absolute inset-0 arabesque-pattern pointer-events-none"></div>
+<div class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
+<!-- Profile Header Section -->
+<section class="flex flex-col md:flex-row items-center md:items-end gap-stack-lg mb-12">
+<div class="relative group">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg overflow-hidden relative">
+<img alt="Amira Hernandez portrait" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoEtUuYjZ8LawhuKjKbs0crDwkUiVnudTFFI1C7mhZlRpmcS-e8A9oBdi_1Gw8oDlqd2rMZ6OqneFn1VljhaUMHhKRxa2JETOk7l-zL0c5TKXfaCxF5YHL1ykrzV4J4ClndZY47KmlxFkM5L8rEJt6Aq_RNHyqnBg8_oa6fmckkagwP5ON35_ZB-s5QURjusBlHKHA-zvqY_EUBErOC3eiYAdbQrOoDTskTCnwFEGOn3jngtJYHABYShh525G0fe-z7SSNZOX7biP-"/>
+</div>
+<button class="absolute bottom-2 right-2 bg-primary text-on-primary p-2 rounded-full shadow-md active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<div class="flex-1 text-center md:text-left space-y-2">
+<div class="flex flex-col md:flex-row items-center md:items-baseline gap-4">
+<h2 class="font-headline-md text-headline-md text-on-surface">Amira Hernandez</h2>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-0.5 rounded-full font-label-bold text-caption">Master Host</span>
+</div>
+<p class="text-on-surface-variant max-w-xl font-body-lg text-body-lg">
+                        Blending the spices of my grandmother’s kitchen in Aleppo with the vibrant flavors of my home in Barranquilla. Cooking is my bridge between two worlds.
+                    </p>
+</div>
+<div class="flex gap-4">
+<button class="p-3 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-outline-variant transition-colors active:scale-95" onclick="toggleSettings(true)">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-3 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-outline-variant transition-colors active:scale-95">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</section>
+<!-- Tabs Section -->
+<section class="mb-8 border-b border-outline-variant/30 sticky top-16 bg-background/80 backdrop-blur-md z-40">
+<div class="flex gap-stack-lg overflow-x-auto no-scrollbar">
+<button class="relative pb-4 font-label-bold text-label-bold text-primary whitespace-nowrap" id="tab-saved" onclick="switchTab('saved')">
+                        Saved Recipes
+                        <div class="active-tab-indicator" id="indicator-saved"></div>
+</button>
+<button class="relative pb-4 font-label-bold text-label-bold text-on-surface-variant whitespace-nowrap" id="tab-history" onclick="switchTab('history')">
+                        My History
+                        <div class="active-tab-indicator hidden" id="indicator-history"></div>
+</button>
+</div>
+</section>
+<!-- Saved Recipes Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="content-saved">
+<!-- Recipe Card: Mote de Queso -->
+<div class="group bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10">
+<div class="h-56 relative overflow-hidden">
+<img alt="Mote de Queso" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbVTSSv4kxfD2SOCHhVzEeOSB_H7IMGSbpZLyK-3AhoFsF9ENqZqSwqsya8r_MRRG7PI5yWCur-qrOBFcgevrgwqv0cmAFXyKDovw8p9_BSBUqI7lCrsscDxZPjx1Xl4BA8SDN8Hh1qTyQGix2pqdbAuiPOdn0CHyFo5kFTfqzIDEzCqXp0qFKxx4O_oTtjf-MEVo4MOJdgsoBzM0KffzpWhcVM333DcdN6w7sp8Zj0jb1fY-kKpgLlzZY14DUrHT9aTC1SDtVBwMM"/>
+<div class="absolute top-4 right-4">
+<button class="bg-white/90 backdrop-blur-sm text-primary p-2 rounded-full shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-2 py-1 rounded text-caption font-label-bold">Colombian Classic</span>
+</div>
+</div>
+<div class="p-stack-md space-y-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Mote de Queso</h3>
+<p class="text-on-surface-variant text-body-md line-clamp-2">A soul-warming coastal yam soup featuring salty costeño cheese and aromatic local herbs.</p>
+<div class="flex items-center justify-between pt-2">
+<span class="flex items-center gap-1 text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 45 min
+                            </span>
+<span class="flex items-center gap-1 text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">person</span> Serving: 4
+                            </span>
+</div>
+</div>
+</div>
+<!-- Recipe Card: Ensalada de Berenjena Ahumada -->
+<div class="group bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10">
+<div class="h-56 relative overflow-hidden">
+<img alt="Ensalada de Berenjena Ahumada" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi2q0-KrxAMWTpqn6TUqgjEA6zOFKr6lR7JQ0obwf_PBQPM4hKB1ab69woTmVr01_6Zv7aWWGbRLQ0IZlDAGJeKzdYHyVfgzJ0FLtRgqyCCwK-cAH-eHI4laEdRiBm9kAj8NBL4UACJYe3uOnxNx9jxgRqfzwels5gEi1hStzWWu3cs_5OepHJ9bgNW3JgsxdS5ezn5lrxCF1GEJoHU4Ob1sCTGn4yvdNAcQTgks9UsBUgROvQ5HcVhCuIy6ylxXZQ1MsTeft_ACLD"/>
+<div class="absolute top-4 right-4">
+<button class="bg-white/90 backdrop-blur-sm text-primary p-2 rounded-full shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-2 py-1 rounded text-caption font-label-bold">Levant-Fusion</span>
+</div>
+</div>
+<div class="p-stack-md space-y-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ensalada de Berenjena Ahumada</h3>
+<p class="text-on-surface-variant text-body-md line-clamp-2">Smoky, charred eggplant blended with tahini and finished with fresh pomegranate and local herbs.</p>
+<div class="flex items-center justify-between pt-2">
+<span class="flex items-center gap-1 text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 30 min
+                            </span>
+<span class="flex items-center gap-1 text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">person</span> Serving: 2
+                            </span>
+</div>
+</div>
+</div>
+<!-- Recipe Card: Arepas de Anis -->
+<div class="group bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10">
+<div class="h-56 relative overflow-hidden">
+<img alt="Arepas de Anis" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbr3GDGhy_xau-8mciXcUqzVF7HyyjF_9xcTV9pWC7JKJjb_ny_zPt3f8H1BtgKa2zOxLRdau_FUSU1XjOPcZsf9YhGLM3mx10qZ01aNthLUqhhszqysV_90tZ7668IY9dG3yRuMXd7R5WrrljOQo0R5b0J9DU28FnyrVuqOwUlb7Kwg1zrYuTrb3btxN8QR1e2H5akCYlxXTuL_1RFMKQBQJdOvPTT3CabhyRkpbsKJ4t_m9xy3FRQYhaotGomLBlqgxEJh3Ihwqm"/>
+<div class="absolute top-4 right-4">
+<button class="bg-white/90 backdrop-blur-sm text-primary p-2 rounded-full shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+</div>
+<div class="p-stack-md space-y-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Arepas de Anis y Panela</h3>
+<p class="text-on-surface-variant text-body-md line-clamp-2">Sweet corn arepas flavored with star anise and unrefined cane sugar, a traditional breakfast staple.</p>
+<div class="flex items-center justify-between pt-2">
+<span class="flex items-center gap-1 text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 25 min
+                            </span>
+<span class="flex items-center gap-1 text-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">bolt</span> Easy
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- History List -->
+<div class="hidden space-y-4" id="content-history">
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-4">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Hummus thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBPCs8LiUhN9-h1ktI0-HC4aSarsMeeylu8lfD4UQpDVkG03folQ4Kg1g0mvgWlcNX_ZMfMl-g979cerdxq_fs_STTtB9ySNWOgauyAeTX8HtFLwEDVHsxPnywS6gQ0Jdbp2ZyPGKzTpWd0NzsFR6bWYeQaHwUfgM523-m98knb1TKDTwE4qiIeCfg0wy7Xpujb3PxuQtCWJ0j4Rg80Y09FKW5PbcBCVy2dRgqBy8AUBe6ycgNTa7aSnmWEwY_ulBZO4YB2XIKo7ck"/>
+</div>
+<div class="flex-1">
+<h4 class="font-label-bold text-label-bold text-on-surface">Classic Hummus with Za'atar</h4>
+<p class="text-caption text-on-surface-variant">Cooked on Oct 24, 2023</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-4">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Sancocho thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQj8pRGYr3t1C27q6GHHSX7ZdXxjEHxYaG6c07CgmscCbvCsR3zGaUKwg7bdAG-gPFgYTjmlLSYmAUM2pV3Cxv588ePFqgMJKijZvIxzgV6AsvYbL9XO1sxnxrZ66lvlYgy_dx5veKP10cP4ZbynBJ6dPrRUAhtAC8ClRUFPrKGC3eckLew6rM13cWo5EpnnAdKV-5xU6W3phiRKvTszBV6My8YSx_v9Wezy0weTLeSQ8jMva4otN8U6S1I4MLuoYVgbnes0cm05z-"/>
+</div>
+<div class="flex-1">
+<h4 class="font-label-bold text-label-bold text-on-surface">Sancocho Trifásico</h4>
+<p class="text-caption text-on-surface-variant">Cooked on Oct 18, 2023</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-4">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+<img alt="Kibbeh thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNt_EqeYLeT45jqJyc1hwH0PRhFZ4s9vi-6Y7PVq0rQ12uYmPwEqZAP-jl3F27PzUD0KzEc3Ou4VfFGdLD_BCykew4u8kdXovC2xVAZft3Ody0lnDhpyG-iWdFtGv3y_2kKX10MHXpucb78RQiYsxU1DQo8GAf-eDJmraYQHTnSzYH3_dax6aGmYwoZx6QXfKaVGVDVnFEpgGQzwQcf4naYMmamo_CYPmykcigonpl5_jEzbjSmPKkJJlhdv1QTnW32N8pr2nCpclM"/>
+</div>
+<div class="flex-1">
+<h4 class="font-label-bold text-label-bold text-on-surface">Baked Kibbeh</h4>
+<p class="text-caption text-on-surface-variant">Cooked on Oct 12, 2023</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface dark:bg-surface-container shadow-[0_-4px_12px_rgba(185,87,62,0.08)] rounded-t-xl md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-bold text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-bold text-[10px]">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-bold text-[10px]">Favorites</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-bold text-[10px]">Profile</span>
+</a>
+</nav>
+<!-- Desktop Sidebar/Overlay for Settings -->
+<div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="settings-overlay">
+<div class="absolute right-0 top-0 h-full w-full max-w-sm bg-surface shadow-2xl p-margin-desktop transform translate-x-full transition-transform duration-300">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Settings</h3>
+<button class="text-on-surface-variant" onclick="toggleSettings(false)">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<ul class="space-y-6">
+<li class="flex items-center gap-4 p-2 hover:bg-surface-container-high rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+<span class="font-body-md text-body-md">Account Information</span>
+</li>
+<li class="flex items-center gap-4 p-2 hover:bg-surface-container-high rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-primary">restaurant_menu</span>
+<span class="font-body-md text-body-md">Dietary Preferences</span>
+</li>
+<li class="flex items-center gap-4 p-2 hover:bg-surface-container-high rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+<span class="font-body-md text-body-md">Notifications</span>
+</li>
+<li class="flex flex-col gap-2 p-2 rounded-lg">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">language</span>
+<span class="font-body-md text-body-md">Language</span>
+</div>
+<div class="mt-2 pl-10">
+<select class="w-full bg-surface-container-low border-outline-variant rounded-lg font-body-md py-2 px-3 focus:ring-primary focus:border-primary">
+<option selected="" value="en">English</option>
+<option value="es">Español</option>
+<option value="ar">العربية (Arabic)</option>
+</select>
+</div>
+</li>
+<li class="pt-8 mt-8 border-t border-outline-variant/30">
+<button class="w-full py-3 bg-primary text-on-primary rounded-lg font-label-bold shadow-md active:scale-95 transition-transform">
+                        Logout
+                    </button>
+</li>
+</ul>
+</div>
+</div>
+<script>
+        function switchTab(tab) {
+            const savedBtn = document.getElementById('tab-saved');
+            const historyBtn = document.getElementById('tab-history');
+            const savedContent = document.getElementById('content-saved');
+            const historyContent = document.getElementById('content-history');
+            const savedIndicator = document.getElementById('indicator-saved');
+            const historyIndicator = document.getElementById('indicator-history');
+
+            if (tab === 'saved') {
+                savedBtn.classList.add('text-primary');
+                savedBtn.classList.remove('text-on-surface-variant');
+                historyBtn.classList.remove('text-primary');
+                historyBtn.classList.add('text-on-surface-variant');
+                
+                savedContent.classList.remove('hidden');
+                historyContent.classList.add('hidden');
+                
+                savedIndicator.classList.remove('hidden');
+                historyIndicator.classList.add('hidden');
+            } else {
+                historyBtn.classList.add('text-primary');
+                historyBtn.classList.remove('text-on-surface-variant');
+                savedBtn.classList.remove('text-primary');
+                savedBtn.classList.add('text-on-surface-variant');
+                
+                historyContent.classList.remove('hidden');
+                savedContent.classList.add('hidden');
+                
+                historyIndicator.classList.remove('hidden');
+                savedIndicator.classList.add('hidden');
+            }
+        }
+
+        // Settings Toggle Logic
+        const settingsOverlay = document.getElementById('settings-overlay');
+        const settingsPanel = settingsOverlay.querySelector('div');
+
+        function toggleSettings(show) {
+            if (show) {
+                settingsOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    settingsOverlay.classList.add('opacity-100');
+                    settingsOverlay.classList.remove('pointer-events-none');
+                    settingsPanel.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                settingsOverlay.classList.remove('opacity-100');
+                settingsOverlay.classList.add('pointer-events-none');
+                settingsPanel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    settingsOverlay.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Close on backdrop click
+        settingsOverlay.onclick = (e) => {
+            if (e.target === settingsOverlay) toggleSettings(false);
+        };
+    </script>
+</body></html>

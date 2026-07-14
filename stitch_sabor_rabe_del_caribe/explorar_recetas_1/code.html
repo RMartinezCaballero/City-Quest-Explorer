@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Tierra y Canela - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#fffbff",
+                    "inverse-primary": "#ffb4a2",
+                    "tertiary-container": "#a96428",
+                    "on-secondary-fixed": "#001f23",
+                    "primary-container": "#b9573e",
+                    "surface-variant": "#e3e2df",
+                    "surface-container-low": "#f4f4f0",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#89726c",
+                    "inverse-surface": "#2f312e",
+                    "on-primary-fixed": "#3c0800",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#2f1400",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#dbdad6",
+                    "secondary-container": "#9ff0fb",
+                    "tertiary": "#8b4c11",
+                    "on-secondary-fixed-variant": "#004f56",
+                    "secondary-fixed": "#9ff0fb",
+                    "outline-variant": "#dcc0ba",
+                    "background": "#faf9f5",
+                    "primary": "#9a4028",
+                    "surface-container-highest": "#e3e2df",
+                    "primary-fixed-dim": "#ffb4a2",
+                    "on-tertiary-fixed-variant": "#6f3800",
+                    "on-background": "#1b1c1a",
+                    "on-surface-variant": "#56423d",
+                    "tertiary-fixed-dim": "#ffb780",
+                    "on-surface": "#1b1c1a",
+                    "error": "#ba1a1a",
+                    "surface-container": "#efeeea",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e9e8e4",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#ffdbd2",
+                    "surface-bright": "#faf9f5",
+                    "on-tertiary-container": "#fffbff",
+                    "secondary-fixed-dim": "#82d3de",
+                    "secondary": "#006972",
+                    "surface": "#faf9f5",
+                    "surface-tint": "#9d422b",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#7e2b16",
+                    "tertiary-fixed": "#ffdcc4",
+                    "on-secondary-container": "#066f79"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "16px",
+                    "container-max-width": "1200px",
+                    "gutter": "24px",
+                    "stack-sm": "8px",
+                    "stack-lg": "32px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Libre Caslon Text"],
+                    "headline-md": ["Libre Caslon Text"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "display-lg-mobile": ["Libre Caslon Text"],
+                    "display-lg": ["Libre Caslon Text"],
+                    "label-bold": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        height: 0px;
+        display: none;
+      }
+      .bg-pattern {
+        background-color: #faf9f5;
+        background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+        background-repeat: repeat;
+      }
+      .arabesque-overlay {
+        mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        opacity: 0.05;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen pb-24 md:pb-0 md:pt-16 bg-pattern">
+<!-- Top Navigation (Shell) -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-dim shadow-sm shadow-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95">menu</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim tracking-tight">Tierra y Canela</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95">notifications</button>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop pt-24 space-y-stack-lg">
+<!-- Greeting & Intro -->
+<section class="space-y-2">
+<p class="font-label-bold text-label-bold text-tertiary uppercase tracking-widest">Bienvenido a casa</p>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Good Morning, Chef.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Discover the fusion of coastal Colombian spice and Levantine tradition in your kitchen today.</p>
+</section>
+<!-- Category Selector -->
+<section class="relative">
+<div class="flex overflow-x-auto gap-4 custom-scrollbar pb-2">
+<button class="flex-shrink-0 px-6 py-3 rounded-full bg-primary-container text-on-primary-container font-label-bold text-label-bold shadow-sm transition-transform active:scale-95">All Recipes</button>
+<button class="flex-shrink-0 px-6 py-3 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant font-label-bold text-label-bold hover:bg-secondary-container/20 transition-all active:scale-95">Frituras</button>
+<button class="flex-shrink-0 px-6 py-3 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant font-label-bold text-label-bold hover:bg-secondary-container/20 transition-all active:scale-95">Arroces</button>
+<button class="flex-shrink-0 px-6 py-3 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant font-label-bold text-label-bold hover:bg-secondary-container/20 transition-all active:scale-95">Kibbeh</button>
+<button class="flex-shrink-0 px-6 py-3 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant font-label-bold text-label-bold hover:bg-secondary-container/20 transition-all active:scale-95">Dulces</button>
+</div>
+</section>
+<!-- Featured Recipe (Hero Card) -->
+<section>
+<div class="relative group overflow-hidden rounded-xl bg-surface-container shadow-lg shadow-primary/5 cursor-pointer">
+<div class="flex flex-col md:flex-row min-h-[400px]">
+<!-- Image Side -->
+<div class="w-full md:w-3/5 h-64 md:h-auto overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A top-down, beautifully styled close-up of Arroz de Almendras con Carne Desmechada. The rice is golden with toasted almond slivers, and the shredded beef is richly seasoned with a deep mahogany color. Garnished with fresh coriander and served in a traditional hand-crafted terracotta bowl on a textured cream linen tablecloth. Soft morning sunlight filters through a window, creating warm highlights and a cozy, inviting kitchen atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu87IRwxgNjonSr4qwXbjvPXeA5Ct5tBEMnFu_QjNg2PkZGhpxqFM2fc3dvOPCeUCUJb3YdLNWoEUxOo6x0RvGm24Pnb2UFO9kubKcinrPDsdw3Rkw_VWM7xuwZxyM3YNr5U2v9lMDMO52A0XXxelg2l0nKLPxQRp1BjRGjbqkd53pNcNnng0wm6bFbnP2oRbjXVE3jacGqeqOlpnQCC0x69JMPmy1ujXV4sCgm38K88uB-lb_GUndwE8D36SmxRcIwlW4A33PurDn"/>
+</div>
+<!-- Content Side -->
+<div class="w-full md:w-2/5 p-8 flex flex-col justify-center space-y-4">
+<div class="flex items-center gap-2 text-secondary font-label-bold text-label-bold uppercase">
+<span class="material-symbols-outlined text-[18px]">star</span>
+                            Recipe of the Day
+                        </div>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Arroz de Almendras con Carne desmechada</h3>
+<div class="flex items-center gap-4 text-on-surface-variant font-caption text-caption">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 45 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">group</span> 4 Servings</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">A heartwarming fusion where Caribbean slow-cooked beef meets the fragrant, nutty richness of Lebanese-style almond rice. Truly the soul of Tierra y Canela.</p>
+<div class="pt-4">
+<button class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-lg font-label-bold text-label-bold shadow-md hover:shadow-lg transition-all active:scale-95">
+                                View Recipe
+                                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Recipes Bento-ish Grid -->
+<section class="space-y-stack-md">
+<div class="flex justify-between items-end">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Recent Traditions</h4>
+<a class="font-label-bold text-label-bold text-primary hover:underline transition-all" href="#">Explore all</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Large Card (Bento Item) -->
+<div class="md:col-span-8 group relative overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-low hover:shadow-xl transition-all">
+<div class="aspect-[16/9] md:aspect-auto md:h-full flex flex-col">
+<img class="w-full h-full object-cover" data-alt="A gourmet platter of Kibbeh Nayyeh beautifully plated with swirls of extra virgin olive oil, fresh mint leaves, and vibrant radishes. The setting is a rustic Mediterranean patio in the afternoon sun. Warm earthy tones dominate the scene, reflecting a sense of ancient heritage and culinary craftsmanship. High-end food photography with deep bokeh." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_6-PQs36OBQt4l9etNVDoxJ0tIpdoPMlPLbuoNc4137-h5P44dqVms06P3fM-h1hCF1ah5rR1TJWteVykfha7Z2nkcFvZ-OTCREwJi5loL9lODLMXW140OBFc3WRpztsaVdNVeQbwQh1rH9UmpK5DA1-B4ThRUL3e6iHvtkqkkxi2w8WDKpwI199OCpA6_3HMY-mbvfoKG4QUMsi8RW1MVhME_D3ZmIjkLZ54McbiEuVFj8EaxTWA0Sw2BkNh1zuvGaCArwtz3NGX"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent flex flex-col justify-end p-6">
+<span class="text-secondary-fixed bg-on-secondary-fixed-variant/80 backdrop-blur-md px-3 py-1 rounded-full w-fit text-[10px] font-bold uppercase mb-2">Heritage Recipe</span>
+<h5 class="text-white font-headline-sm text-headline-sm">Authentic Kibbeh Nayyeh</h5>
+<p class="text-white/80 font-caption text-caption">15 min Prep • Levant Tradition</p>
+</div>
+</div>
+</div>
+<!-- Vertical Card (Bento Item) -->
+<div class="md:col-span-4 group flex flex-col rounded-xl border border-outline-variant/30 bg-surface shadow-sm hover:shadow-md transition-all overflow-hidden">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Golden-brown Frituras de Maiz (corn fritters) piled high in a woven Caribbean basket. The lighting is warm and bright, emphasizing the crunchy texture. A small bowl of spicy suero dip sits beside the basket. Authentic Colombian coastal aesthetic with vibrant, sun-drenched colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnCqcAtLILk_8vhSecHha9MINdkTDR783g0foGR_sjm52c68du5B3cXd_w41DOrwf1gGQU45FB9iOsc5NYqDonis6KUkFz44ODDgtdCXOWxrOLv7gEhllZtbf9x-37m9xKachJ-AAfG-ACfZ4OWVf6HMyDfTOuB-xfwLo9wlRwctZi2ZqI3BGS9OsDCmv4eok88NxraPAX6ZONVZrEjbQQ4vSe1BKEOau4AbpOn77GRkjwM935xEbd4GRH4bLQrrPI72CVW7cl4B8Q"/>
+</div>
+<div class="p-4 space-y-2">
+<h5 class="font-headline-sm text-headline-sm text-on-surface">Frituras de Maíz</h5>
+<p class="font-body-md text-body-md text-on-surface-variant">The crunchy, golden secret of the Cartagena coast.</p>
+<div class="flex items-center gap-2 pt-2">
+<span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-md text-[10px] font-bold uppercase">Spicy</span>
+<span class="px-2 py-0.5 bg-secondary-fixed text-on-secondary-fixed-variant rounded-md text-[10px] font-bold uppercase">Snack</span>
+</div>
+</div>
+</div>
+<!-- Row of smaller cards -->
+<div class="md:col-span-4 group flex flex-col rounded-xl border border-outline-variant/30 bg-surface shadow-sm hover:shadow-md transition-all overflow-hidden">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A close up of traditional Lebanese Dulces like Baklava and Maamoul, arranged on a brass tray. Dustings of pistachio and rose petals add color. Luxurious, warm lighting with a focus on textures of flaky pastry and nutty fillings. Rich terracotta and golden tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAymOnoJfCvBeQaX45iiy6TF2H24qNwg1C_pTXRKjqR2W9YrcI-8Pw-d983371JVGReRokf-b19CfCHTOZ_kDXJMfIbs8wDlO0vm1oY0AG_zo5z9CLsjOcdbz8UYleWB20_gyxyymv_S8zNbGyTkocjyNJBuUMvdbRoZCZBc-hsA23vDSjfmnZ66AbvaUngSp_RtjluAtjevwlVmCSKDbNNQqeitxaUAd4a-pxCsLCqucqynuNL2DwR0XAldtklm08A3JXeP4ZArZ9c"/>
+</div>
+<div class="p-4">
+<h5 class="font-headline-sm text-headline-sm text-on-surface">Rose Baklava</h5>
+<p class="font-caption text-caption text-on-surface-variant">Sweet Levant Memories</p>
+</div>
+</div>
+<div class="md:col-span-4 group flex flex-col rounded-xl border border-outline-variant/30 bg-surface shadow-sm hover:shadow-md transition-all overflow-hidden">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A steaming pot of Sancocho de Pescado, a traditional Colombian fish soup. Coconut milk makes the broth creamy. Garnished with cilantro and served with a side of white rice and avocado. Bright, natural lighting, fresh and vibrant kitchen setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0uVxdJKxhHC-BzSMtvV0j1ympuqaWms-WY4sxqqHMw5ac1_04OL3TUZlvbpUJRh_BK2jVmHpUyJQ6gywON9zCKaI8jkdREtyUbyx-p0N5OfNl2cbzls5da7gFbXQGisF2WHcXd4c5jRPgkplbnM5QKi2rUNl6I_khw3VoyQZqxfYdtmzSd9S37BbY1VgDw61KfqTMJwWbmayYg3d1dyRBfHbcxqiSUk80di0XnVrb3L9qTHX34cGqXBHUWVolHLxxkAyxkj1OZIqn"/>
+</div>
+<div class="p-4">
+<h5 class="font-headline-sm text-headline-sm text-on-surface">Sancocho del Mar</h5>
+<p class="font-caption text-caption text-on-surface-variant">Caribbean Soul Food</p>
+</div>
+</div>
+<div class="md:col-span-4 group flex flex-col rounded-xl border border-outline-variant/30 bg-surface shadow-sm hover:shadow-md transition-all overflow-hidden">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Lebanese Tabbouleh salad with vibrant green parsley, red tomatoes, and cracked wheat. Drizzled with lemon and oil. Fresh, crisp, and high-contrast colors under bright daylight. Minimalist ceramic bowl." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvbozV8Ytc6_W3CJHiPIv4xK_pq3z9hTggmEYrwi-Zqj_k-t9j5rMLoF4x5DrtmuwX1_SzbR4M1178YX10H08AmEj_yTLPbb8lq6Ey-I_ZrMsjzGKziBdHgrbF3eJl4UW_linniFgps8EOtmmJQLSw6eEPn1rhH2tZ337cDvpi8CtR1XZL5j_XSIljLoihXcbd1xzBM8A6LD0MEwcRx6hGx6MovwyhPZdZBM0i2cnlPjkiemGwU5qSLe5NclNveY8A53d1ktcQwUwd"/>
+</div>
+<div class="p-4">
+<h5 class="font-headline-sm text-headline-sm text-on-surface">Fresh Tabbouleh</h5>
+<p class="font-caption text-caption text-on-surface-variant">The Zest of Life</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter / Community Section -->
+<section class="rounded-2xl bg-on-secondary-container p-8 md:p-12 text-on-primary-container relative overflow-hidden">
+<div class="absolute right-0 top-0 w-64 h-64 opacity-10 -mr-20 -mt-20">
+<svg class="w-full h-full fill-current" viewbox="0 0 100 100">
+<path d="M50 0 L100 50 L50 100 L0 50 Z"></path>
+</svg>
+</div>
+<div class="relative z-10 max-w-xl space-y-4">
+<h3 class="font-headline-md text-headline-md">Join Our Kitchen Table</h3>
+<p class="font-body-lg text-body-lg text-secondary-fixed-dim">Receive weekly stories of heritage and secret family recipes from our matriarchs across the globe.</p>
+<form class="flex flex-col sm:flex-row gap-4 pt-2">
+<input class="flex-grow px-4 py-3 rounded-lg bg-surface-container-lowest border-none focus:ring-2 focus:ring-secondary text-on-surface placeholder:text-outline" placeholder="your@email.com" type="email"/>
+<button class="px-8 py-3 bg-secondary text-on-secondary font-label-bold text-label-bold rounded-lg shadow-lg hover:bg-on-secondary-container transition-all active:scale-95">Subscribe</button>
+</form>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface dark:bg-surface-container shadow-[0_-4px_12px_rgba(185,87,62,0.08)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 transition-all duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-bold text-label-bold text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary transition-all duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-bold text-label-bold text-[10px]">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary transition-all duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-bold text-label-bold text-[10px]">Favorites</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary transition-all duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-bold text-label-bold text-[10px]">Profile</span>
+</a>
+</nav>
+<!-- Floating Action Button (Contextual for Home) -->
+<button class="fixed bottom-24 right-6 md:bottom-12 md:right-12 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40">
+<span class="material-symbols-outlined">add</span>
+</button>
+<script>
+        // Micro-interaction for scroll reveals
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-8');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-8');
+                observer.observe(section);
+            });
+        });
+
+        // Horizontal scroll categories helper
+        const scrollContainer = document.querySelector('.overflow-x-auto');
+        if (scrollContainer) {
+            scrollContainer.addEventListener('wheel', (evt) => {
+                evt.preventDefault();
+                scrollContainer.scrollLeft += evt.deltaY;
+            });
+        }
+    </script>
+</body></html>

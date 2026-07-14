@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tierra y Canela - Search &amp; Discover</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Style Guidance Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-error": "#ffffff",
+                "on-primary-container": "#fffbff",
+                "inverse-primary": "#ffb4a2",
+                "tertiary-container": "#a96428",
+                "on-secondary-fixed": "#001f23",
+                "primary-container": "#b9573e",
+                "surface-variant": "#e3e2df",
+                "surface-container-low": "#f4f4f0",
+                "surface-container-lowest": "#ffffff",
+                "outline": "#89726c",
+                "inverse-surface": "#2f312e",
+                "on-primary-fixed": "#3c0800",
+                "inverse-on-surface": "#f2f1ed",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed": "#2f1400",
+                "error-container": "#ffdad6",
+                "surface-dim": "#dbdad6",
+                "secondary-container": "#9ff0fb",
+                "tertiary": "#8b4c11",
+                "on-secondary-fixed-variant": "#004f56",
+                "secondary-fixed": "#9ff0fb",
+                "outline-variant": "#dcc0ba",
+                "background": "#faf9f5",
+                "primary": "#9a4028",
+                "surface-container-highest": "#e3e2df",
+                "primary-fixed-dim": "#ffb4a2",
+                "on-tertiary-fixed-variant": "#6f3800",
+                "on-background": "#1b1c1a",
+                "on-surface-variant": "#56423d",
+                "tertiary-fixed-dim": "#ffb780",
+                "on-surface": "#1b1c1a",
+                "error": "#ba1a1a",
+                "surface-container": "#efeeea",
+                "on-secondary": "#ffffff",
+                "surface-container-high": "#e9e8e4",
+                "on-tertiary": "#ffffff",
+                "primary-fixed": "#ffdbd2",
+                "surface-bright": "#faf9f5",
+                "on-tertiary-container": "#fffbff",
+                "secondary-fixed-dim": "#82d3de",
+                "secondary": "#006972",
+                "surface": "#faf9f5",
+                "surface-tint": "#9d422b",
+                "on-error-container": "#93000a",
+                "on-primary-fixed-variant": "#7e2b16",
+                "tertiary-fixed": "#ffdcc4",
+                "on-secondary-container": "#066f79"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "unit": "8px",
+                "margin-desktop": "40px",
+                "margin-mobile": "16px",
+                "container-max-width": "1200px",
+                "gutter": "24px",
+                "stack-sm": "8px",
+                "stack-lg": "32px",
+                "stack-md": "16px"
+            },
+            "fontFamily": {
+                "headline-sm": ["Libre Caslon Text"],
+                "headline-md": ["Libre Caslon Text"],
+                "caption": ["Plus Jakarta Sans"],
+                "body-lg": ["Plus Jakarta Sans"],
+                "body-md": ["Plus Jakarta Sans"],
+                "display-lg-mobile": ["Libre Caslon Text"],
+                "display-lg": ["Libre Caslon Text"],
+                "label-bold": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                "caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "display-lg-mobile": ["36px", {"lineHeight": "42px", "fontWeight": "700"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #faf9f5;
+            background-image: radial-gradient(#9a402808 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface shadow-sm shadow-primary/10">
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Tierra y Canela</h1>
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="pt-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+<!-- Search Section -->
+<section class="mt-stack-lg mb-stack-lg">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl transition-all shadow-sm outline-none font-body-lg text-body-lg" placeholder="Search recipes, ingredients..." type="text"/>
+</div>
+</section>
+<!-- Popular Tags (Horizontal Scroll) -->
+<section class="mb-stack-lg">
+<h3 class="font-label-bold text-label-bold text-on-surface-variant uppercase mb-stack-sm tracking-widest">Popular Searches</h3>
+<div class="flex gap-stack-sm overflow-x-auto no-scrollbar pb-2">
+<button class="whitespace-nowrap px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full font-label-bold text-label-bold hover:opacity-90 transition-opacity">Ajiaco</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-bold text-label-bold hover:bg-surface-variant transition-colors">Hummus</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-bold text-label-bold hover:bg-surface-variant transition-colors">Empanadas</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-bold text-label-bold hover:bg-surface-variant transition-colors">Kibbeh</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-bold text-label-bold hover:bg-surface-variant transition-colors">Arepas</button>
+</div>
+</section>
+<!-- Filter Sidebar & Results Grid Layout -->
+<div class="flex flex-col lg:flex-row gap-gutter">
+<!-- Filter Sidebar -->
+<aside class="w-full lg:w-64 space-y-stack-lg">
+<div class="p-6 bg-surface-container-low rounded-xl border border-outline-variant/30">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Filters</h2>
+<button class="text-primary font-label-bold text-label-bold hover:underline">Clear all</button>
+</div>
+<!-- Filter Group: Time -->
+<div class="mb-8">
+<p class="font-label-bold text-label-bold text-primary mb-4">Time</p>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-body-md group-hover:text-primary transition-colors">Under 15 mins</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-body-md group-hover:text-primary transition-colors">15 - 45 mins</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-body-md group-hover:text-primary transition-colors">Over 45 mins</span>
+</label>
+</div>
+</div>
+<!-- Filter Group: Difficulty -->
+<div class="mb-8">
+<p class="font-label-bold text-label-bold text-primary mb-4">Difficulty</p>
+<div class="grid grid-cols-2 gap-2">
+<button class="px-3 py-2 border border-outline-variant rounded-lg text-body-md hover:bg-primary-container hover:text-on-primary-container transition-all">Easy</button>
+<button class="px-3 py-2 bg-primary text-on-primary rounded-lg text-body-md shadow-sm">Medium</button>
+<button class="px-3 py-2 border border-outline-variant rounded-lg text-body-md hover:bg-primary-container hover:text-on-primary-container transition-all col-span-2">Pro Chef</button>
+</div>
+</div>
+<!-- Filter Group: Main Ingredient -->
+<div>
+<p class="font-label-bold text-label-bold text-primary mb-4">Main Ingredient</p>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="border-outline-variant text-primary focus:ring-primary" name="ingredient" type="radio"/>
+<span class="text-body-md group-hover:text-primary transition-colors">Beef</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="border-outline-variant text-primary focus:ring-primary" name="ingredient" type="radio"/>
+<span class="text-body-md group-hover:text-primary transition-colors">Fish</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="border-outline-variant text-primary focus:ring-primary" name="ingredient" type="radio"/>
+<span class="text-body-md group-hover:text-primary transition-colors">Vegetable</span>
+</label>
+</div>
+</div>
+</div>
+</aside>
+<!-- Results Grid -->
+<div class="flex-1">
+<div class="flex justify-between items-center mb-6">
+<p class="text-on-surface-variant font-body-md">Showing <span class="font-label-bold text-on-surface">12 results</span> for <span class="italic">"Vegetarian Dinner"</span></p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">sort</span>
+<select class="bg-transparent border-none focus:ring-0 text-label-bold cursor-pointer">
+<option>Relevance</option>
+<option>Newest</option>
+<option>Popularity</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Recipe Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer border border-outline-variant/10">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A lush and vibrant dish of Colombian Patacones topped with fresh Mediterranean-style pico de gallo and crumbled feta cheese. The lighting is warm and golden, reminiscent of a sunset in Cartagena. The camera angle is a close-up top-down view, highlighting the crisp texture of the fried plantains and the juicy colors of the tomatoes and onions. High-end food photography with deep contrast and rich textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzRd6OqQHeZDwZROi0XuojrXmkPRt6-CpWTLws9fowxp36HBCVkGvdKZOOHCt5FTxTV4Om9IV1hiVP4x8JmjYxdGHXToBSXn6u3RuA1ACYwYqMPASougsVzJzAUHCxDmHrXPs6BHTL4V0Ym9GENdx3IoK_fBFbzpOVEPBfp9P2kNFPgsi9OVWKVEdSNYNif9SveCZw0qgKkymLdTQQgILntYf7dg1j3NYnYpxQh4yJHHz3esaQhTbs14q4mqZhQ_FKHDUUMFeet97A"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</div>
+<div class="absolute bottom-2 left-2 flex gap-1">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Vegan</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-2 line-clamp-1">Spiced Patacones with Feta</h4>
+<div class="flex items-center gap-3 text-on-surface-variant text-caption">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>25 mins</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">equalizer</span>
+<span>Medium</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer border border-outline-variant/10">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A beautifully presented bowl of creamy Lebanese Hummus swirled with high-quality olive oil and topped with roasted Colombian coffee-infused chickpeas. The setting is a rustic kitchen table with linen textures and warm terracotta accents. Soft morning light filters through a window, creating long, elegant shadows. The visual style is organic and tactile, emphasizing the smoothness of the hummus against the crunch of the chickpeas." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKOGPSKOBbn4qsYm4IAbQtWu1N9G0F6eoGDG4S4AdY_rLUuZiBdq8F8jrH9xjKO-vXucMFR8MmLI3EAhtT0LygNwmXkOr7qDguxKV9Ox6fGBILJE6ZsfwdxkdpEM3Af_Ml3tvs6SjSdXiQgtAu7Iu98kFd1fBPvBnTLGuN3ZwdrBBVFr5thmJBaYiov9WOkEt_kkIYd6sh1iwylLUnnZuSnk2pMePUPhYQ18CH-h9N-WP5-4g9LWt4RfXMXWJrk_XtavquCed-VAbl"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-2 line-clamp-1">Mocha-Roasted Hummus</h4>
+<div class="flex items-center gap-3 text-on-surface-variant text-caption">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>15 mins</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">equalizer</span>
+<span>Easy</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer border border-outline-variant/10">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Stuffed grape leaves arranged in a circular pattern on a traditional Colombian ceramic plate. The grape leaves are glistening with lemon and oil, filled with a rich rice and herb mixture. The background features a subtle geometric Arabic pattern. The lighting is bright and airy, typical of a modern light-mode design. The colors are dominated by earthy greens, deep terracotta, and creamy white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAD-wmbfD_63xMCdC0W6U3pPyDnMxDbVL7zs6K1dHUnRyZ4578F8xlVGXYpfxfQIMlVpAu1vL9HCNVe672kSUT2DFilazTRhvEq21s7wDBmF4T07Bgo5e4qbzQ9V-m1J7QjO_-atpyDAxNMXL-5Duc9vfg0HvdkLK0OKzFoSfaIZSne_8a_PCju7aHdHERniMoM44lEx9-u14DemuC8h-TmsttHZl_jbFWNn17UxgEyFTpG20Wxp_YqUpm32yC05-8ebnvc8VYdJfJE"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-2 line-clamp-1">Cilantro Dolmas</h4>
+<div class="flex items-center gap-3 text-on-surface-variant text-caption">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>50 mins</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">equalizer</span>
+<span>Hard</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer border border-outline-variant/10">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A modern interpretation of Falafel, shaped into small squares and served with a zesty Colombian Hogao sauce on the side. The scene is set in a minimalist studio with clean lines and soft ambient lighting. The palette is dominated by warm ochre, deep turquoise, and neutral suero cream. The mood is sophisticated and culinary-forward, showcasing a fusion of Middle Eastern and South American traditions." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVlH6hIHVl2iX-TJmnb1K35KDNKDsYifrWdd6GTc3-TrIjdm4tVeo1MD4p9_Roky8VN4WfWdcbNp4M_soo_NXPF5qNsdawJwofdB1rzYCQEoY_8H5eUAk-wUB_nAPW7mFe7WnvJrHxsGbxMenuC6UPvjcfgBi1r5Q8wTABthb-_DzmKquVeuvraiqdyEMEOe1LY1ldM03D-JBKAZvsYJBhUFtbIjff34yeYE4_k-KooaMGa1jWIEo54x8_Fy_Dhgfj1C-yhcFzi3zU"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-2 line-clamp-1">Crispy Falafel Squares with Hogao</h4>
+<div class="flex items-center gap-3 text-on-surface-variant text-caption">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>35 mins</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">equalizer</span>
+<span>Medium</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 5 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer border border-outline-variant/10">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A vibrant salad featuring roasted pumpkin, pomegranate seeds, and toasted pumpkin seeds, served in a handcrafted wooden bowl. The aesthetic is organic and warm, reflecting the 'Global Matriarch' brand personality. Sunlight dapples the scene, highlighting the textures of the seeds and the soft flesh of the pumpkin. The color palette is rich with terracotta and saffron tones, grounded by neutral backgrounds." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeF8wmPfgTjZdvWY-C9JhBHxvkpXVO4cyg1-d5UDkRti_Wuyqg1QSY80gftPoY1W5FyGZpTC76tilwuNa0mP3eK8so9qnoxckGAJ1sbtAVgNxniZo9YkxXJdFXG5vYfHV84dA0538YlVbfkZNL8k6L5ZFirvYMmpFMK4SHt5B7jcT6GKgFNHPgaVlu9sB_l1ncCWLWIEma4Pf4oqvyu-h4W4VRiMINe3HntxpC4s68ExLR2I3g6FCnjYFjh4ysk4SNpi6qrfm_G_mF"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-2 line-clamp-1">Roasted Squash &amp; Pomegranate</h4>
+<div class="flex items-center gap-3 text-on-surface-variant text-caption">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>40 mins</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">equalizer</span>
+<span>Easy</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 6 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer border border-outline-variant/10">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Traditional Lebanese Tabbouleh salad with a Colombian twist, incorporating finely diced mango and toasted quinoa instead of bulgur. The dish is presented on a minimalist white plate with a splash of deep turquoise on the rim. The lighting is clean and professional, focusing on the vivid green of the parsley and the golden hue of the mango. High-key light-mode aesthetic with sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeuJDadaulXU3dwZI7aamgW7dF66Umxt5ivNxDcb9WSMNbSUUayAKOvCaya3zFmY6cPGlQxO6lRkbeG683DWkymPsmsYXaRK354mS8q9K6lmbVIuAZfU2dPgIZyi_Gh4a6cZpwJhbAISmriLdknIpGRoHRlEF2PBFZPpp4bh_NTPav_5i3jA_6R12Xmi6ZorMDyT-W0r9SNkNVk3X_6yr8TF-4pvOy8Kv8w7RjDwJzgkFkkKIVotbqivRzArOJ18pajxsTmf3YZgan"/>
+<div class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full text-primary hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-2 line-clamp-1">Mango Quinoa Tabbouleh</h4>
+<div class="flex items-center gap-3 text-on-surface-variant text-caption">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>20 mins</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">equalizer</span>
+<span>Easy</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-12 flex justify-center items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-label-bold text-label-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-high transition-colors font-label-bold text-label-bold">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-high transition-colors font-label-bold text-label-bold">3</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface shadow-[0_-4px_12px_rgba(185,87,62,0.08)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-bold text-label-bold mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-bold text-label-bold mt-1">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-bold text-label-bold mt-1">Favorites</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-bold text-label-bold mt-1">Profile</span>
+</a>
+</nav>
+<!-- Micro-interaction Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+            inputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const label = this.closest('label');
+                    if(this.checked) {
+                        label.style.transform = 'scale(1.02)';
+                        setTimeout(() => label.style.transform = 'scale(1)', 150);
+                    }
+                });
+            });
+
+            // Active State Logic: Search is already highlighted in the nav above.
+        });
+    </script>
+</body></html>
