@@ -10,6 +10,11 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
+const category_entity_1 = require("./entities/category.entity");
+const content_entity_1 = require("./entities/content.entity");
+const categories_module_1 = require("./modules/categories/categories.module");
+const content_module_1 = require("./modules/content/content.module");
+const seed_module_1 = require("./modules/seed/seed.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -20,10 +25,13 @@ exports.AppModule = AppModule = __decorate([
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'sqlite',
                 database: process.env.DB_PATH || './data/dev.sqlite',
-                entities: [],
+                entities: [category_entity_1.Category, content_entity_1.Content],
                 synchronize: true,
                 logging: false,
             }),
+            categories_module_1.CategoriesModule,
+            content_module_1.ContentModule,
+            seed_module_1.SeedModule,
         ],
     })
 ], AppModule);

@@ -1,0 +1,22 @@
+<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="700" height="400" fill="#FFF8EC"/>
+
+  <!-- patrón de azulejo árabe simplificado, esquina -->
+  <g opacity="0.9">
+    <rect x="40" y="40" width="60" height="60" fill="none" stroke="#0E6E6E" stroke-width="3"/>
+    <path d="M40 70 L70 40 L100 70 L70 100 Z" fill="#0E6E6E"/>
+    <rect x="100" y="40" width="60" height="60" fill="none" stroke="#C1440E" stroke-width="3"/>
+    <path d="M100 70 L130 40 L160 70 L130 100 Z" fill="#C1440E"/>
+    <rect x="40" y="100" width="60" height="60" fill="none" stroke="#C1440E" stroke-width="3"/>
+    <path d="M40 130 L70 100 L100 130 L70 160 Z" fill="#C1440E"/>
+    <rect x="100" y="100" width="60" height="60" fill="none" stroke="#0E6E6E" stroke-width="3"/>
+    <path d="M100 130 L130 100 L160 130 L130 160 Z" fill="#0E6E6E"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="230" y="230" font-family="Georgia, serif" font-size="88" fill="#5A2E1B" font-weight="bold" letter-spacing="3">LEGADO</text>
+
+  <line x1="230" y1="270" x2="630" y2="270" stroke="#E8B84B" stroke-width="3"/>
+  <text x="230" y="300" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#5A2E1B" letter-spacing="2.5">RECETAS DE LA COSTA · ALMA ÁRABE</text>
+  <text x="230" y="325" font-family="Georgia, serif" font-size="14" fill="#C1440E" font-style="italic">narrado por Abuela Tula &amp; Tío Roberto</text>
+</svg>
